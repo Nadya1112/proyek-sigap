@@ -4,13 +4,14 @@
 
 @section('content')
     <!-- 🔹 HEADER HERO -->
-    <header class="relative h-screen bg-cover bg-center parallax overflow-hidden" style="background-image: url('{{ asset('img/perumahan.jpg') }}');">
+    <header class="relative h-screen bg-cover bg-center parallax overflow-hidden"
+        style="background-image: url('{{ asset('img/perumahan.jpg') }}');">
         <!-- Animated background overlay -->
         <div class="hero-overlay"></div>
-        
+
         <!-- Floating elements -->
         <div class="floating-elements"></div>
-        
+
         <!-- Animated particles -->
         <div class="absolute inset-0 overflow-hidden">
             <div class="particle particle-1"></div>
@@ -18,23 +19,28 @@
             <div class="particle particle-3"></div>
         </div>
 
-        <div class="relative z-10 container mx-auto h-full flex flex-col md:flex-row items-center justify-center md:justify-between px-6">
+        <div
+            class="relative z-10 container mx-auto h-full flex flex-col md:flex-row items-center justify-center md:justify-between px-6">
 
             <!-- Text Content -->
             <div class="text-white max-w-2xl animate-slide-up">
-                <p class="mb-4 text-lg opacity-90 animate-fade-in text-shadow" style="animation-delay: 0.2s;">Selamat Datang di</p>
-                
-                <h1 class="text-5xl md:text-7xl font-bold mb-4 leading-tight animate-fade-in text-shadow" style="animation-delay: 0.4s;">
+                <p class="mb-4 text-lg opacity-90 animate-fade-in text-shadow" style="animation-delay: 0.2s;">Selamat Datang
+                    di</p>
+
+                <h1 class="text-5xl md:text-7xl font-bold mb-4 leading-tight animate-fade-in text-shadow"
+                    style="animation-delay: 0.4s;">
                     <span class="block">SIGAP</span>
                     <span class="hero-title-gradient text-6xl md:text-8xl">KOMPLEK</span>
                 </h1>
-                
+
                 <p class="italic text-xl mb-6 opacity-90 animate-fade-in text-shadow" style="animation-delay: 0.6s;">
                     ( Sinergi Gerak Aksi PSU Komplek Perumahan )
                 </p>
-                
-                <p class="text-lg leading-relaxed mb-8 opacity-90 animate-fade-in max-w-lg text-shadow" style="animation-delay: 0.8s;">
-                    Melayani Penanganan PSU (Prasarana, Sarana, dan Utilitas Umum) Perumahan Kota Banjarmasin dengan teknologi terdepan dan pelayanan terbaik.
+
+                <p class="text-lg leading-relaxed mb-8 opacity-90 animate-fade-in max-w-lg text-shadow"
+                    style="animation-delay: 0.8s;">
+                    Melayani Penanganan PSU (Prasarana, Sarana, dan Utilitas Umum) Perumahan Kota Banjarmasin dengan
+                    teknologi terdepan dan pelayanan terbaik.
                 </p>
 
                 <!-- CTA Buttons -->
@@ -43,7 +49,7 @@
                         <span class="relative z-10">Jelajahi Fitur</span>
                         <div class="cta-primary-hover"></div>
                     </a>
-                    
+
                     <a href="{{ route('kontak') }}" class="cta-secondary">
                         Pelajari Lebih Lanjut
                     </a>
@@ -55,13 +61,13 @@
                 <div class="hero-logo-container">
                     <!-- Glowing background -->
                     <div class="hero-logo-glow"></div>
-                    
+
                     <!-- Main logo container -->
                     <div class="hero-logo-main">
                         <img src="{{ asset('img/logo-sigap.png') }}" alt="logo sigap"
-                             class="w-48 md:w-64 h-auto object-contain filter drop-shadow-lg">
+                            class="w-48 md:w-64 h-auto object-contain filter drop-shadow-lg">
                     </div>
-                    
+
                     <!-- Decorative rings -->
                     <div class="hero-logo-ring-1"></div>
                     <div class="hero-logo-ring-2"></div>
@@ -104,27 +110,32 @@
                     <div class="feature-card">
                         <!-- Background pattern -->
                         <div class="feature-card-bg feature-card-bg-yellow"></div>
-                        
+
                         <!-- Icon -->
                         <div class="relative z-10">
                             <div class="feature-icon icon-yellow">
                                 <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                    </path>
                                 </svg>
                             </div>
-                            
+
                             <h3 class="feature-card-title">
                                 Informasi FASUM
                             </h3>
-                            
+
                             <p class="feature-card-desc">
-                                Data tabel sertifikat FASUM yang telah & belum diserahkan dengan sistem monitoring real-time.
+                                Data tabel sertifikat FASUM yang telah & belum diserahkan dengan sistem monitoring
+                                real-time.
                             </p>
-                            
+
                             <a href="{{ route('informasi') }}" class="feature-card-btn">
                                 Lihat Detail
-                                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                                    </path>
                                 </svg>
                             </a>
                         </div>
@@ -136,27 +147,32 @@
                     <div class="feature-card">
                         <!-- Background pattern -->
                         <div class="feature-card-bg feature-card-bg-blue"></div>
-                        
+
                         <!-- Icon -->
                         <div class="relative z-10">
                             <div class="feature-icon icon-blue">
                                 <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                                    </path>
                                 </svg>
                             </div>
-                            
+
                             <h3 class="feature-card-title">
                                 E-Proposal PSU
                             </h3>
-                            
+
                             <p class="feature-card-desc">
-                                Platform digital untuk pengajuan proposal bantuan PSU dengan proses yang transparan dan efisien.
+                                Platform digital untuk pengajuan proposal bantuan PSU dengan proses yang transparan dan
+                                efisien.
                             </p>
-                            
+
                             <a href="{{ route('eproposal') }}" class="feature-card-btn">
                                 Ajukan Proposal
-                                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                                    </path>
                                 </svg>
                             </a>
                         </div>
@@ -168,27 +184,32 @@
                     <div class="feature-card">
                         <!-- Background pattern -->
                         <div class="feature-card-bg feature-card-bg-green"></div>
-                        
+
                         <!-- Icon -->
                         <div class="relative z-10">
                             <div class="feature-icon icon-green">
-                                <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                    </path>
                                 </svg>
                             </div>
-                            
+
                             <h3 class="feature-card-title">
                                 Pengaduan Masyarakat
                             </h3>
-                            
+
                             <p class="feature-card-desc">
                                 Layanan pengaduan masyarakat yang responsif dengan sistem tracking dan follow-up otomatis.
                             </p>
-                            
+
                             <a href="{{ route('pengaduan') }}" class="feature-card-btn">
                                 Buat Pengaduan
-                                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
                                 </svg>
                             </a>
                         </div>
@@ -244,21 +265,21 @@
 
         <div class="container mx-auto px-6 relative z-10">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                
+
                 <!-- Text Content -->
                 <div class="text-white animate-slide-up">
                     <h2 class="text-4xl md:text-5xl font-bold mb-6 text-shadow">
                         Tentang <span class="text-gradient">SIGAP KOMPLEK</span>
                     </h2>
-                    
+
                     <div class="space-y-6 text-lg leading-relaxed">
                         <p class="opacity-90 text-shadow">
-                            SIGAP KOMPLEK adalah sistem terintegrasi yang dirancang khusus untuk mengelola dan memantau 
+                            SIGAP KOMPLEK adalah sistem terintegrasi yang dirancang khusus untuk mengelola dan memantau
                             Prasarana, Sarana, dan Utilitas Umum (PSU) di kompleks perumahan Kota Banjarmasin.
                         </p>
-                        
+
                         <p class="opacity-90 text-shadow">
-                            Dengan teknologi modern dan antarmuka yang user-friendly, kami berkomitmen memberikan 
+                            Dengan teknologi modern dan antarmuka yang user-friendly, kami berkomitmen memberikan
                             pelayanan terbaik untuk masyarakat dalam pengelolaan infrastruktur perumahan.
                         </p>
                     </div>
@@ -293,7 +314,7 @@
                                     <div class="status-dot status-red"></div>
                                 </div>
                             </div>
-                            
+
                             <!-- Mock chart -->
                             <div class="dashboard-charts">
                                 <div class="chart-item">
@@ -302,14 +323,14 @@
                                         <div class="chart-progress chart-progress-green"></div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="chart-item">
                                     <span class="chart-label">Proposal Aktif</span>
                                     <div class="chart-bar">
                                         <div class="chart-progress chart-progress-blue"></div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="chart-item">
                                     <span class="chart-label">Pengaduan Selesai</span>
                                     <div class="chart-bar">
@@ -318,17 +339,21 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Floating indicators -->
                         <div class="dashboard-indicator dashboard-indicator-success">
                             <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                <path fill-rule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clip-rule="evenodd"></path>
                             </svg>
                         </div>
-                        
+
                         <div class="dashboard-indicator dashboard-indicator-star">
                             <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                                </path>
                             </svg>
                         </div>
                     </div>
@@ -358,25 +383,28 @@
 
             <!-- Benefits grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
+
                 <!-- Benefit 1 -->
                 <div class="benefit-card-wrapper group">
                     <div class="benefit-card">
                         <div class="benefit-card-bg benefit-card-bg-green"></div>
-                        
+
                         <div class="relative z-10">
                             <div class="benefit-icon benefit-icon-green">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                 </svg>
                             </div>
-                            
+
                             <h3 class="benefit-title benefit-title-green">
                                 Proses Cepat
                             </h3>
-                            
+
                             <p class="benefit-desc">
-                                Sistem otomatis yang mempercepat proses pengajuan dan persetujuan proposal PSU hingga 70% lebih cepat.
+                                Sistem otomatis yang mempercepat proses pengajuan dan persetujuan proposal PSU hingga 70%
+                                lebih cepat.
                             </p>
                         </div>
                     </div>
@@ -386,20 +414,24 @@
                 <div class="benefit-card-wrapper group">
                     <div class="benefit-card">
                         <div class="benefit-card-bg benefit-card-bg-blue"></div>
-                        
+
                         <div class="relative z-10">
                             <div class="benefit-icon benefit-icon-blue">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                                    </path>
                                 </svg>
                             </div>
-                            
+
                             <h3 class="benefit-title benefit-title-blue">
                                 Keamanan Terjamin
                             </h3>
-                            
+
                             <p class="benefit-desc">
-                                Data dan dokumen Anda terlindungi dengan sistem keamanan berlapis dan enkripsi tingkat enterprise.
+                                Data dan dokumen Anda terlindungi dengan sistem keamanan berlapis dan enkripsi tingkat
+                                enterprise.
                             </p>
                         </div>
                     </div>
@@ -409,19 +441,23 @@
                 <div class="benefit-card-wrapper group">
                     <div class="benefit-card">
                         <div class="benefit-card-bg benefit-card-bg-purple"></div>
-                        
+
                         <div class="relative z-10">
                             <div class="benefit-icon benefit-icon-purple">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                    </path>
                                 </svg>
                             </div>
-                            
+
                             <h3 class="benefit-title benefit-title-purple">
                                 Transparansi Penuh
                             </h3>
-                            
+
                             <p class="benefit-desc">
                                 Tracking real-time status pengajuan dan progress penanganan PSU untuk transparansi maksimal.
                             </p>
@@ -433,20 +469,24 @@
                 <div class="benefit-card-wrapper group">
                     <div class="benefit-card">
                         <div class="benefit-card-bg benefit-card-bg-indigo"></div>
-                        
+
                         <div class="relative z-10">
                             <div class="benefit-icon benefit-icon-indigo">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z">
+                                    </path>
                                 </svg>
                             </div>
-                            
+
                             <h3 class="benefit-title benefit-title-indigo">
                                 Mobile Friendly
                             </h3>
-                            
+
                             <p class="benefit-desc">
-                                Akses mudah dari berbagai perangkat dengan responsive design yang optimal untuk semua ukuran layar.
+                                Akses mudah dari berbagai perangkat dengan responsive design yang optimal untuk semua ukuran
+                                layar.
                             </p>
                         </div>
                     </div>
@@ -456,20 +496,24 @@
                 <div class="benefit-card-wrapper group">
                     <div class="benefit-card">
                         <div class="benefit-card-bg benefit-card-bg-red"></div>
-                        
+
                         <div class="relative z-10">
                             <div class="benefit-icon benefit-icon-red">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z">
+                                    </path>
                                 </svg>
                             </div>
-                            
+
                             <h3 class="benefit-title benefit-title-red">
                                 Support 24/7
                             </h3>
-                            
+
                             <p class="benefit-desc">
-                                Tim support yang siap membantu Anda kapan saja dengan respon time yang cepat dan solusi yang tepat.
+                                Tim support yang siap membantu Anda kapan saja dengan respon time yang cepat dan solusi yang
+                                tepat.
                             </p>
                         </div>
                     </div>
@@ -479,20 +523,24 @@
                 <div class="benefit-card-wrapper group">
                     <div class="benefit-card">
                         <div class="benefit-card-bg benefit-card-bg-teal"></div>
-                        
+
                         <div class="relative z-10">
                             <div class="benefit-icon benefit-icon-teal">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                    </path>
                                 </svg>
                             </div>
-                            
+
                             <h3 class="benefit-title benefit-title-teal">
                                 Analytics & Report
                             </h3>
-                            
+
                             <p class="benefit-desc">
-                                Dashboard analytics lengkap dengan laporan real-time untuk monitoring dan evaluasi yang lebih baik.
+                                Dashboard analytics lengkap dengan laporan real-time untuk monitoring dan evaluasi yang
+                                lebih baik.
                             </p>
                         </div>
                     </div>
@@ -514,9 +562,9 @@
             <div class="max-w-4xl mx-auto animate-fade-in">
                 <h2 class="text-4xl md:text-6xl font-bold text-white mb-6 text-shadow">
                     Siap Bergabung dengan <br>
-                    <span class="cta-highlight">SIGAP KOMPLEK</span>?
+                    <span>SIGAP KOMPLEK</span>?
                 </h2>
-                
+
                 <p class="text-xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed text-shadow">
                     Bergabunglah dengan ribuan pengguna yang sudah merasakan kemudahan layanan PSU digital terdepan
                 </p>
@@ -524,14 +572,18 @@
                 <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
                     <a href="{{ route('eproposal') }}" class="cta-btn-primary">
                         <span>Mulai Sekarang</span>
-                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                         </svg>
                     </a>
-                    
+
                     <a href="{{ route('kontak') }}" class="cta-btn-secondary">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                            </path>
                         </svg>
                         <span>Hubungi Kami</span>
                     </a>
