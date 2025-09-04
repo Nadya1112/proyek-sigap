@@ -156,7 +156,7 @@
                 @else
                     <!-- Login & Register Buttons -->
                     <div class="flex items-center gap-3">
-                        <a href="#" class="btn-gradient">
+                        <a href="" class="btn-gradient">
                             <span class="relative z-10">Masuk</span>
                             <div class="btn-gradient-hover"></div>
                         </a>
@@ -259,20 +259,9 @@
                                     </path>
                                 </svg>
                             </div>
-                            <span>info@sigapkomplek.banjarmasin.go.id</span>
+                            <span>dckp.bjm@gmail.com</span>
                         </div>
                     </div>
-                </div>
-
-                <!-- Services -->
-                <div>
-                    <h4 class="text-lg font-bold mb-6">Layanan</h4>
-                    <ul class="space-y-3">
-                        <li><a href="#" class="footer-link">Pengelolaan FASUM</a></li>
-                        <li><a href="#" class="footer-link">Bantuan PSU</a></li>
-                        <li><a href="#" class="footer-link">Konsultasi Teknis</a></li>
-                        <li><a href="#" class="footer-link">Monitoring Proyek</a></li>
-                    </ul>
                 </div>
             </div>
 

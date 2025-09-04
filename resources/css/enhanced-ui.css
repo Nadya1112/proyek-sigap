@@ -120,6 +120,8 @@
     transition: var(--transition-smooth);
     border: none;
     cursor: pointer;
+    display: inline-block;
+    text-decoration: none;
 }
 
 .btn-gradient:hover {
@@ -137,6 +139,91 @@
 
 .btn-gradient:hover .btn-gradient-hover {
     opacity: 1;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: #6B7280;
+    padding: 0.5rem 1.5rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    border: 2px solid #E5E7EB;
+    transition: var(--transition-smooth);
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    border-color: var(--sigap-yellow);
+    color: var(--sigap-yellow);
+    background: rgba(245, 158, 11, 0.05);
+    transform: scale(1.02);
+}
+
+/* Dropdown Styles */
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    color: #374151;
+    transition: var(--transition-smooth);
+    border-radius: 0.5rem;
+    margin: 0 0.5rem;
+    text-decoration: none;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.dropdown-item:hover {
+    background: #F3F4F6;
+    color: var(--sigap-yellow);
+    transform: translateX(4px);
+}
+
+.dropdown-item:hover svg {
+    color: var(--sigap-yellow);
+    transform: scale(1.1);
+}
+
+.dropdown-item svg {
+    transition: var(--transition-smooth);
+    color: #9CA3AF;
+}
+
+/* Mobile Menu Items */
+.mobile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    color: #374151;
+    transition: var(--transition-smooth);
+    border-radius: 0.5rem;
+    text-decoration: none;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.mobile-menu-item:hover {
+    background: #F3F4F6;
+    color: var(--sigap-yellow);
+}
+
+.mobile-menu-item svg {
+    transition: var(--transition-smooth);
+    color: #9CA3AF;
+}
+
+.mobile-menu-item:hover svg {
+    color: var(--sigap-yellow);
 }
 
 /* Hero Section */

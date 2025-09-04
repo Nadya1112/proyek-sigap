@@ -544,7 +544,73 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ===== ENHANCED LOADING STATES =====
+    // ===== ENHANCED USER DROPDOWN =====
+    const userDropdowns = document.querySelectorAll('[x-data]');
+    userDropdowns.forEach(dropdown => {
+        const button = dropdown.querySelector('button');
+        const menu = dropdown.querySelector('[x-show]');
+        
+        if (button && menu) {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.02)';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        }
+    });
+
+    // ===== ENHANCED LOGIN/REGISTER BUTTONS =====
+    document.querySelectorAll('.btn-gradient, .btn-secondary').forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            if (this.classList.contains('btn-gradient')) {
+                this.style.boxShadow = '0 10px 25px -3px rgba(245, 158, 11, 0.4)';
+            } else {
+                this.style.boxShadow = '0 4px 12px -2px rgba(0, 0, 0, 0.1)';
+            }
+        });
+        
+        btn.addEventListener('mouseleave', function() {
+            this.style.boxShadow = '';
+        });
+    });
+
+    // ===== NOTIFICATION BADGE ANIMATION =====
+    function addNotificationBadge(element, count) {
+        const badge = document.createElement('span');
+        badge.className = 'notification-badge';
+        badge.style.cssText = `
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 9999px;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: bounce 1s infinite;
+            z-index: 10;
+        `;
+        badge.textContent = count;
+        
+        element.style.position = 'relative';
+        element.appendChild(badge);
+    }
+
+    // Example: Add notification badge to user avatar if there are pending notifications
+    const userAvatar = document.querySelector('[x-data] button .w-8.h-8');
+    if (userAvatar && window.pendingNotifications > 0) {
+        addNotificationBadge(userAvatar, window.pendingNotifications);
+    }
+
+    // ===== ENHANCED MOBILE MENU =====
     function showLoadingSpinner(element) {
         const spinner = document.createElement('div');
         spinner.className = 'loading-spinner';

@@ -34,7 +34,7 @@
                 </h1>
 
                 <p class="italic text-xl mb-6 opacity-90 animate-fade-in text-shadow" style="animation-delay: 0.6s;">
-                    ( Sinergi Gerak Aksi PSU Komplek Perumahan )
+                    ( Sinergi Gerak Aksi Percepatan Penanganan Jalan Komplek Perumahan )
                 </p>
 
                 <p class="text-lg leading-relaxed mb-8 opacity-90 animate-fade-in max-w-lg text-shadow"
