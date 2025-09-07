@@ -1,43 +1,23 @@
 <?php
-namespace App\Filament\Resources;
-use App\Filament\Resources\UserResource\Pages;
-use App\Models\User;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class UserResource extends Resource {
-    protected static ?string $model = User::class;
-    protected static ?string $navigationIcon = 'heroicon-o-users';
-    public static function form(Form $form): Form {
-        return $form->schema([
-            Forms\Components\TextInput::make('name')->required(),
-            Forms\Components\TextInput::make('email')->email()->required()->unique(ignoreRecord: true),
-            Forms\Components\TextInput::make('kontak'),
-            Forms\Components\TextInput::make('password')->password()->required()->dehydrateStateUsing(fn ($state) => Hash::make($state))->dehydrated(fn ($state) => filled($state))->required(fn (string $context): bool => $context === 'create'),
-            Forms\Components\Select::make('role')->options(['admin' => 'Admin', 'pengguna' => 'Pengguna',])->required(),
-        ]);
+return new class extends Migration {
+    public function up(): void {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->enum('role', ['admin', 'pengguna'])->default('pengguna');
+            $table->string('kontak', 20)->nullable();
+            $table->rememberToken();
+            $table->timestamps();
+        });
     }
-    public static function table(Table $table): Table {
-        return $table->columns([
-                Tables\Columns\TextColumn::make('name')->searchable(),
-                Tables\Columns\TextColumn::make('email')->searchable(),
-                Tables\Columns\TextColumn::make('role')->badge()->color(fn (string $state): string => match ($state) {
-                    'admin' => 'danger', 'pengguna' => 'success',
-                }),
-            ])
-            ->filters([Tables\Filters\SelectFilter::make('role')->options(['admin' => 'Admin', 'pengguna' => 'Pengguna',])])
-            ->actions([Tables\Actions\EditAction::class,])
-            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::class,]),]);
+    public function down(): void {
+        Schema::dropIfExists('users');
     }
-    public static function getPages(): array {
-        return [
-            'index' => Pages\ListUsers::class,
-            'create' => Pages\CreateUser::class,
-            'edit' => Pages\EditUser::class,
-        ];
-    }
-}
+};
