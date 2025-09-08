@@ -16,7 +16,22 @@
       <a href="{{ route('kontak') }}" class="hover:text-black">Kontak</a>
     </div>
     
-    <!-- Tombol masuk -->
-    <a href="#" class="bg-sigap-yellow px-4 py-2 rounded-lg font-semibold">Masuk</a>
+    <!-- Tombol masuk / keluar -->
+    <div>
+      @auth
+        <form action="{{ route('logout') }}" method="POST">
+          @csrf
+          <button type="submit"
+                  class="bg-sigap-orange text-white px-4 py-2 rounded-lg font-semibold hover:brightness-95 transition">
+            Keluar
+          </button>
+        </form>
+      @else
+        <a href="{{ route('login') }}"
+           class="bg-sigap-orange text-white px-4 py-2 rounded-lg font-semibold hover:brightness-95 transition">
+          Masuk
+        </a>
+      @endauth
+    </div>
   </div>
 </nav>
