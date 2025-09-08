@@ -10,8 +10,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class KecamatanResource extends Resource
 {
@@ -24,8 +22,9 @@ class KecamatanResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('nama_kecamatan')
+                    ->label('Nama Kecamatan')
                     ->required()
-                    ->maxLength(255),
+                    ->unique(ignoreRecord: true),
             ]);
     }
 
@@ -34,21 +33,15 @@ class KecamatanResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nama_kecamatan')
+                    ->label('Nama Kecamatan')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

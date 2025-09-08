@@ -21,56 +21,58 @@ class PsuResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
+        return $form->schema([
+            Forms\Components\Select::make('kompleks_id')
+            ->relationship('komplek', 'nama_komplek')
+            ->searchable()
+            ->preload()
+            ->required()
+            ->label('Komplek Perumahan'),
+            Forms\Components\TextInput::make('jenis_psu')
+            ->label('Jenis PSU')
+            ->required()
+            ->maxLength(255)
+            ->placeholder('Contoh: Jalan, Saluran Drainase, Taman'),
+            Forms\Components\FileUpload::make('foto_psu')
+            ->image()
+            ->directory('foto-psu')
+            ->label('Foto PSU'),
+            Forms\Components\Fieldset::make('Detail Ukuran (Opsional)')
             ->schema([
-                Forms\Components\TextInput::make('kompleks_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('jenis_psu')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('foto_psu')
-                    ->maxLength(255),
                 Forms\Components\TextInput::make('panjang_jalan')
-                    ->numeric(),
+                ->label('Panjang Jalan')
+                ->numeric()
+                ->suffix('meter'),
                 Forms\Components\TextInput::make('lebar_jalan')
-                    ->numeric(),
-                Forms\Components\Textarea::make('keterangan')
-                    ->columnSpanFull(),
-            ]);
+                ->label('Lebar Jalan')
+                ->numeric()
+                ->suffix('meter'),
+            ])->columns(2),
+            Forms\Components\Textarea::make('keterangan')
+            ->label('Keterangan')
+            ->columnSpanFull(),
+        ]);
     }
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('kompleks_id')
-                    ->numeric()
-                    ->sortable(),
+        return $table->columns([
+                Tables\Columns\ImageColumn::make('foto_psu')
+                ->label('Foto')
+                ->circular(),
+                Tables\Columns\TextColumn::make('komplek.nama_komplek')
+                ->label('Komplek Perumahan')
+                ->sortable()
+                ->searchable(),
                 Tables\Columns\TextColumn::make('jenis_psu')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('foto_psu')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('panjang_jalan')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('lebar_jalan')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                ->searchable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

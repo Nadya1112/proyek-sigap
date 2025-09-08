@@ -21,59 +21,66 @@ class KomplekResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('kelurahan_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('nama_komplek')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('alamat')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('foto_komplek')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('jumlah_sertifikat')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                Forms\Components\TextInput::make('status_aset')
-                    ->required()
-                    ->maxLength(255),
-            ]);
+        return $form->schema([
+            Forms\Components\TextInput::make('nama_komplek')
+            ->label('Nama Komplek')
+            ->required(),
+            Forms\Components\Select::make('kelurahan_id')
+            ->relationship('kelurahan', 'nama_kelurahan')
+            ->label('Kelurahan')
+            ->searchable()
+            ->preload()
+            ->required(),
+            Forms\Components\Textarea::make('alamat')
+            ->label('Alamat')
+            ->required()
+            ->columnSpanFull(),
+            Forms\Components\FileUpload::make('foto_komplek')
+            ->label('Foto Komplek')            
+            ->image()
+            ->directory('foto-komplek'),
+            Forms\Components\TextInput::make('jumlah_sertifikat')
+            ->label('Jumlah Sertifikat')
+            ->numeric()
+            ->default(0),
+            Forms\Components\Select::make('status_aset')
+            ->label('Status Aset')
+            ->options(['Sudah Diserahkan' => 'Sudah Diserahkan', 
+            'Belum Diserahkan' => 'Belum Diserahkan', 
+            'Proses Penyerahan' => 'Proses Penyerahan',])
+            ->required(),
+        ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('kelurahan_id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\ImageColumn::make('foto_komplek')
+                ->label('Foto')
+                ->circular(),
                 Tables\Columns\TextColumn::make('nama_komplek')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('foto_komplek')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('jumlah_sertifikat')
-                    ->numeric()
-                    ->sortable(),
+                ->label('Nama Komplek')
+                ->searchable()
+                ->sortable(),
+                Tables\Columns\TextColumn::make('kelurahan.nama_kelurahan')
+                ->label('Kelurahan')
+                ->sortable(),
                 Tables\Columns\TextColumn::make('status_aset')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                ->label('Status Aset')
+                ->badge()
+                ->color(fn (string $state): string => match ($state) {
+                    'Sudah Diserahkan' => 'success', 
+                    'Belum Diserahkan' => 'danger', 
+                    'Proses Penyerahan' => 'warning',
+                }),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

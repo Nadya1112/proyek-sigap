@@ -2,16 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
-use App\Models\User;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use App\Models\User;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\UserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\UserResource\RelationManagers;
 
 class UserResource extends Resource
 {
@@ -19,51 +20,51 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\TextInput::make('password')
-                    ->password()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('role')
-                    ->required(),
-                Forms\Components\TextInput::make('kontak')
-                    ->maxLength(20),
-            ]);
+    public static function form(Form $form): Form {
+        return $form->schema([
+            Forms\Components\TextInput::make('name')
+            ->label('Nama')
+            ->required(),
+            Forms\Components\TextInput::make('email')
+            ->label('Email')
+            ->email()
+            ->required()
+            ->unique(ignoreRecord: true),
+            Forms\Components\TextInput::make('kontak')
+            ->label('Kontak'),
+            Forms\Components\TextInput::make('password')
+            ->label('Password')
+            ->password()
+            ->required()
+            ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+            ->dehydrated(fn ($state) => filled($state))
+            ->required(fn (string $context): bool => $context === 'create'),
+            Forms\Components\Select::make('role')
+            ->label('Role')
+            ->options([
+                'admin' => 'Admin', 
+                'pengguna' => 'Pengguna',
+                ])
+            ->required(),
+        ]);
     }
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->columns([
+        return $table->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                ->label('Nama')
+                ->searchable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('email_verified_at')
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('role'),
-                Tables\Columns\TextColumn::make('kontak')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                ->label('Email')
+                ->searchable(),
+                Tables\Columns\TextColumn::make('role')
+                ->label('Role')
+                ->badge()
+                ->color(fn (string $state): string => match ($state) {
+                    'admin' => 'danger', 
+                    'pengguna' => 'success',
+                }),
             ])
             ->filters([
                 //
