@@ -224,28 +224,28 @@
                     <div class="stats-number stats-yellow">
                         <span class="counter" data-target="500">0</span>
                     </div>
-                    <p class="stats-label">Komplek Terdaftar</p>
+                    <p class="stats-label">Total Pengunjung</p>
                 </div>
 
                 <div class="stats-item group">
                     <div class="stats-number stats-blue">
                         <span class="counter" data-target="100">0</span>
                     </div>
-                    <p class="stats-label">Proposal Diproses</p>
+                    <p class="stats-label">Total Pengguna</p>
                 </div>
 
                 <div class="stats-item group">
                     <div class="stats-number stats-green">
-                        24/7
+                        <span class="counter" data-target="100">0</span>
                     </div>
-                    <p class="stats-label">Layanan Online</p>
+                    <p class="stats-label">Total Proposal</p>
                 </div>
 
                 <div class="stats-item group">
                     <div class="stats-number stats-red">
                         <span class="counter" data-target="98">0</span>
                     </div>
-                    <p class="stats-label">Kepuasan Pengguna</p>
+                    <p class="stats-label">Total Pengaduan</p>
                 </div>
             </div>
         </div>
