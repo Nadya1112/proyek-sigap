@@ -1,0 +1,672 @@
+/* ===== INFORMASI PAGE ADDITIONAL STYLES ===== */
+
+/* Enhanced Select Dropdown */
+.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.25rem 1.25rem;
+    padding-right: 3rem;
+    appearance: none;
+}
+
+.form-select:focus {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23F59E0B' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+}
+
+/* Table Enhancements */
+.table-row:nth-child(even) {
+    background: rgba(249, 250, 251, 0.5);
+}
+
+.table-row:hover {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.03), rgba(249, 115, 22, 0.03)) !important;
+}
+
+/* Status Badge Animation */
+@keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.status-indicator {
+    animation: statusPulse 2s ease-in-out infinite;
+}
+
+/* Enhanced Action Buttons with Tooltips */
+.btn-detail,
+.btn-image {
+    position: relative;
+}
+
+.btn-detail::after,
+.btn-image::after {
+    content: attr(title);
+    position: absolute;
+    bottom: -2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 1000;
+}
+
+.btn-detail:hover::after,
+.btn-image:hover::after {
+    opacity: 1;
+}
+
+/* Enhanced Search Input */
+.form-input[type="text"] {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: left 1rem center;
+    background-size: 1.25rem 1.25rem;
+}
+
+/* Loading Spinner for Submit Button */
+.btn-loading {
+    position: relative;
+}
+
+.btn-loading::before {
+    content: '';
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Enhanced Modal Animations */
+.image-modal.show,
+.detail-modal.show {
+    display: flex !important;
+    animation: modalFadeIn 0.3s ease-out forwards;
+}
+
+.image-modal.hide,
+.detail-modal.hide {
+    animation: modalFadeOut 0.2s ease-in forwards;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+    to {
+        opacity: 1;
+        backdrop-filter: blur(4px);
+    }
+}
+
+@keyframes modalFadeOut {
+    from {
+        opacity: 1;
+        backdrop-filter: blur(4px);
+    }
+    to {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+}
+
+/* Enhanced Pagination */
+.pagination-nav .pagination {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 0.25rem;
+}
+
+.pagination-nav .page-item {
+    display: flex;
+}
+
+.pagination-nav .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.75rem;
+    margin: 0;
+    text-decoration: none;
+    color: #6B7280;
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    min-width: 2.5rem;
+    height: 2.5rem;
+}
+
+.pagination-nav .page-link:hover {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: var(--sigap-yellow);
+    color: var(--sigap-yellow);
+    transform: translateY(-1px);
+}
+
+.pagination-nav .page-item.active .page-link {
+    background: linear-gradient(135deg, var(--sigap-yellow), var(--sigap-orange));
+    border-color: var(--sigap-yellow);
+    color: white;
+    font-weight: 700;
+}
+
+.pagination-nav .page-item.disabled .page-link {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Enhanced Breadcrumb */
+.breadcrumb ol {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 9999px;
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: inline-flex;
+}
+
+.breadcrumb a {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.breadcrumb a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+/* Enhanced Filter Card Header */
+.card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--sigap-yellow), var(--sigap-orange));
+    border-radius: 1.5rem 1.5rem 0 0;
+}
+
+/* Enhanced Form Focus States */
+.form-group {
+    position: relative;
+}
+
+.form-label {
+    transition: all 0.2s ease;
+}
+
+.form-select:focus + .form-label,
+.form-input:focus + .form-label {
+    color: var(--sigap-yellow);
+    transform: translateY(-2px);
+}
+
+/* Enhanced Table Header */
+.table-th {
+    position: relative;
+    background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+}
+
+.table-th::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--sigap-yellow), var(--sigap-orange));
+    opacity: 0.6;
+}
+
+/* Enhanced Image Loading */
+.komplek-img {
+    background: linear-gradient(45deg, #f3f4f6 25%, transparent 25%), 
+                linear-gradient(-45deg, #f3f4f6 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #f3f4f6 75%), 
+                linear-gradient(-45deg, transparent 75%, #f3f4f6 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.komplek-img[src] {
+    background: none;
+}
+
+/* Enhanced Certificate Count */
+.certificate-count {
+    position: relative;
+}
+
+.certificate-count::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 3rem;
+    height: 3rem;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(249, 115, 22, 0.1));
+    border-radius: 50%;
+    z-index: -1;
+}
+
+/* Enhanced Status Animation */
+.status-badge {
+    position: relative;
+    overflow: hidden;
+}
+
+.status-badge::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+    transform: rotate(45deg);
+    animation: shimmer 3s infinite;
+    opacity: 0;
+}
+
+.status-badge:hover::before {
+    opacity: 1;
+}
+
+/* Enhanced Search Clear Button */
+.form-input:not(:placeholder-shown) + .search-clear {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.search-clear {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #9CA3AF;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.search-clear:hover {
+    color: #EF4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Enhanced Empty State */
+.empty-state-content {
+    animation: emptyStateFadeIn 0.6s ease-out;
+}
+
+@keyframes emptyStateFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced Action Buttons Grouping */
+.action-buttons {
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.table-row:hover .action-buttons {
+    opacity: 1;
+}
+
+/* Enhanced Row Number with Gradient */
+.row-number {
+    background: linear-gradient(135deg, var(--sigap-yellow) 0%, var(--sigap-orange) 50%, #EF4444 100%);
+    box-shadow: 0 2px 8px -2px rgba(245, 158, 11, 0.3);
+}
+
+/* Enhanced Location Info */
+.location-info {
+    position: relative;
+}
+
+.location-info::before {
+    content: '📍';
+    position: absolute;
+    left: -1.5rem;
+    top: 0;
+    font-size: 0.875rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.table-row:hover .location-info::before {
+    opacity: 1;
+}
+
+/* Enhanced Modal Content */
+.modal-content,
+.modal-content-detail {
+    animation: modalContentSlideIn 0.3s ease-out;
+}
+
+@keyframes modalContentSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Enhanced Filter Badge */
+.filter-active {
+    position: relative;
+}
+
+.filter-active::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 8px;
+    height: 8px;
+    background: #EF4444;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+/* Enhanced Results Summary */
+.results-summary {
+    position: relative;
+}
+
+.results-summary::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, var(--sigap-yellow), var(--sigap-orange));
+    border-radius: 0 2px 2px 0;
+}
+
+/* Enhanced Komplek Details Hover */
+.komplek-info:hover .komplek-name {
+    color: var(--sigap-yellow);
+}
+
+.komplek-info:hover .komplek-number {
+    background: rgba(245, 158, 11, 0.2);
+    color: #78350F;
+}
+
+/* Enhanced Table Responsive Scroll */
+.data-table-container {
+    position: relative;
+}
+
+.data-table-container::before,
+.data-table-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.data-table-container::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(255,255,255,1), rgba(255,255,255,0));
+}
+
+.data-table-container::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(255,255,255,1), rgba(255,255,255,0));
+}
+
+/* Enhanced Mobile Responsiveness */
+@media (max-width: 1024px) {
+    .komplek-info {
+        gap: 0.75rem;
+    }
+    
+    .komplek-image {
+        width: 3.5rem;
+        height: 3.5rem;
+    }
+    
+    .action-buttons {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        padding: 3rem 0;
+    }
+    
+    .search-filter-card form {
+        padding: 1.5rem;
+    }
+    
+    .table-th,
+    .table-td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .komplek-info {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    .komplek-image {
+        width: 3rem;
+        height: 3rem;
+        flex-shrink: 0;
+    }
+    
+    .status-badge {
+        font-size: 0.6rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .cert-number {
+        font-size: 1rem;
+    }
+    
+    .action-buttons {
+        flex-direction: row;
+        gap: 0.25rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .table-row {
+        display: block;
+        border: 1px solid #E5E7EB;
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+    
+    .table-th {
+        display: none;
+    }
+    
+    .table-td {
+        display: block;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #F3F4F6;
+        position: relative;
+    }
+    
+    .table-td:last-child {
+        border-bottom: none;
+    }
+    
+    .table-td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 1rem;
+        top: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6B7280;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+    
+    .table-td:first-child::before {
+        content: 'No.';
+    }
+    
+    .table-td:nth-child(2)::before {
+        content: 'Komplek';
+    }
+    
+    .table-td:nth-child(3)::before {
+        content: 'Wilayah';
+    }
+    
+    .table-td:nth-child(4)::before {
+        content: 'Status';
+    }
+    
+    .table-td:nth-child(5)::before {
+        content: 'Sertifikat';
+    }
+    
+    .table-td:nth-child(6)::before {
+        content: 'Aksi';
+    }
+    
+    .table-td {
+        padding-top: 2rem;
+        min-height: 3.5rem;
+    }
+    
+    .row-number {
+        float: right;
+        margin-top: -1.5rem;
+    }
+}
+
+/* Enhanced Print Styles */
+@media print {
+    .search-filter-card,
+    .action-buttons,
+    .pagination-wrapper,
+    .modal-backdrop,
+    .floating-circle {
+        display: none !important;
+    }
+    
+    .page-header {
+        background: none !important;
+        color: black !important;
+        padding: 1rem 0 !important;
+    }
+    
+    .page-header-title,
+    .page-header-desc {
+        color: black !important;
+        text-shadow: none !important;
+    }
+    
+    .data-table-container {
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+    }
+    
+    .table-th {
+        background: #f5f5f5 !important;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    .status-badge {
+        border: 1px solid #000 !important;
+        background: white !important;
+        color: black !important;
+    }
+}
+
+/* Enhanced Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .data-table-container,
+    .search-filter-card,
+    .results-summary,
+    .pagination-wrapper {
+        background: #1F2937 !important;
+        border-color: #374151 !important;
+        color: #F9FAFB !important;
+    }
+    
+    .table-th {
+        background: linear-gradient(135deg, #374151, #4B5563) !important;
+        color: #F9FAFB !important;
+    }
+    
+    .table-td {
+        color: #E5E7EB !important;
+        border-color: #374151 !important;
+    }
+    
+    .form-select,
+    .form-input {
+        background: #374151 !important;
+        border-color: #4B5563 !important;
+        color: #F9FAFB !important;
+    }
+    
+    .form-label {
+        color: #D1D5DB !important;
+    }
+    
+    .modal-content,
+    .modal-content-detail {
+        background: #1F2937 !important;
+        color: #F9FAFB !important;
+    }
+    
+    .modal-header {
+        background: rgba(59, 130, 246, 0.1) !important;
+        border-color: #374151 !important;
+    }
+}
