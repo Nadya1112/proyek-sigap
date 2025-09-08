@@ -5,9 +5,16 @@ use Illuminate\Database\Eloquent\Model;
 class Komplek extends Model
 {
     use HasFactory;
-    protected $table = 'kompleks';
-    protected $guarded = [];
-    public function kelurahan() {
-        return $this->belongsTo(Kelurahan::class);
-    }
+
+    protected $fillable = [
+        'nomor',
+        'nama_komplek',
+        'kelurahan_id',
+        'alamat',
+        'foto_komplek',
+        'jumlah_sertifikat',
+        'status_aset',
+    ];
+
+    public function kelurahan() { return $this->belongsTo(Kelurahan::class); }
 }
