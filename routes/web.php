@@ -12,7 +12,12 @@ use App\Http\Controllers\Auth\LoginController;
 */
 Route::view('/home', 'public.home')->name('home');
 Route::view('/fitur','public.fitur')->name('fitur');
+
 Route::get('/informasi', [FasumController::class,'index'])->name('informasi');
+// Endpoint dependent dropdown: ambil kelurahan berdasarkan kecamatan
+Route::get('/kelurahan-by-kecamatan/{kecamatan}', [FasumController::class, 'kelurahanByKecamatan'])
+    ->name('kelurahan.byKecamatan');
+
 Route::view('/sebaran-komplek','public.sebaran')->name('sebaran');
 Route::view('/kontak','public.kontak')->name('kontak');
 Route::view('/e-proposal-psu','public.eproposal')->name('eproposal');

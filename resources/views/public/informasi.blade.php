@@ -212,7 +212,7 @@
             </div>
 
             <!-- Data Table -->
-            <div class="data-container">
+            <div class="data-container mb-3">
                 <!-- Table View -->
                 <div id="tableView" class="data-table">
                     <div class="table-wrapper">
@@ -1305,20 +1305,56 @@
             }
         });
 
-        // Kecamatan-Kelurahan dependency
-        document.getElementById('kecamatan').addEventListener('change', function() {
+        // Kecamatan-Kelurahan dependency (AJAX)
+        document.getElementById('kecamatan').addEventListener('change', async function() {
             const kecamatanId = this.value;
             const kelurahanSelect = document.getElementById('kelurahan');
 
-            if (kecamatanId) {
+            // Reset dropdown kelurahan
+            kelurahanSelect.innerHTML = '<option value="">Pilih Kelurahan</option>';
+            kelurahanSelect.value = '';
+            kelurahanSelect.disabled = true;
+
+            if (!kecamatanId) return;
+
+            try {
+                // Contoh pembuatan URL dinamis dari route()
+                const url = "{{ route('kelurahan.byKecamatan', ':id') }}".replace(':id', kecamatanId);
+                const res = await fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                if (!res.ok) throw new Error('Gagal memuat data kelurahan');
+                const data = await res.json();
+
+                // Populate opsi kelurahan
+                data.forEach(k => {
+                    const opt = document.createElement('option');
+                    opt.value = k.id;
+                    opt.textContent = k.nama_kelurahan;
+                    kelurahanSelect.appendChild(opt);
+                });
+
                 kelurahanSelect.disabled = false;
-                // You can implement AJAX call here to fetch kelurahan based on kecamatan
-                // For now, we'll just enable the dropdown
-            } else {
-                kelurahanSelect.disabled = true;
-                kelurahanSelect.value = '';
+            } catch (e) {
+                console.error(e);
+                alert('Tidak bisa memuat daftar kelurahan. Coba lagi.');
             }
         });
+
+        // (opsional) Saat halaman pertama kali load, jika ada kecamatan terpilih dari query string,
+        // dropdown kelurahan sudah diload server-side via controller.
+        // Kalau mau force refresh lewat AJAX juga, bisa panggil event change:
+        @if ($request->filled('kecamatan') && $kelurahans->isEmpty())
+            document.addEventListener('DOMContentLoaded', () => {
+                const kecSel = document.getElementById('kecamatan');
+                if (kecSel.value) {
+                    const event = new Event('change');
+                    kecSel.dispatchEvent(event);
+                }
+            });
+        @endif
 
         // Search with debounce
         let searchTimeout;
