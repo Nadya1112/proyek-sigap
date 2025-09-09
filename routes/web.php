@@ -51,5 +51,5 @@ Route::post('/logout', [LoginController::class, 'logout'])
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
-    Route::view('/dashboard', 'public.dashboard')->name('dashboard'); // ganti ke view dashboard Anda
+    Route::view('/home', 'public.home')->name('home'); // ganti ke view dashboard Anda
 });

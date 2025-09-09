@@ -14,7 +14,7 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (auth()->guard($guard)->check()) {
-                return redirect()->route('dashboard'); // sudah login -> langsung ke dashboard
+                return redirect()->route('home'); // sudah login -> langsung ke dashboard
             }
         }
 
