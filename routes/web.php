@@ -10,7 +10,7 @@ use App\Http\Controllers\Auth\LoginController;
 | Public pages (tanpa login)
 |--------------------------------------------------------------------------
 */
-Route::view('/', 'public.home')->name('home');
+Route::view('/home', 'public.home')->name('home');
 Route::view('/fitur','public.fitur')->name('fitur');
 Route::get('/informasi', [FasumController::class,'index'])->name('informasi');
 Route::view('/sebaran-komplek','public.sebaran')->name('sebaran');

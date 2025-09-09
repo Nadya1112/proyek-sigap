@@ -14,53 +14,36 @@ class FasumController extends Controller
      */
     public function index(Request $request)
     {
-        // Ambil semua data kecamatan dan kelurahan untuk dropdown filter
+        // --- QUICK STATS (global, tidak terpengaruh filter) ---
+        // Pastikan nilai status di DB: 'Sudah Diserahkan', 'Proses Penyerahan', 'Belum Diserahkan'
+        $stats = Komplek::query()
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw("SUM(CASE WHEN status_aset = 'Sudah Diserahkan' THEN 1 ELSE 0 END) as sudah_diserahkan")
+            ->selectRaw("SUM(CASE WHEN status_aset = 'Proses Penyerahan' THEN 1 ELSE 0 END) as proses_penyerahan")
+            ->selectRaw("SUM(CASE WHEN status_aset = 'Belum Diserahkan' THEN 1 ELSE 0 END) as belum_diserahkan")
+            ->first();
+
+        // --- DATA PENDUKUNG FILTER (biar halaman tetap render walau Filter Section belum kita beresin) ---
         $kecamatans = Kecamatan::orderBy('nama_kecamatan')->get();
+        // sementara: tampilkan semua kelurahan (nanti tahap 2 kita perketat sesuai kecamatan)
         $kelurahans = Kelurahan::orderBy('nama_kelurahan')->get();
 
-        // Mulai query untuk mengambil data Komplek
-        $kompleksQuery = Komplek::query()
-            ->with(['kelurahan.kecamatan']) // Eager loading untuk performa
-            ->latest(); // Urutkan berdasarkan yang terbaru
+        // --- LIST DATA (sementara simple; filter kita bereskan di langkah berikut) ---
+        $kompleks = Komplek::with(['kelurahan.kecamatan'])
+            ->orderBy('nama_komplek')
+            ->paginate(10);
 
-        // Terapkan filter pencarian jika ada
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $kompleksQuery->where(function ($query) use ($search) {
-                $query->where('nama_komplek', 'like', "%{$search}%")
-                      ->orWhere('nomor', 'like', "%{$search}%");
-            });
-        }
-
-        // Terapkan filter berdasarkan Kecamatan
-        if ($request->filled('kecamatan')) {
-            $kompleksQuery->whereHas('kelurahan.kecamatan', function ($query) use ($request) {
-                $query->where('id', $request->input('kecamatan'));
-            });
-        }
-        
-        // Terapkan filter berdasarkan Kelurahan
-        if ($request->filled('kelurahan')) {
-            $kompleksQuery->whereHas('kelurahan', function ($query) use ($request) {
-                $query->where('id', $request->input('kelurahan'));
-            });
-        }
-
-        // Ambil data dengan paginasi (10 data per halaman)
-        $kompleks = $kompleksQuery->paginate(10);
-
-        // Hitung statistik untuk ringkasan di atas tabel
-        $totalKomplek = $kompleks->total();
-        $sudahDiserahkan = Komplek::where('status_aset', 'Sudah Diserahkan')->count();
-        $prosesPenyerahan = Komplek::where('status_aset', 'Proses Penyerahan')->count();
-        $belumDiserahkan = Komplek::where('status_aset', 'Belum Diserahkan')->count();
-
-        // Kirim semua data yang diperlukan ke view
         return view('public.informasi', [
-            'kompleks' => $kompleks,
-            'kecamatans' => $kecamatans,
-            'kelurahans' => $kelurahans,
-            'request' => $request, // Kirim request untuk mempertahankan nilai input
+            'request'           => $request,
+            // QUICK STATS ke Blade
+            'totalKomplek'      => (int) ($stats->total ?? 0),
+            'sudahDiserahkan'   => (int) ($stats->sudah_diserahkan ?? 0),
+            'prosesPenyerahan'  => (int) ($stats->proses_penyerahan ?? 0),
+            'belumDiserahkan'   => (int) ($stats->belum_diserahkan ?? 0),
+            // Data lain
+            'kecamatans'        => $kecamatans,
+            'kelurahans'        => $kelurahans,
+            'kompleks'          => $kompleks,
         ]);
     }
 }

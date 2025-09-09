@@ -9,16 +9,18 @@
             <div class="text-center max-w-4xl mx-auto">
                 <div class="header-badge">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
                     </svg>
                     Informasi FASUM
                 </div>
                 <h1 class="page-header-title">Data Prasarana, Sarana & Utilitas Umum</h1>
                 <p class="page-header-desc">
-                    Temukan informasi lengkap mengenai status FASUM komplek perumahan di Kota Banjarmasin. 
+                    Temukan informasi lengkap mengenai status FASUM komplek perumahan di Kota Banjarmasin.
                     Data real-time yang akurat dan terpercaya untuk kemudahan masyarakat.
                 </p>
-                
+
                 <!-- Quick Stats -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
                     <div class="quick-stat">
@@ -51,7 +53,9 @@
                 <div class="filter-header">
                     <h2 class="filter-title">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z">
+                            </path>
                         </svg>
                         Filter Data
                     </h2>
@@ -64,49 +68,63 @@
                         <div class="filter-group">
                             <label for="kecamatan" class="form-label">
                                 <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                    </path>
                                 </svg>
                                 Kecamatan
                             </label>
                             <select id="kecamatan" name="kecamatan" class="form-select">
                                 <option value="">Pilih Kecamatan</option>
                                 @foreach ($kecamatans as $kecamatan)
-                                    <option value="{{ $kecamatan->id }}" {{ $request->input('kecamatan') == $kecamatan->id ? 'selected' : '' }}>
+                                    <option value="{{ $kecamatan->id }}"
+                                        {{ $request->input('kecamatan') == $kecamatan->id ? 'selected' : '' }}>
                                         {{ $kecamatan->nama_kecamatan }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
-                        
+
                         <div class="filter-group">
                             <label for="kelurahan" class="form-label">
                                 <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                    </path>
                                 </svg>
                                 Kelurahan
                             </label>
-                            <select id="kelurahan" name="kelurahan" class="form-select" {{ !$request->input('kecamatan') ? 'disabled' : '' }}>
+                            <select id="kelurahan" name="kelurahan" class="form-select"
+                                {{ !$request->input('kecamatan') ? 'disabled' : '' }}>
                                 <option value="">Pilih Kelurahan</option>
                                 @foreach ($kelurahans as $kelurahan)
-                                    <option value="{{ $kelurahan->id }}" {{ $request->input('kelurahan') == $kelurahan->id ? 'selected' : '' }}>
+                                    <option value="{{ $kelurahan->id }}"
+                                        {{ $request->input('kelurahan') == $kelurahan->id ? 'selected' : '' }}>
                                         {{ $kelurahan->nama_kelurahan }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
-                        
+
                         <div class="filter-group">
                             <label for="status" class="form-label">
                                 <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                                 Status Aset
                             </label>
                             <select id="status" name="status" class="form-select">
                                 <option value="">Semua Status</option>
-                                <option value="Sudah Diserahkan" {{ $request->input('status') == 'Sudah Diserahkan' ? 'selected' : '' }}>Sudah Diserahkan</option>
-                                <option value="Proses Penyerahan" {{ $request->input('status') == 'Proses Penyerahan' ? 'selected' : '' }}>Proses Penyerahan</option>
-                                <option value="Belum Diserahkan" {{ $request->input('status') == 'Belum Diserahkan' ? 'selected' : '' }}>Belum Diserahkan</option>
+                                <option value="Sudah Diserahkan"
+                                    {{ $request->input('status') == 'Sudah Diserahkan' ? 'selected' : '' }}>Sudah
+                                    Diserahkan</option>
+                                <option value="Proses Penyerahan"
+                                    {{ $request->input('status') == 'Proses Penyerahan' ? 'selected' : '' }}>Proses
+                                    Penyerahan</option>
+                                <option value="Belum Diserahkan"
+                                    {{ $request->input('status') == 'Belum Diserahkan' ? 'selected' : '' }}>Belum
+                                    Diserahkan</option>
                             </select>
                         </div>
                     </div>
@@ -116,33 +134,40 @@
                         <div class="filter-group lg:col-span-2">
                             <label for="search" class="form-label">
                                 <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
                                 Cari Komplek
                             </label>
                             <div class="search-input-wrapper">
-                                <input type="text" id="search" name="search" class="form-input search-input" 
-                                       placeholder="Masukkan nama komplek atau alamat..." 
-                                       value="{{ $request->input('search') }}">
+                                <input type="text" id="search" name="search" class="form-input search-input"
+                                    placeholder="Masukkan nama komplek atau alamat..."
+                                    value="{{ $request->input('search') }}">
                                 <div class="search-icon">
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                     </svg>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="filter-actions">
                             <button type="submit" class="btn-filter-apply">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z">
+                                    </path>
                                 </svg>
                                 Terapkan Filter
                             </button>
-                            
+
                             <a href="{{ route('informasi') }}" class="btn-filter-reset">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                    </path>
                                 </svg>
                                 Reset
                             </a>
@@ -155,25 +180,31 @@
             <div class="results-info">
                 <div class="results-summary">
                     <span class="results-count">{{ $kompleks->total() }}</span> komplek ditemukan
-                    @if($request->hasAny(['kecamatan', 'kelurahan', 'status', 'search']))
+                    @if ($request->hasAny(['kecamatan', 'kelurahan', 'status', 'search']))
                         <span class="results-filtered">dengan filter aktif</span>
                     @endif
                 </div>
-                
+
                 <div class="results-actions">
                     <button id="toggleView" class="view-toggle" data-view="table">
                         <svg class="w-4 h-4 view-icon-table" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-9 8h9m-9 4h9m-9-8h9"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 10h18M3 6h18m-9 8h9m-9 4h9m-9-8h9"></path>
                         </svg>
-                        <svg class="w-4 h-4 view-icon-grid hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                        <svg class="w-4 h-4 view-icon-grid hidden" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                            </path>
                         </svg>
                         <span class="view-label">Tampilan Grid</span>
                     </button>
-                    
+
                     <button id="exportBtn" class="export-btn">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
                         </svg>
                         Export
                     </button>
@@ -196,8 +227,10 @@
                                     <th class="table-th">
                                         <div class="th-content">
                                             <span>Komplek Perumahan</span>
-                                            <svg class="sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                            <svg class="sort-icon" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
                                             </svg>
                                         </div>
                                     </th>
@@ -227,19 +260,19 @@
                                 @forelse ($kompleks as $index => $item)
                                     <tr class="table-row">
                                         <td class="table-td text-center">
-                                            <span class="row-number">{{ ($kompleks->currentPage() - 1) * $kompleks->perPage() + $index + 1 }}</span>
+                                            <span
+                                                class="row-number">{{ ($kompleks->currentPage() - 1) * $kompleks->perPage() + $index + 1 }}</span>
                                         </td>
                                         <td class="table-td">
                                             <div class="komplek-info">
                                                 <div class="komplek-image">
                                                     <img src="{{ $item->foto_komplek ? asset('storage/' . $item->foto_komplek) : asset('img/placeholder-komplek.jpg') }}"
-                                                         alt="Foto {{ $item->nama_komplek }}"
-                                                         loading="lazy">
+                                                        alt="Foto {{ $item->nama_komplek }}" loading="lazy">
                                                 </div>
                                                 <div class="komplek-details">
                                                     <h3 class="komplek-name">{{ $item->nama_komplek }}</h3>
                                                     <p class="komplek-address">{{ Str::limit($item->alamat, 50) }}</p>
-                                                    @if($item->nomor)
+                                                    @if ($item->nomor)
                                                         <span class="komplek-number">No. {{ $item->nomor }}</span>
                                                     @endif
                                                 </div>
@@ -248,21 +281,30 @@
                                         <td class="table-td">
                                             <div class="location-info">
                                                 <div class="location-item">
-                                                    <svg class="location-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"></path>
+                                                    <svg class="location-icon" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5">
+                                                        </path>
                                                     </svg>
                                                     {{ $item->kelurahan->nama_kelurahan }}
                                                 </div>
                                                 <div class="location-item">
-                                                    <svg class="location-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                                    <svg class="location-icon" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                                        </path>
                                                     </svg>
                                                     {{ $item->kelurahan->kecamatan->nama_kecamatan }}
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="table-td">
-                                            <span class="status-badge status-{{ str_replace(' ', '-', strtolower($item->status_aset)) }}">
+                                            <span
+                                                class="status-badge status-{{ str_replace(' ', '-', strtolower($item->status_aset)) }}">
                                                 <span class="status-dot"></span>
                                                 {{ $item->status_aset }}
                                             </span>
@@ -275,16 +317,29 @@
                                         </td>
                                         <td class="table-td">
                                             <div class="action-buttons">
-                                                <button class="action-btn action-btn-view" onclick="viewDetail({{ $item->id }})" title="Lihat Detail">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                <button class="action-btn action-btn-view"
+                                                    onclick="viewDetail({{ $item->id }})" title="Lihat Detail">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                        </path>
                                                     </svg>
                                                 </button>
-                                                <button class="action-btn action-btn-map" onclick="showMap({{ $item->latitude ?? 0 }}, {{ $item->longitude ?? 0 }})" title="Lihat Peta">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <button class="action-btn action-btn-map"
+                                                    onclick="showMap({{ $item->latitude ?? 0 }}, {{ $item->longitude ?? 0 }})"
+                                                    title="Lihat Peta">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                                        </path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                     </svg>
                                                 </button>
                                             </div>
@@ -296,14 +351,22 @@
                                             <div class="empty-state-content">
                                                 <div class="empty-icon">
                                                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                        </path>
                                                     </svg>
                                                 </div>
                                                 <h3 class="empty-title">Data tidak ditemukan</h3>
-                                                <p class="empty-description">Tidak ada komplek yang sesuai dengan kriteria pencarian Anda. Coba ubah filter atau kata kunci pencarian.</p>
+                                                <p class="empty-description">Tidak ada komplek yang sesuai dengan kriteria
+                                                    pencarian Anda. Coba ubah filter atau kata kunci pencarian.</p>
                                                 <a href="{{ route('informasi') }}" class="empty-action">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                                        </path>
                                                     </svg>
                                                     Reset Pencarian
                                                 </a>
@@ -323,11 +386,10 @@
                             <div class="grid-card">
                                 <div class="grid-card-header">
                                     <img src="{{ $item->foto_komplek ? asset('storage/' . $item->foto_komplek) : asset('img/placeholder-komplek.jpg') }}"
-                                         alt="Foto {{ $item->nama_komplek }}"
-                                         class="grid-card-image"
-                                         loading="lazy">
+                                        alt="Foto {{ $item->nama_komplek }}" class="grid-card-image" loading="lazy">
                                     <div class="grid-card-status">
-                                        <span class="status-badge status-{{ str_replace(' ', '-', strtolower($item->status_aset)) }}">
+                                        <span
+                                            class="status-badge status-{{ str_replace(' ', '-', strtolower($item->status_aset)) }}">
                                             <span class="status-dot"></span>
                                             {{ $item->status_aset }}
                                         </span>
@@ -336,32 +398,44 @@
                                 <div class="grid-card-body">
                                     <h3 class="grid-card-title">{{ $item->nama_komplek }}</h3>
                                     <p class="grid-card-address">{{ Str::limit($item->alamat, 60) }}</p>
-                                    
+
                                     <div class="grid-card-info">
                                         <div class="info-item">
-                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <svg class="info-icon" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                                </path>
                                             </svg>
-                                            <span>{{ $item->kelurahan->nama_kelurahan }}, {{ $item->kelurahan->kecamatan->nama_kecamatan }}</span>
+                                            <span>{{ $item->kelurahan->nama_kelurahan }},
+                                                {{ $item->kelurahan->kecamatan->nama_kecamatan }}</span>
                                         </div>
                                         <div class="info-item">
-                                            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            <svg class="info-icon" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                                </path>
                                             </svg>
                                             <span>{{ $item->jumlah_sertifikat }} Sertifikat</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="grid-card-footer">
-                                    <button class="grid-action-btn grid-btn-primary" onclick="viewDetail({{ $item->id }})">
+                                    <button class="grid-action-btn grid-btn-primary"
+                                        onclick="viewDetail({{ $item->id }})">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         </svg>
                                         Lihat Detail
                                     </button>
-                                    <button class="grid-action-btn grid-btn-secondary" onclick="showMap({{ $item->latitude ?? 0 }}, {{ $item->longitude ?? 0 }})">
+                                    <button class="grid-action-btn grid-btn-secondary"
+                                        onclick="showMap({{ $item->latitude ?? 0 }}, {{ $item->longitude ?? 0 }})">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                            </path>
                                         </svg>
                                         Peta
                                     </button>
@@ -372,11 +446,14 @@
                                 <div class="empty-state-content">
                                     <div class="empty-icon">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                            </path>
                                         </svg>
                                     </div>
                                     <h3 class="empty-title">Data tidak ditemukan</h3>
-                                    <p class="empty-description">Tidak ada komplek yang sesuai dengan kriteria pencarian Anda.</p>
+                                    <p class="empty-description">Tidak ada komplek yang sesuai dengan kriteria pencarian
+                                        Anda.</p>
                                 </div>
                             </div>
                         @endforelse
@@ -385,7 +462,7 @@
             </div>
 
             <!-- Pagination -->
-            @if($kompleks->hasPages())
+            @if ($kompleks->hasPages())
                 <div class="pagination-wrapper">
                     {{ $kompleks->appends(request()->query())->links() }}
                 </div>
@@ -1189,8 +1266,13 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
     </style>
 
@@ -1203,7 +1285,7 @@
             const viewLabel = toggleBtn.querySelector('.view-label');
             const tableIcon = toggleBtn.querySelector('.view-icon-table');
             const gridIcon = toggleBtn.querySelector('.view-icon-grid');
-            
+
             if (tableView.classList.contains('hidden')) {
                 // Show table view
                 tableView.classList.remove('hidden');
@@ -1227,7 +1309,7 @@
         document.getElementById('kecamatan').addEventListener('change', function() {
             const kecamatanId = this.value;
             const kelurahanSelect = document.getElementById('kelurahan');
-            
+
             if (kecamatanId) {
                 kelurahanSelect.disabled = false;
                 // You can implement AJAX call here to fetch kelurahan based on kecamatan
@@ -1243,7 +1325,7 @@
         document.getElementById('search').addEventListener('input', function() {
             clearTimeout(searchTimeout);
             const searchTerm = this.value;
-            
+
             searchTimeout = setTimeout(() => {
                 // You can implement live search here
                 console.log('Searching for:', searchTerm);
@@ -1269,7 +1351,7 @@
                 alert('Koordinat lokasi tidak tersedia untuk komplek ini.');
                 return;
             }
-            
+
             // Open Google Maps
             const url = `https://www.google.com/maps?q=${lat},${lng}`;
             window.open(url, '_blank');
@@ -1279,7 +1361,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.querySelector('.filter-form');
             const submitBtn = document.querySelector('.btn-filter-apply');
-            
+
             form.addEventListener('submit', function() {
                 submitBtn.innerHTML = `
                     <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
