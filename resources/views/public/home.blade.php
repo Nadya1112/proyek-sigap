@@ -130,7 +130,7 @@
                                 real-time.
                             </p>
 
-                            <a href="{{ route('informasi') }}" class="feature-card-btn">
+                            <a href="{{ route('informasi-fasum') }}" class="feature-card-btn">
                                 Lihat Detail
                                 <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">

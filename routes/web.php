@@ -12,8 +12,9 @@ use App\Http\Controllers\Auth\LoginController;
 */
 Route::view('/home', 'public.home')->name('home');
 Route::view('/fitur','public.fitur')->name('fitur');
+// Route::view('/informasi', 'public.home')->name('informasi'); // biar gak error kalau ada link lama ke /informasi
 
-Route::get('/informasi', [FasumController::class,'index'])->name('informasi');
+Route::get('/informasi-fasum', [FasumController::class,'index'])->name('informasi-fasum');
 // Endpoint dependent dropdown: ambil kelurahan berdasarkan kecamatan
 Route::get('/kelurahan-by-kecamatan/{kecamatan}', [FasumController::class, 'kelurahanByKecamatan'])
     ->name('kelurahan.byKecamatan');
@@ -51,5 +52,5 @@ Route::post('/logout', [LoginController::class, 'logout'])
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
-    Route::view('/home', 'public.home')->name('home'); // ganti ke view dashboard Anda
+    Route::view('/dashboard', 'public.dashboard')->name('dashboard'); // ganti ke view dashboard Anda
 });

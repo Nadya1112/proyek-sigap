@@ -62,7 +62,7 @@
                     <p class="filter-subtitle">Gunakan filter untuk mempersempit hasil pencarian</p>
                 </div>
 
-                <form action="{{ route('informasi') }}" method="GET" class="filter-form">
+                <form action="{{ route('informasi-fasum') }}" method="GET" class="filter-form">
                     <!-- Filter Row 1 -->
                     <div class="filter-row">
                         <div class="filter-group">
@@ -163,7 +163,7 @@
                                 Terapkan Filter
                             </button>
 
-                            <a href="{{ route('informasi') }}" class="btn-filter-reset">
+                            <a href="{{ route('informasi-fasum') }}" class="btn-filter-reset">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
@@ -360,7 +360,7 @@
                                                 <h3 class="empty-title">Data tidak ditemukan</h3>
                                                 <p class="empty-description">Tidak ada komplek yang sesuai dengan kriteria
                                                     pencarian Anda. Coba ubah filter atau kata kunci pencarian.</p>
-                                                <a href="{{ route('informasi') }}" class="empty-action">
+                                                <a href="{{ route('informasi.fasum') }}" class="empty-action">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"

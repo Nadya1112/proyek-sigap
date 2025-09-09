@@ -71,7 +71,7 @@ class FasumController extends Controller
                 ->get();
         }
 
-        return view('public.informasi', [
+        return view('public.informasi-fasum', [
             'request'           => $request,
 
             // Quick Stats

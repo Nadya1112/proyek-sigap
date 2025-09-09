@@ -49,7 +49,7 @@
                 <a href="{{ route('sebaran') }}" class="nav-link {{ request()->routeIs('sebaran') ? 'active' : '' }}">
                     Sebaran Komplek
                 </a>
-                <a href="{{ route('informasi') }}"
+                <a href="#"
                     class="nav-link {{ request()->routeIs('informasi') ? 'active' : '' }}">
                     Informasi
                 </a>
@@ -212,7 +212,7 @@
                     <h4 class="text-lg font-bold mb-6">Quick Links</h4>
                     <ul class="space-y-3">
                         <li><a href="{{ route('home') }}" class="footer-link">Beranda</a></li>
-                        <li><a href="{{ route('informasi') }}" class="footer-link">Informasi FASUM</a></li>
+                        <li><a href="#" class="footer-link">Informasi FASUM</a></li>
                         <li><a href="{{ route('eproposal') }}" class="footer-link">E-Proposal PSU</a></li>
                         <li><a href="{{ route('pengaduan') }}" class="footer-link">Pengaduan</a></li>
                     </ul>
