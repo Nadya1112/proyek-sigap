@@ -1,4 +1,4 @@
-<nav class="bg-white shadow sticky top-0 z-50">
+<!-- <nav class="bg-white shadow sticky top-0 z-50">
   <div class="container mx-auto px-6 flex items-center justify-between py-3">
     
     <!-- Logo Dinas -->
@@ -34,4 +34,4 @@
       @endauth
     </div>
   </div>
-</nav>
+</nav> -->
