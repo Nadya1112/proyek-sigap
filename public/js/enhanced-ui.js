@@ -503,7 +503,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         const target = parseInt(
                             counter.getAttribute("data-target")
                         );
-                        const suffix = target === 98 ? "%" : "+";
+                        const suffix = '';
 
                         setTimeout(() => {
                             enhancedCounterAnimation(counter, target, suffix);
