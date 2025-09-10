@@ -5,7 +5,7 @@
 @section('content')
 <div class="min-h-screen flex items-center justify-center relative px-4">
 
-  {{-- Siluet lembut seperti login --}}
+  {{-- Siluet lembut --}}
   <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
     <div class="absolute -top-24 -left-24 w-[520px] h-[520px] rounded-full opacity-20 blur-3xl"
          style="background: radial-gradient(50% 50% at 30% 30%, rgba(255,160,67,.50) 0%, rgba(255,160,67,.08) 60%, transparent 70%);"></div>
@@ -14,7 +14,7 @@
   </div>
 
   {{-- CARD REGISTER --}}
-  <div class="w-full max-w-[500px] bg-white rounded-[26px] shadow-xl border border-gray-100">
+    <div class="w-full max-w-md md:max-w-lg bg-white rounded-[26px] shadow-xl border border-gray-100 mx-auto">
     <div class="px-8 pt-9 pb-9">
 
       {{-- Logo --}}
@@ -34,54 +34,52 @@
       <form method="POST" action="{{ route('register.post') }}" class="mt-7 space-y-5">
         @csrf
 
-        {{-- Nama lengkap --}}
+        {{-- Nama lengkap (wajib) --}}
         <div>
           <label class="block text-[13px] font-semibold text-gray-700 mb-1.5">Nama lengkap</label>
-          <input type="text" name="name" value="{{ old('name') }}" required
+          <input required type="text" name="name" value="{{ old('name') }}"
                  placeholder="Masukkan nama lengkap"
                  class="w-full rounded-2xl border border-gray-200 bg-[#F7F8FA] text-[14px] placeholder:text-gray-400
                         px-4 py-3 transition focus:bg-white focus:border-[#F39B28] focus:ring-2 focus:ring-[#F39B28]/45 outline-none"/>
           @error('name') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
         </div>
 
-        {{-- Email --}}
+        {{-- Email (wajib) --}}
         <div>
           <label class="block text-[13px] font-semibold text-gray-700 mb-1.5">Email</label>
-          <input type="email" name="email" value="{{ old('email') }}" required
+          <input required type="email" name="email" value="{{ old('email') }}"
                  placeholder="nama@email.com"
                  class="w-full rounded-2xl border border-gray-200 bg-[#F7F8FA] text-[14px] placeholder:text-gray-400
                         px-4 py-3 transition focus:bg-white focus:border-[#F39B28] focus:ring-2 focus:ring-[#F39B28]/45 outline-none"/>
           @error('email') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
         </div>
 
-        {{-- Username (opsional) --}}
+        {{-- Username (wajib) --}}
         <div>
-          <div class="flex items-center justify-between">
-            <label class="block text-[13px] font-semibold text-gray-700 mb-1.5">Username <span class="text-gray-400 font-normal">(opsional)</span></label>
-          </div>
-          <input type="text" name="username" value="{{ old('username') }}"
-                 placeholder="Nama pengguna (opsional)"
+          <label class="block text-[13px] font-semibold text-gray-700 mb-1.5">Username</label>
+          <input required type="text" name="username" value="{{ old('username') }}"
+                 placeholder="Nama pengguna"
                  class="w-full rounded-2xl border border-gray-200 bg-[#F7F8FA] text-[14px] placeholder:text-gray-400
                         px-4 py-3 transition focus:bg-white focus:border-[#F39B28] focus:ring-2 focus:ring-[#F39B28]/45 outline-none"/>
           @error('username') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
         </div>
 
-        {{-- Nomor HP (opsional) --}}
+        {{-- Nomor HP (wajib) --}}
         <div>
-          <label class="block text-[13px] font-semibold text-gray-700 mb-1.5">Nomor HP <span class="text-gray-400 font-normal">(opsional)</span></label>
-          <input type="tel" name="phone" value="{{ old('phone') }}"
+          <label class="block text-[13px] font-semibold text-gray-700 mb-1.5">Nomor HP</label>
+          <input required type="tel" name="phone" value="{{ old('phone') }}" inputmode="numeric"
                  placeholder="08xxxxxxxxxx"
                  class="w-full rounded-2xl border border-gray-200 bg-[#F7F8FA] text-[14px] placeholder:text-gray-400
                         px-4 py-3 transition focus:bg-white focus:border-[#F39B28] focus:ring-2 focus:ring-[#F39B28]/45 outline-none"/>
           @error('phone') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
         </div>
 
-        {{-- Kata sandi --}}
+        {{-- Kata sandi (wajib, min 8) --}}
         <div x-data="{ show:false }">
           <label class="block text-[13px] font-semibold text-gray-700 mb-1.5">Kata sandi</label>
           <div class="relative">
-            <input :type="show ? 'text' : 'password'" name="password" required
-                   placeholder="Buat kata sandi"
+            <input required minlength="8" :type="show ? 'text' : 'password'" name="password"
+                   placeholder="Buat kata sandi (min. 8 karakter)"
                    class="w-full rounded-2xl border border-gray-200 bg-[#F7F8FA] text-[14px] placeholder:text-gray-400
                           px-4 py-3 pr-11 transition focus:bg-white focus:border-[#F39B28] focus:ring-2 focus:ring-[#F39B28]/45 outline-none"/>
             <button type="button" @click="show = !show"
@@ -97,11 +95,11 @@
           @error('password') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
         </div>
 
-        {{-- Konfirmasi kata sandi --}}
+        {{-- Konfirmasi kata sandi (wajib, min 8) --}}
         <div x-data="{ show:false }">
           <label class="block text-[13px] font-semibold text-gray-700 mb-1.5">Konfirmasi kata sandi</label>
           <div class="relative">
-            <input :type="show ? 'text' : 'password'" name="password_confirmation" required
+            <input required minlength="8" :type="show ? 'text' : 'password'" name="password_confirmation"
                    placeholder="Ulangi kata sandi"
                    class="w-full rounded-2xl border border-gray-200 bg-[#F7F8FA] text-[14px] placeholder:text-gray-400
                           px-4 py-3 pr-11 transition focus:bg-white focus:border-[#F39B28] focus:ring-2 focus:ring-[#F39B28]/45 outline-none"/>
@@ -117,10 +115,10 @@
           </div>
         </div>
 
-        {{-- S&K --}}
+        {{-- S&K (wajib) --}}
         <label class="inline-flex items-start gap-3 text-[13px] text-gray-600">
-          <input type="checkbox" name="terms"
-                 class="mt-[3px] rounded border-gray-300 text-[#F39B28] focus:ring-[#F39B28]" required>
+          <input required type="checkbox" name="terms"
+                 class="mt-[3px] rounded border-gray-300 text-[#F39B28] focus:ring-[#F39B28]">
           <span>Saya menyetujui <a href="#" class="text-[#F39B28] hover:underline">Syarat & Ketentuan</a> serta <a href="#" class="text-[#F39B28] hover:underline">Kebijakan Privasi</a>.</span>
         </label>
 
