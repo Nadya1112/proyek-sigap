@@ -76,6 +76,20 @@
           </a>
         </div>
 
+        {{-- 🔒 Verifikasi Manusia (CAPTCHA) – tepat di bawah password --}}
+        <div>
+          <label class="block text-[13px] font-semibold text-gray-700 mb-1.5">Verifikasi manusia</label>
+          <div class="flex items-center gap-3">
+            <span class="text-[14px] text-gray-700 whitespace-nowrap">
+              Berapa hasil: <strong>{{ $a }}</strong> + <strong>{{ $b }}</strong> = ?
+            </span>
+            <input type="number" inputmode="numeric" name="captcha" value="{{ old('captcha') }}"
+                   class="ml-auto w-28 rounded-2xl border border-gray-200 bg-[#F7F8FA] text-[14px] px-3 py-2
+                          focus:bg-white focus:border-[#F39B28] focus:ring-2 focus:ring-[#F39B28]/45 outline-none"/>
+          </div>
+          @error('captcha') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+        </div>
+
         {{-- Ingat saya --}}
         <label class="inline-flex items-center gap-2 text-[13px] text-gray-600">
           <input type="checkbox" name="remember"
