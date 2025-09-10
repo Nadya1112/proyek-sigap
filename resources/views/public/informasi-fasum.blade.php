@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Informasi FASUM - SIGAP KOMPLEK')
+@section('title', 'SIGAP KOMPLEK')
 
 @section('content')
     <!-- Page Header -->

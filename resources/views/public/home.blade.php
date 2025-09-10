@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Beranda - SIGAP KOMPLEK')
+@section('title', 'SIGAP KOMPLEK')
 
 @section('content')
     <!-- 🔹 HEADER HERO -->
@@ -220,34 +220,38 @@
 
             <!-- Stats Section -->
             <div class="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 animate-fade-in">
-                <div class="stats-item group">
-                    <div class="stats-number stats-yellow">
-                        <span class="counter" data-target="500">0</span>
+                    <div class="stats-item group">
+                        <div class="stats-number stats-yellow">
+                            {{-- Data dari Controller --}}
+                            <span class="counter" data-target="{{ $totalPengunjung }}">0</span>
+                        </div>
+                        <p class="stats-label">Total Pengunjung</p>
                     </div>
-                    <p class="stats-label">Total Pengunjung</p>
-                </div>
 
-                <div class="stats-item group">
-                    <div class="stats-number stats-blue">
-                        <span class="counter" data-target="100">0</span>
+                    <div class="stats-item group">
+                        <div class="stats-number stats-blue">
+                            {{-- Data dari Controller --}}
+                            <span class="counter" data-target="{{ $totalPengguna }}">0</span>
+                        </div>
+                        <p class="stats-label">Total Pengguna</p>
                     </div>
-                    <p class="stats-label">Total Pengguna</p>
-                </div>
 
-                <div class="stats-item group">
-                    <div class="stats-number stats-green">
-                        <span class="counter" data-target="100">0</span>
+                    <div class="stats-item group">
+                        <div class="stats-number stats-green">
+                            {{-- Data dari Controller --}}
+                            <span class="counter" data-target="{{ $totalProposal }}">0</span>
+                        </div>
+                        <p class="stats-label">Total Proposal</p>
                     </div>
-                    <p class="stats-label">Total Proposal</p>
-                </div>
 
-                <div class="stats-item group">
-                    <div class="stats-number stats-red">
-                        <span class="counter" data-target="98">0</span>
+                    <div class="stats-item group">
+                        <div class="stats-number stats-red">
+                            {{-- Data dari Controller --}}
+                            <span class="counter" data-target="{{ $totalPengaduan }}">0</span>
+                        </div>
+                        <p class="stats-label">Total Pengaduan</p>
                     </div>
-                    <p class="stats-label">Total Pengaduan</p>
                 </div>
-            </div>
         </div>
     </section>
 
@@ -296,7 +300,7 @@
                         </div>
                         <div class="about-feature-item group">
                             <div class="about-feature-dot about-feature-dot-light"></div>
-                            <span class="about-feature-text">Layanan 24/7 Online</span>
+                            <span class="about-feature-text">Layanan Jam Kerja</span>
                         </div>
                     </div>
                 </div>
@@ -508,12 +512,11 @@
                             </div>
 
                             <h3 class="benefit-title benefit-title-red">
-                                Support 24/7
+                                Support Jam Kerja
                             </h3>
 
                             <p class="benefit-desc">
-                                Tim support yang siap membantu Anda kapan saja dengan respon time yang cepat dan solusi yang
-                                tepat.
+                                Siap membantu Anda setiap hari di jam kerja (08.00 - 16.30) dengan respon time yang cepat.
                             </p>
                         </div>
                     </div>
