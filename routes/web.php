@@ -4,15 +4,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PublicFormController;
 use App\Http\Controllers\FasumController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
 | Public pages (tanpa login)
 |--------------------------------------------------------------------------
 */
-Route::view('/home', 'public.home')->name('home');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::view('/fitur','public.fitur')->name('fitur');
-// Route::view('/informasi', 'public.home')->name('informasi'); // biar gak error kalau ada link lama ke /informasi
+Route::view('/informasi', 'public.home')->name('informasi'); // biar gak error kalau ada link lama ke /informasi
 
 Route::get('/informasi-fasum', [FasumController::class,'index'])->name('informasi-fasum');
 // Endpoint dependent dropdown: ambil kelurahan berdasarkan kecamatan
