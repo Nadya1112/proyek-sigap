@@ -15,8 +15,6 @@
 
     <!-- Enhanced CSS -->
     <link rel="stylesheet" href="{{ asset('css/enhanced-ui.css') }}">
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="bg-gray-50">
@@ -51,9 +49,8 @@
                 <a href="{{ route('sebaran') }}" class="nav-link {{ request()->routeIs('sebaran') ? 'active' : '' }}">
                     Sebaran Komplek
                 </a>
-                <a href="{{ route('informasi') }}"
-                class="nav-link {{ request()->routeIs('informasi') ? 'active' : '' }}">
-                Informasi
+                <a href="#" class="nav-link {{ request()->routeIs('informasi') ? 'active' : '' }}">
+                    Informasi
                 </a>
                 <a href="{{ route('kontak') }}" class="nav-link {{ request()->routeIs('kontak') ? 'active' : '' }}">
                     Kontak
