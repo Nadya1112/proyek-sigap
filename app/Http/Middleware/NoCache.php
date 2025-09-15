@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class NoCache
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
 

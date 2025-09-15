@@ -54,7 +54,7 @@
           @error('email') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
         </div>
 
-        {{-- Username (wajib) --}}
+        <!-- {{-- Username (wajib) --}}
         <div>
           <label class="block text-[13px] font-semibold text-gray-700 mb-1.5">Username</label>
           <input required type="text" name="username" value="{{ old('username') }}"
@@ -62,7 +62,7 @@
                  class="w-full rounded-2xl border border-gray-200 bg-[#F7F8FA] text-[14px] placeholder:text-gray-400
                         px-4 py-3 transition focus:bg-white focus:border-[#F39B28] focus:ring-2 focus:ring-[#F39B28]/45 outline-none"/>
           @error('username') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-        </div>
+        </div> -->
 
         {{-- Nomor HP (wajib) --}}
         <div>

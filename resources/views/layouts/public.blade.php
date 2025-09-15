@@ -47,7 +47,7 @@
                 <a href="{{ route('sebaran') }}" class="nav-link {{ request()->routeIs('sebaran') ? 'active' : '' }}">
                     Sebaran Komplek
                 </a>
-                <a href="#" class="nav-link {{ request()->routeIs('informasi') ? 'active' : '' }}">
+                <a href="{{ route('informasi') }}" class="nav-link {{ request()->routeIs('informasi') ? 'active' : '' }}">
                     Informasi
                 </a>
                 <a href="{{ route('kontak') }}" class="nav-link {{ request()->routeIs('kontak') ? 'active' : '' }}">

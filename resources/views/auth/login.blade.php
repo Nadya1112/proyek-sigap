@@ -40,7 +40,7 @@
           <label class="block text-[13px] font-semibold text-gray-700 mb-1.5">Login</label>
           <input
             type="text" name="login" value="{{ old('login') }}" required
-            placeholder="Email / nomor HP / username"
+            placeholder="Email / Nomor HP "
             class="w-full rounded-2xl border border-gray-200 bg-[#F7F8FA] text-[14px] placeholder:text-gray-400
                    px-4 py-3 transition
                    focus:bg-white focus:border-[#F39B28] focus:ring-2 focus:ring-[#F39B28]/45 outline-none"/>
