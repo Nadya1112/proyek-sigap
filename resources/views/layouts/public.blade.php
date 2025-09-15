@@ -6,9 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>@yield('title', 'SIGAP - KOMPLEK')</title>
 
-    {{-- Tetap pakai Laravel Mix sesuai file Anda --}}
-    <link rel="stylesheet" href="{{ mix('css/app.css') }}">
-    <script src="{{ mix('js/app.js') }}" defer></script>
+    @vite(['resources/css/app.css','resources/js/app.js'])
 
     <!-- Alpine.js for dropdown -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
