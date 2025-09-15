@@ -22,7 +22,7 @@
       </span>
 
       <h1 class="mt-4 text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.12)]">
-        Informasi & Dokumen Resmi
+        Informasi Dokumen Resmi
       </h1>
       <p class="mt-4 text-base md:text-lg text-white/90 max-w-3xl mx-auto">
         Kumpulan peraturan, keputusan, dan dokumen pendukung SIGAP–KOMPLEK. Unduh dan pelajari sesuai kebutuhan Anda.
