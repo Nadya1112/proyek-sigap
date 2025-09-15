@@ -1,12 +1,12 @@
 <?php
-
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\VerifyEmailCodeMail;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Schema;
 
@@ -19,56 +19,52 @@ class RegisterController extends Controller
 
     public function store(Request $request)
     {
+        // Validasi
         $rules = [
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'confirmed', Password::min(8)], // min 8 sesuai permintaan
-            'terms'    => ['accepted'],
+            'name'     => ['required','string','max:255'],
+            'email'    => ['required','string','lowercase','email','max:255','unique:users,email'],
+            'password' => ['required','confirmed', Password::min(8)],
         ];
 
-        // Wajibkan jika kolom tersedia di tabel users
         if (Schema::hasColumn('users', 'username')) {
-            $rules['username'] = ['required', 'string', 'max:50', 'unique:users,username'];
+            $rules['username'] = ['required','string','max:50','unique:users,username'];
         }
         if (Schema::hasColumn('users', 'phone')) {
-            $rules['phone'] = ['required', 'string', 'max:20', 'unique:users,phone'];
+            $rules['phone'] = ['required','string','max:20','unique:users,phone'];
         }
 
-        $messages = [
-            'name.required'          => 'Nama wajib diisi.',
-            'email.required'         => 'Email wajib diisi.',
-            'email.email'            => 'Format email tidak valid.',
-            'email.unique'           => 'Email sudah terdaftar.',
-            'username.required'      => 'Username wajib diisi.',
-            'username.unique'        => 'Username sudah digunakan.',
-            'phone.required'         => 'Nomor HP wajib diisi.',
-            'phone.unique'           => 'Nomor HP sudah digunakan.',
-            'password.required'      => 'Kata sandi wajib diisi.',
-            'password.confirmed'     => 'Konfirmasi kata sandi tidak cocok.',
-            'password.min'           => 'Kata sandi minimal :min karakter.',
-            'terms.accepted'         => 'Anda harus menyetujui Syarat & Ketentuan.',
-        ];
+        $data = $request->validate($rules, [
+            'name.required'         => 'Nama wajib diisi.',
+            'email.required'        => 'Email wajib diisi.',
+            'email.email'           => 'Format email tidak valid.',
+            'email.unique'          => 'Email sudah terdaftar.',
+            'username.required'     => 'Username wajib diisi.',
+            'phone.required'        => 'Nomor HP wajib diisi.',
+            'password.required'     => 'Kata sandi wajib diisi.',
+            'password.confirmed'    => 'Konfirmasi kata sandi tidak cocok.',
+        ]);
 
-        $data = $request->validate($rules, $messages);
-
+        // Simpan user
         $user = new User();
         $user->name  = $data['name'];
         $user->email = $data['email'];
-
-        if (Schema::hasColumn('users', 'username')) {
-            $user->username = $data['username'];
-        }
-        if (Schema::hasColumn('users', 'phone')) {
-            $user->phone = $data['phone'];
-        }
-
+        if (isset($data['username'])) $user->username = $data['username'];
+        if (isset($data['phone']))    $user->phone    = $data['phone'];
         $user->password = Hash::make($data['password']);
+
+        // Generate kode verifikasi (4 digit) + masa berlaku
+        $code = (string) random_int(1000, 9999);
+        $user->verification_code       = $code;
+        $user->verification_expires_at = now()->addMinutes(10);
+
         $user->save();
 
-        Auth::login($user);
-        $request->session()->regenerate();
+        // Kirim email
+        Mail::to($user->email)->send(new \App\Mail\VerifyEmailCodeMail($user));
+        // Mail::to($user->email)->send(new VerifyEmailCodeMail($user->name, $code));
 
-        return redirect()->intended(route('home'))
-            ->with('status', 'Akun berhasil dibuat. Selamat datang!');
+        // Arahkan ke halaman verifikasi (bawa email agar auto-terisi)
+        return redirect()->route('verification.show', ['email' => $user->email])
+            ->with('status', 'Kode verifikasi dikirim ke email Anda.');
     }
 }

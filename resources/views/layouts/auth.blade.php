@@ -6,8 +6,9 @@
   <title>@yield('title','Masuk - SIGAP KOMPLEK')</title>
 
   {{-- Kamu pakai Mix --}}
-  <link rel="stylesheet" href="{{ mix('css/app.css') }}">
-  <script src="{{ mix('js/app.js') }}" defer></script>
+   @vite(['resources/css/app.css','resources/js/app.js'])
+
+
 
   {{-- Alpine untuk toggle password --}}
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>

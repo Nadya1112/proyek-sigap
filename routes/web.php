@@ -1,11 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PublicFormController;
 use App\Http\Controllers\FasumController;
+use App\Http\Controllers\InformasiController;          // ⬅️ NEW
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\Auth\RegisterController; // <— tambahkan
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\VerifyEmailController;    // verifikasi 4 digit
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +16,7 @@ use App\Http\Controllers\Auth\RegisterController; // <— tambahkan
 |--------------------------------------------------------------------------
 */
 Route::redirect('/', '/home');
+
 /*
 |--------------------------------------------------------------------------
 | Public pages (tanpa login)
@@ -20,12 +24,17 @@ Route::redirect('/', '/home');
 */
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::view('/fitur','public.fitur')->name('fitur');
-Route::view('/informasi', 'public.home')->name('informasi'); // biar gak error kalau ada link lama ke /informasi
 
+/**
+ * Halaman FASUM lama (jika masih dipakai).
+ */
 Route::get('/informasi-fasum', [FasumController::class,'index'])->name('informasi-fasum');
 
-// Kompatibilitas link lama: /informasi → /informasi-fasum
-Route::get('/informasi', fn () => redirect()->route('informasi-fasum'))->name('informasi');
+/**
+ * ✅ Halaman INFORMASI BARU + unduh file
+ */
+Route::get('/informasi', [InformasiController::class, 'index'])->name('informasi');
+Route::get('/informasi/unduh/{slug}', [InformasiController::class, 'download'])->name('informasi.download');
 
 Route::get('/kelurahan-by-kecamatan/{kecamatan}', [FasumController::class, 'kelurahanByKecamatan'])
     ->name('kelurahan.byKecamatan');
@@ -53,13 +62,16 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'authenticate'])->name('login.post');
 
-    // Register (halaman daftar akun)
+    // Register
     Route::get('/register', [RegisterController::class, 'showForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'store'])->name('register.post');
 
-    // (opsional) Forgot password – aktifkan jika sudah siap controllernya
-    // Route::get('/password/forgot', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-    // Route::post('/password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    // Verifikasi email (kode 4 digit)
+    Route::get('/verify-email',         [VerifyEmailController::class, 'showForm'])->name('verification.show');
+    Route::post('/verify-email',        [VerifyEmailController::class, 'verify'])->name('verification.verify');
+    Route::post('/verify-email/resend', [VerifyEmailController::class, 'resend'])->name('verification.resend');
+
+    // (opsional) lupa password...
 });
 
 Route::post('/logout', [LoginController::class, 'logout'])
@@ -68,7 +80,7 @@ Route::post('/logout', [LoginController::class, 'logout'])
 
 /*
 |--------------------------------------------------------------------------
-| Dashboard (wajib login) – SATU SAJA
+| Dashboard (wajib login)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {

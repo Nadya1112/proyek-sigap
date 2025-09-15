@@ -360,7 +360,7 @@
                                                 <h3 class="empty-title">Data tidak ditemukan</h3>
                                                 <p class="empty-description">Tidak ada komplek yang sesuai dengan kriteria
                                                     pencarian Anda. Coba ubah filter atau kata kunci pencarian.</p>
-                                                <a href="{{ route('informasi.fasum') }}" class="empty-action">
+                                                <a href="{{ route('informasi-fasum') }}" class="empty-action">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
