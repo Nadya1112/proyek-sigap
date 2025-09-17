@@ -30,8 +30,11 @@ Route::get('/informasi-fasum', [FasumController::class,'index'])->name('informas
 
 // INFORMASI baru + unduh
 Route::get('/informasi', [InformasiController::class, 'index'])->name('informasi');
-Route::get('/informasi/unduh/{slug}', [InformasiController::class, 'download'])->name('informasi.download');
 
+Route::get('/informasi/unduh/{slug}', [InformasiController::class, 'download'])
+     ->name('informasi.download')
+     ->middleware('throttle:60,1'); // rate-limit opsional
+     
 // dependent dropdown
 Route::get('/kelurahan-by-kecamatan/{kecamatan}', [FasumController::class, 'kelurahanByKecamatan'])
     ->name('kelurahan.byKecamatan');

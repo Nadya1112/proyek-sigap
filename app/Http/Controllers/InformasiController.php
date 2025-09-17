@@ -1,86 +1,49 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Models\Document;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class InformasiController extends Controller
 {
-    public function index()
+    // Daftar + pencarian
+    public function index(Request $request)
     {
-        // Contoh data dokumen. Nanti bisa diambil dari DB.
-        $docs = [
-            [
-                'slug'  => 'uud-no-1-2011',
-                'title' => 'UUD No 1 Tahun 2011',
-                'file'  => 'uud-no-1-2011.pdf',
-                'ext'   => 'PDF',
-                'size'  => 524, // KB
-                'year'  => 2011,
-            ],
-            [
-                'slug'  => 'perda-no-1-2023',
-                'title' => 'Perda No 1 Tahun 2023',
-                'file'  => 'perda-no-1-2023.pdf',
-                'ext'   => 'PDF',
-                'size'  => 812,
-                'year'  => 2023,
-            ],
-            [
-                'slug'  => 'uu-no-1-sk-jalan-2022',
-                'title' => 'UU No 1 SK Jalan 2022',
-                'file'  => 'uu-no-1-sk-jalan-2022.pdf',
-                'ext'   => 'PDF',
-                'size'  => 690,
-                'year'  => 2022,
-            ],
-            [
-                'slug'  => 'uu-no-1-2011',
-                'title' => 'UU No 1 Tahun 2011',
-                'file'  => 'uu-no-1-2011.pdf',
-                'ext'   => 'PDF',
-                'size'  => 476,
-                'year'  => 2011,
-            ],
-            [
-                'slug'  => 'uu-no-1-2011-rev',
-                'title' => 'UU No 1 Tahun 2011 (Revisi)',
-                'file'  => 'uu-no-1-2011-revisi.pdf',
-                'ext'   => 'PDF',
-                'size'  => 502,
-                'year'  => 2011,
-            ],
+        $q = trim($request->get('q',''));
+
+        $docs = Document::when($q, function($query) use ($q) {
+                    $query->where('title','like',"%{$q}%")
+                          ->orWhere('year',$q);
+                })
+                ->orderByDesc('year')
+                ->orderBy('title')
+                ->get();
+
+        $stats = [
+            'total' => $docs->count(),
+            // kalau mau tampil di hero
         ];
 
-        return view('public.informasi', [
-            'docs' => $docs,
-            'total' => count($docs),
-        ]);
+        return view('public.informasi', compact('docs','q','stats'));
     }
 
+    // Unduhan file publik
     public function download(string $slug)
     {
-        // Cari doc dari daftar di index(). Produksi: ambil dari DB.
-        $docs = collect([
-            ['slug'=>'uud-no-1-2011','file'=>'uud-no-1-2011.pdf'],
-            ['slug'=>'perda-no-1-2023','file'=>'perda-no-1-2023.pdf'],
-            ['slug'=>'uu-no-1-sk-jalan-2022','file'=>'uu-no-1-sk-jalan-2022.pdf'],
-            ['slug'=>'uu-no-1-2011','file'=>'uu-no-1-2011.pdf'],
-            ['slug'=>'uu-no-1-2011-rev','file'=>'uu-no-1-2011-revisi.pdf'],
-        ]);
+        $doc = Document::where('slug',$slug)->firstOrFail();
 
-        $doc = $docs->firstWhere('slug', $slug);
-        if (!$doc) {
-            abort(404);
-        }
+        $path = "informasi/{$doc->filename}";
+        abort_unless(Storage::disk('public')->exists($path), 404, 'File tidak ditemukan.');
 
-        // Simpan file di storage/app/public/informasi
-        $path = storage_path('app/public/informasi/'.$doc['file']);
-        if (!file_exists($path)) {
-            abort(404, 'File tidak ditemukan.');
-        }
+        $ext = pathinfo($doc->filename, PATHINFO_EXTENSION);
+        $downloadName = str($doc->title)->slug('-')->append(".{$ext}");
 
-        return response()->download($path);
+        Log::info('document_download', ['slug'=>$slug, 'ip'=>request()->ip()]);
+
+        return Storage::disk('public')->download($path, $downloadName);
     }
 }
+
+
