@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class KelurahanResource extends Resource
 {
     protected static ?string $model = Kelurahan::class;
+    protected static ?string $navigationGroup = 'Informasi FASUM';
     protected static ?string $title = 'Kelurahan';
     protected static ?string $navigationLabel = 'Kelurahan';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
