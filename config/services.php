@@ -29,5 +29,11 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    
+        'gdrive' => [
+        // Simpan ENV berisi path relatif di bawah storage/, lalu bungkus dengan storage_path()
+        'service_account_json' => storage_path(env('GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON', 'app/keys/sigap-drive-service.json')),
+        'folder_id'            => env('GOOGLE_DRIVE_FOLDER_ID'),
+    ],
 
 ];

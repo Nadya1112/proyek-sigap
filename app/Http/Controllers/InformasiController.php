@@ -1,49 +1,42 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use App\Models\Document;
+use App\Services\GoogleDriveService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 
 class InformasiController extends Controller
 {
-    // Daftar + pencarian
+    public function __construct(private GoogleDriveService $gdrive) {}
+
     public function index(Request $request)
     {
-        $q = trim($request->get('q',''));
+        $folderId = env('GOOGLE_DRIVE_FOLDER_ID');
+        $q = trim((string) $request->get('q', ''));
+        $files = $this->gdrive->listFiles($folderId, $q ?: null);
 
-        $docs = Document::when($q, function($query) use ($q) {
-                    $query->where('title','like',"%{$q}%")
-                          ->orWhere('year',$q);
-                })
-                ->orderByDesc('year')
-                ->orderBy('title')
-                ->get();
+        // Urutkan: terbaru dulu
+        usort($files, fn($a,$b) => strcmp($b['mtime'] ?? '', $a['mtime'] ?? ''));
 
-        $stats = [
-            'total' => $docs->count(),
-            // kalau mau tampil di hero
-        ];
-
-        return view('public.informasi', compact('docs','q','stats'));
+        return view('public.informasi', [
+            'docs' => collect($files)->map(function($f){
+                // Ekstrak tahun dari nama (opsional)
+                preg_match('/\b(19|20)\d{2}\b/', $f['name'], $m);
+                return [
+                    'id'      => $f['id'],
+                    'title'   => preg_replace('/\.\w+$/','',$f['name']),
+                    'year'    => isset($m[0]) ? (int) $m[0] : null,
+                    'size_kb' => isset($f['size']) ? (int) round($f['size']/1024) : null,
+                    'mime'    => $f['mime'] ?? null,
+                    'mtime'   => $f['mtime'] ?? null,
+                ];
+            }),
+            'q' => $q,
+        ]);
     }
 
-    // Unduhan file publik
-    public function download(string $slug)
+    public function download(string $id)
     {
-        $doc = Document::where('slug',$slug)->firstOrFail();
-
-        $path = "informasi/{$doc->filename}";
-        abort_unless(Storage::disk('public')->exists($path), 404, 'File tidak ditemukan.');
-
-        $ext = pathinfo($doc->filename, PATHINFO_EXTENSION);
-        $downloadName = str($doc->title)->slug('-')->append(".{$ext}");
-
-        Log::info('document_download', ['slug'=>$slug, 'ip'=>request()->ip()]);
-
-        return Storage::disk('public')->download($path, $downloadName);
+        return app(GoogleDriveService::class)->download($id);
     }
 }
-
-

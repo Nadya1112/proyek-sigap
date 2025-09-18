@@ -21,11 +21,11 @@
         Pusat Informasi
       </span>
 
-      <h1 class="mt-4 text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.12)]">
+      <h1 class="mt-4 text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.10)]">
         Informasi Dokumen Resmi
       </h1>
       <p class="mt-4 text-base md:text-lg text-white/90 max-w-3xl mx-auto">
-        Kumpulan peraturan, keputusan, dan dokumen pendukung SIGAP–KOMPLEK. Unduh dan pelajari sesuai kebutuhan Anda.
+        Kumpulan peraturan, keputusan, dan dokumen pendukung SIGAP–KOMPLEK. Unduh sesuai kebutuhan Anda.
       </p>
     </div>
   </div>
@@ -45,7 +45,7 @@
         </div>
 
         {{-- Pencarian (center) --}}
-        <div x-data="{q:''}" class="mt-6 flex justify-center">
+        <div x-data="{q:'{{ addslashes($q ?? '') }}'}" class="mt-6 flex justify-center">
           <div class="relative w-full max-w-lg">
             <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <circle cx="11" cy="11" r="7" stroke-width="2"></circle>
@@ -59,17 +59,18 @@
 
         {{-- List dokumen (rata tengah) --}}
         <ul class="mt-7 max-w-3xl mx-auto divide-y divide-gray-100">
-          @foreach ($docs as $d)
+          @forelse ($docs as $doc)
             @php
-              $slug = $d['slug'];
-              $title= $d['title'];
-              $ext  = $d['ext'] ?? 'PDF';
-              $size = $d['size'] ?? null; // KB
-              $year = $d['year'] ?? null;
+              $title = $doc['title'];
+              $year  = $doc['year'] ?? null;
+              $size  = $doc['size_kb'] ?? null; // KB
+              $mime  = strtoupper(pathinfo($title, PATHINFO_EXTENSION) ?: ($doc['mime'] ?? 'PDF'));
+              $id    = $doc['id'];
             @endphp
             <li
               x-show="!q || '{{ strtolower($title) }}'.includes(q.toLowerCase())"
               class="group flex items-stretch justify-between gap-4 px-2 md:px-1 py-3 md:py-4">
+
               <div class="flex items-center gap-3 min-w-0">
                 {{-- Icon --}}
                 <div class="flex-shrink-0 w-9 h-9 rounded-lg bg-orange-50 ring-1 ring-orange-100 grid place-content-center">
@@ -83,7 +84,7 @@
                   <p class="text-gray-800 font-medium truncate">{{ $title }}</p>
                   <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
                     <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 ring-1 ring-orange-200">
-                      {{ $ext }}
+                      {{ $mime === '' ? 'PDF' : $mime }}
                     </span>
                     @if($year)<span>{{ $year }}</span>@endif
                     @if($size)<span>• {{ number_format($size) }} KB</span>@endif
@@ -92,7 +93,7 @@
               </div>
 
               <div class="flex items-center">
-                <a href="{{ route('informasi.download', $slug) }}"
+                <a href="{{ route('informasi.download', $id) }}"
                    class="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-white text-sm font-semibold
                           bg-gradient-to-r from-[#FFA72B] to-[#F16A00] shadow-sm
                           hover:brightness-95 active:scale-[.99] transition">
@@ -104,12 +105,12 @@
                 </a>
               </div>
             </li>
-          @endforeach
+          @empty
+            <li class="py-8">
+              <p class="text-center text-sm text-gray-500">Belum ada dokumen yang dipublikasikan.</p>
+            </li>
+          @endforelse
         </ul>
-
-        @if(empty($docs))
-          <p class="mt-7 text-center text-sm text-gray-500">Belum ada dokumen yang dipublikasikan.</p>
-        @endif
       </div>
     </div>
   </div>
