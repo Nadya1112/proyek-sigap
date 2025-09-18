@@ -16,7 +16,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class KomplekResource extends Resource
 {
     protected static ?string $model = Komplek::class;
-
+    protected static ?string $title = 'Komplek';
+    protected static ?string $navigationLabel = 'Komplek';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form

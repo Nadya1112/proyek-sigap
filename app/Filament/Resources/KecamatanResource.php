@@ -14,7 +14,8 @@ use Filament\Tables\Table;
 class KecamatanResource extends Resource
 {
     protected static ?string $model = Kecamatan::class;
-
+    protected static ?string $title = 'Kecamatan';
+    protected static ?string $navigationLabel = 'Kecamatan';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
