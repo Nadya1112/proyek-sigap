@@ -2,7 +2,7 @@
     "require": {
         "php": "^8.1",
         "filament/filament": "^3.2",
-        "google/apiclient": "^2.18",
+        "google/apiclient": "^2.15",
         "guzzlehttp/guzzle": "^7.0.1",
         "konnco/filament-import": "^3.0",
         "laravel/framework": "^11.0",
