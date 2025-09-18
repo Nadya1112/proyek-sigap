@@ -35,8 +35,9 @@ class InformasiController extends Controller
         ]);
     }
 
-    public function download(string $id)
-    {
-        return app(GoogleDriveService::class)->download($id);
-    }
+        public function download(string $id)
+        {
+            $url = $this->gdrive->exportDownloadUrl($id);
+            return redirect()->away($url);
+        }
 }

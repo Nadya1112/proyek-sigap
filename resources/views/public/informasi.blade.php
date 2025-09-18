@@ -61,10 +61,11 @@
         <ul class="mt-7 max-w-3xl mx-auto divide-y divide-gray-100">
           @forelse ($docs as $doc)
             @php
-              $title = $doc['title'];
-              $year  = $doc['year'] ?? null;
-              $size  = $doc['size_kb'] ?? null; // KB
-              $mime  = strtoupper(pathinfo($title, PATHINFO_EXTENSION) ?: ($doc['mime'] ?? 'PDF'));
+              $title = $doc['title'] ?? '';
+              $year  = $doc['year']  ?? null;
+              // size_kb dari controller, kalau tidak ada pakai key 'size' (service mengembalikan KB)
+              $size  = $doc['size_kb'] ?? ($doc['size'] ?? null); 
+              $ext   = strtoupper($doc['ext'] ?? 'PDF');
               $id    = $doc['id'];
             @endphp
             <li
@@ -84,17 +85,17 @@
                   <p class="text-gray-800 font-medium truncate">{{ $title }}</p>
                   <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
                     <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 ring-1 ring-orange-200">
-                      {{ $mime === '' ? 'PDF' : $mime }}
+                      {{ $ext }}
                     </span>
                     @if($year)<span>{{ $year }}</span>@endif
-                    @if($size)<span>• {{ number_format($size) }} KB</span>@endif
+                    @if(!is_null($size))<span>• {{ number_format($size) }} KB</span>@endif
                   </div>
                 </div>
               </div>
 
               <div class="flex items-center">
                 <a href="{{ route('informasi.download', $id) }}"
-                   class="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-white text-sm font-semibold
+                  class="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-white text-sm font-semibold
                           bg-gradient-to-r from-[#FFA72B] to-[#F16A00] shadow-sm
                           hover:brightness-95 active:scale-[.99] transition">
                   <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">

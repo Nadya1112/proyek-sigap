@@ -171,9 +171,33 @@ class GoogleDriveService
         ]);
     }
 
-    /** Link download file */
-    public function exportDownloadUrl(string $fileId): string
+public function exportDownloadUrl(string $fileId): string
     {
+    // Ambil mimeType untuk bedakan file biasa vs Google Docs
+    $meta = $this->drive->files->get($fileId, ['fields' => 'mimeType,name']);
+    $mime = $meta->mimeType ?? '';
+
+    // Google Docs family -> pakai endpoint export sesuai tipenya
+    if (str_starts_with($mime, 'application/vnd.google-apps')) {
+        // Mapping format export
+        if ($mime === 'application/vnd.google-apps.document') {
+            // Google Docs -> PDF
+            return "https://docs.google.com/document/d/{$fileId}/export?format=pdf";
+        }
+        if ($mime === 'application/vnd.google-apps.spreadsheet') {
+            // Google Sheets -> XLSX
+            return "https://docs.google.com/spreadsheets/d/{$fileId}/export?format=xlsx";
+        }
+        if ($mime === 'application/vnd.google-apps.presentation') {
+            // Google Slides -> PPTX
+            return "https://docs.google.com/presentation/d/{$fileId}/export?format=pptx";
+        }
+        // Default untuk tipe Google lainnya -> PDF
         return "https://drive.google.com/uc?export=download&id={$fileId}";
+    }
+
+    // File “biasa” (pdf/docx/png/zip, dll)
+    return "https://drive.google.com/uc?export=download&id={$fileId}";
+
     }
 }

@@ -28,13 +28,14 @@ Route::view('/fitur','public.fitur')->name('fitur');
 // FASUM lama (kalau masih dipakai)
 Route::get('/informasi-fasum', [FasumController::class,'index'])->name('informasi-fasum');
 
-// INFORMASI baru + unduh
+// INFORMASI baru + unduh (pakai fileId langsung)
 Route::get('/informasi', [InformasiController::class, 'index'])->name('informasi');
 
-Route::get('/informasi/unduh/{slug}', [InformasiController::class, 'download'])
-     ->name('informasi.download')
-     ->middleware('throttle:60,1'); // rate-limit opsional
-     
+Route::get('/informasi/unduh/{id}', [InformasiController::class, 'download'])
+    ->where('id', '[A-Za-z0-9_-]+') // validasi ID Google Drive
+    ->name('informasi.download')
+    ->middleware('throttle:60,1'); // rate-limit opsional
+
 // dependent dropdown
 Route::get('/kelurahan-by-kecamatan/{kecamatan}', [FasumController::class, 'kelurahanByKecamatan'])
     ->name('kelurahan.byKecamatan');
@@ -70,7 +71,6 @@ Route::middleware('guest')->group(function () {
     Route::post('/verify-email', [VerifyEmailController::class, 'verify'])->name('verification.verify');
     Route::post('/verify-email/resend', [VerifyEmailController::class, 'resend'])->name('verification.resend');
 });
-
 
 // logout (hanya untuk yang sudah login)
 Route::post('/logout', [LoginController::class, 'logout'])
