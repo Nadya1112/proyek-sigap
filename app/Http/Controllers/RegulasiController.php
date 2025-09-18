@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\GoogleDriveService;
 use Illuminate\Http\Request;
 
-class InformasiController extends Controller
+class RegulasiController extends Controller
 {
     public function __construct(private GoogleDriveService $gdrive) {}
 
@@ -18,7 +18,7 @@ class InformasiController extends Controller
         // Urutkan: terbaru dulu
         usort($files, fn($a,$b) => strcmp($b['mtime'] ?? '', $a['mtime'] ?? ''));
 
-        return view('public.informasi', [
+        return view('public.regulasi', [
             'docs' => collect($files)->map(function($f){
                 // Ekstrak tahun dari nama (opsional)
                 preg_match('/\b(19|20)\d{2}\b/', $f['name'], $m);

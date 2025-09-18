@@ -47,8 +47,8 @@
                 <a href="{{ route('sebaran') }}" class="nav-link {{ request()->routeIs('sebaran') ? 'active' : '' }}">
                     Sebaran Komplek
                 </a>
-                <a href="{{ route('informasi') }}" class="nav-link {{ request()->routeIs('informasi') ? 'active' : '' }}">
-                    Informasi
+                <a href="{{ route('regulasi') }}" class="nav-link {{ request()->routeIs('regulasi*') ? 'active' : '' }}">
+                    Regulasi
                 </a>
                 <a href="{{ route('kontak') }}" class="nav-link {{ request()->routeIs('kontak') ? 'active' : '' }}">
                     Kontak
@@ -226,6 +226,7 @@
                         <li><a href="{{ route('informasi-fasum') }}">Informasi FASUM</a></li>
                         <li><a href="{{ route('eproposal') }}">E-Proposal PSU</a></li>
                         <li><a href="{{ route('pengaduan') }}">Pengaduan</a></li>
+                        <li><a href="{{ route('regulasi') }}">Regulasi</a></li>
                     </ul>
                 </div>
 

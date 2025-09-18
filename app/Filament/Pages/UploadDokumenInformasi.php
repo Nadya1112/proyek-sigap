@@ -15,7 +15,6 @@ class UploadDokumenInformasi extends Page implements Forms\Contracts\HasForms
     protected static ?string $navigationIcon = 'heroicon-o-arrow-up-tray';
     protected static ?string $navigationLabel = 'Upload Dokumen Informasi';
     protected static ?string $title = 'Upload Dokumen Informasi';
-    protected static ?string $navigationGroup = 'Informasi';
     protected static ?int $navigationSort = 10;
 
     protected static string $view = 'filament.pages.upload-dokumen-informasi';

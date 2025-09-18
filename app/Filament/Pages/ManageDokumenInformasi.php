@@ -11,7 +11,6 @@ class ManageDokumenInformasi extends Page
 {
     use WithFileUploads;
 
-    protected static ?string $navigationGroup = 'Informasi';
     protected static ?string $navigationLabel = 'Kelola Dokumen';
     protected static ?string $title = 'Kelola Dokumen Informasi';
     protected static string $view = 'filament.pages.manage-dokumen-informasi';

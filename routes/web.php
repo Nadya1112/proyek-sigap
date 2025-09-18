@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PublicFormController;
 use App\Http\Controllers\FasumController;
-use App\Http\Controllers\InformasiController;
+use App\Http\Controllers\RegulasiController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\VerifyEmailController;
@@ -29,12 +29,21 @@ Route::view('/fitur','public.fitur')->name('fitur');
 Route::get('/informasi-fasum', [FasumController::class,'index'])->name('informasi-fasum');
 
 // INFORMASI baru + unduh (pakai fileId langsung)
-Route::get('/informasi', [InformasiController::class, 'index'])->name('informasi');
+// routes/web.php
+Route::redirect('/informasi', '/regulasi', 301);
+Route::get('/informasi/unduh/{id}', fn($id) => redirect()->away(route('regulasi.download', $id), 301));
 
-Route::get('/informasi/unduh/{id}', [InformasiController::class, 'download'])
-    ->where('id', '[A-Za-z0-9_-]+') // validasi ID Google Drive
-    ->name('informasi.download')
-    ->middleware('throttle:60,1'); // rate-limit opsional
+// --- rute baru
+Route::get('/regulasi', [RegulasiController::class, 'index'])->name('regulasi');
+
+Route::get('/regulasi/unduh/{id}', [RegulasiController::class, 'download'])
+    ->where('id', '[A-Za-z0-9_-]+')
+    ->name('regulasi.download')
+    ->middleware('throttle:60,1');
+
+// opsional: redirect lama → baru (SEO & link lama tetap hidup)
+Route::redirect('/informasi', '/regulasi', 301);
+Route::get('/informasi/unduh/{id}', fn($id)=>redirect()->to(route('regulasi.download',$id),301));
 
 // dependent dropdown
 Route::get('/kelurahan-by-kecamatan/{kecamatan}', [FasumController::class, 'kelurahanByKecamatan'])

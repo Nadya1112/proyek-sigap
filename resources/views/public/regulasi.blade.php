@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title','Informasi & Dokumen')
+@section('title','Regulasi & Dokumen')
 
 @section('content')
 
@@ -22,10 +22,10 @@
       </span>
 
       <h1 class="mt-4 text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.10)]">
-        Informasi Dokumen Resmi
+        Informasi Dokumen Regulasi Resmi
       </h1>
       <p class="mt-4 text-base md:text-lg text-white/90 max-w-3xl mx-auto">
-        Kumpulan peraturan, keputusan, dan dokumen pendukung SIGAP–KOMPLEK. Unduh sesuai kebutuhan Anda.
+        Kumpulan regulasi, keputusan, dan dokumen pendukung SIGAP–KOMPLEK.
       </p>
     </div>
   </div>
@@ -94,7 +94,7 @@
               </div>
 
               <div class="flex items-center">
-                <a href="{{ route('informasi.download', $id) }}"
+                <a href="{{ route('regulasi.download', $id) }}"
                   class="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-white text-sm font-semibold
                           bg-gradient-to-r from-[#FFA72B] to-[#F16A00] shadow-sm
                           hover:brightness-95 active:scale-[.99] transition">
