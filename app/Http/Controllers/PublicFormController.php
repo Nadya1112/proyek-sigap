@@ -69,4 +69,19 @@ class PublicFormController extends Controller
 
         return redirect()->back()->with('success', 'Pengaduan Anda berhasil dikirim! Terima kasih.');
     }
+
+    public function showPengaduanForm()
+    {
+        // PERBAIKAN: Menghitung statistik pengaduan dari database
+        $stats = [
+            'total'   => Pengaduan::count(),
+            'selesai' => Pengaduan::where('status', 'Selesai')->count(),
+            'proses'  => Pengaduan::where('status', 'Diproses')->count(),
+            // Status awal saat pengaduan dibuat adalah 'Diterima'
+            'belum'   => Pengaduan::where('status', 'Diterima')->count(), 
+        ];
+
+        // Kirim data statistik ke view
+        return view('public.pengaduan', $stats);
+    }
 }
