@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PublicFormController;
 use App\Http\Controllers\FasumController;
-use App\Http\Controllers\RegulasiController;
+use App\Http\Controllers\RegulasiController;         // <- pastikan controller ini ada (rename dari InformasiController)
+use App\Http\Controllers\UserDashboardController;     // <- controller baru (di langkah C)
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\VerifyEmailController;
@@ -91,5 +92,10 @@ Route::post('/logout', [LoginController::class, 'logout'])
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth','nocache'])->group(function () {
+    // (punya kamu) jika ada dashboard umum
     Route::view('/dashboard', 'public.dashboard')->name('dashboard');
+
+    // === DASHBOARD PENGGUNA ===
+    Route::get('/dashboard-pengguna', [UserDashboardController::class, 'index'])
+        ->name('user.dashboard');
 });

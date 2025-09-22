@@ -98,56 +98,61 @@
                                 </div>
                             </div>
 
-                            <!-- Menu Items -->
                             <div class="py-2">
-                                <a href="{{ route('home') }}" class="dropdown-item">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    {{-- DASHBOARD PENGGUNA --}}
+                                    <a href="{{ route('user.dashboard') }}"
+                                        class="dropdown-item {{ request()->routeIs('user.dashboard') ? 'bg-gray-50' : '' }}">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                                                d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 5a2 2 0 012-2h2a2 2 0 012 2v6H8V5z" />
-                                    </svg>
-                                    Dashboard
-                                </a>
+                                                d="M8 5a2 2 0 012-2h2a2 2 0 012 2v6H8V5z"/>
+                                        </svg>
+                                        Dashboard
+                                    </a>
 
-                                <a href="#" class="dropdown-item">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    {{-- PROFIL (sementara menuju anchor di home; ganti ke route profil bila sudah ada) --}}
+                                    <a href="{{ route('home') }}#profil" class="dropdown-item">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                    Profil Saya
-                                </a>
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                        </svg>
+                                        Profil Saya
+                                    </a>
 
-                                <a href="#" class="dropdown-item">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    {{-- PROPOSAL SAYA (saat ada halaman index khusus, ganti ke route tersebut) --}}
+                                    <a href="{{ route('eproposal') }}" class="dropdown-item">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    Proposal Saya
-                                </a>
+                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        Proposal Saya
+                                    </a>
 
-                                <a href="#" class="dropdown-item">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    {{-- PENGADUAN SAYA (saat ada halaman index khusus, ganti ke route tersebut) --}}
+                                    <a href="{{ route('pengaduan') }}" class="dropdown-item">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                    </svg>
-                                    Pengaduan Saya
-                                </a>
+                                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                        </svg>
+                                        Pengaduan Saya
+                                    </a>
 
-                                <div class="border-t border-gray-100 my-2"></div>
+                                    <div class="border-t border-gray-100 my-2"></div>
 
-                                <!-- LOGOUT: gunakan route('logout') -->
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item text-red-600 hover:bg-red-50">
+                                    {{-- LOGOUT --}}
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item text-red-600 hover:bg-red-50">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                                         </svg>
                                         Keluar
-                                    </button>
-                                </form>
-                            </div>
+                                        </button>
+                                    </form>
+                                    </div>
+
                         </div>
                     </div>
                 @else
