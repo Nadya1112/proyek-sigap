@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Proposal;
 use App\Models\Pengaduan;
+use Illuminate\Support\Facades\Auth;
 
 class PublicFormController extends Controller
 {
@@ -36,30 +37,36 @@ class PublicFormController extends Controller
         return back()->with('success','Proposal berhasil dikirim. ID: '.$proposal->id);
     }
 
-    public function pengaduan(Request $r)
+    public function pengaduan(Request $request)
     {
-        $r->validate([
-            'nama'=>'nullable|string|max:150',
-            'kontak'=>'nullable|string|max:30',
-            'isi'=>'required|string',
-            'bukti'=>'nullable|image|max:5120'
-        ]);
-
-        $path = null;
-        if ($r->hasFile('bukti')) {
-            $file = $r->file('bukti');
-            $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
-            $path = $file->storeAs('pengaduan', $filename, 'public');
+        // Pastikan hanya user yang sudah login yang bisa mengirim
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Anda harus login untuk membuat pengaduan.');
         }
 
-        $pengaduan = Pengaduan::create([
-            'nama'=>$r->nama,
-            'kontak'=>$r->kontak,
-            'isi'=>$r->isi,
-            'bukti_path'=>$path,
-            'status'=>'terkirim'
+        // Validasi input
+        $validated = $request->validate([
+            'nama_pelapor' => 'required|string|max:255',
+            'kontak_pelapor' => 'required|string|max:20',
+            'isi_pengaduan' => 'required|string',
+            'bukti_foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        return back()->with('success','Pengaduan berhasil dikirim. ID: '.$pengaduan->id);
+        $filePath = null;
+        // PERBAIKAN: Menggunakan metode store yang lebih eksplisit
+        if ($request->hasFile('bukti_foto')) {
+            // Simpan di dalam 'storage/app/public/pengaduan'
+            // dan path yang dikembalikan adalah 'pengaduan/namafile.jpg'
+            $filePath = $request->file('bukti_foto')->store('pengaduan', 'public');
+        }
+
+        // Tambahkan user_id dari user yang sedang login
+        $validated['user_id'] = Auth::id();
+        $validated['bukti_foto'] = $filePath; // Masukkan path yang benar ke array
+
+        // Simpan ke database
+        Pengaduan::create($validated);
+
+        return redirect()->back()->with('success', 'Pengaduan Anda berhasil dikirim! Terima kasih.');
     }
 }
