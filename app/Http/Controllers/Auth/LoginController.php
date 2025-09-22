@@ -64,13 +64,18 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
+        // 1. Keluarkan pengguna dari sistem autentikasi
         Auth::logout();
+
+        // 2. Batalkan sesi yang sedang berjalan (mencegah tombol back)
         $request->session()->invalidate();
+
+        // 3. Buat ulang token sesi untuk keamanan
         $request->session()->regenerateToken();
         
-        return redirect()->route('login');
+        // 4. Arahkan pengguna ke landing page (home)
+        return redirect()->route('home');
     }
-
     /**
      * Generate captcha penjumlahan dan simpan hasilnya di session.
      * @return array{int,int} [$a,$b]
