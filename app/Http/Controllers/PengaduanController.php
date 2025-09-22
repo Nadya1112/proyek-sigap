@@ -3,24 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Pengaduan; // Import model Pengaduan
+use App\Models\Pengaduan;
+use Illuminate\Support\Facades\Auth;
 
 class PengaduanController extends Controller
 {
     /**
-     * Menampilkan form pengaduan beserta data statistik.
+     * Menampilkan form pengaduan beserta data statistik yang benar.
      */
     public function showPengaduanForm()
     {
-        // Menghitung statistik pengaduan
         $stats = [
-            'total'   => Pengaduan::count(),
+            'total'    => Pengaduan::count(),
             'diterima' => Pengaduan::where('status', 'Diterima')->count(),
-            'proses'  => Pengaduan::where('status', 'Diproses')->count(),
-            'selesai' => Pengaduan::where('status', 'Selesai')->count(),
+            'proses'   => Pengaduan::where('status', 'Diproses')->count(),
+            'selesai'  => Pengaduan::where('status', 'Selesai')->count(),
         ];
 
-        // Mengirim data statistik ke view 'public.pengaduan'
         return view('public.pengaduan', $stats);
     }
 
@@ -29,9 +28,28 @@ class PengaduanController extends Controller
      */
     public function storePengaduan(Request $request)
     {
-        // Logika untuk menyimpan pengaduan (kode dari sebelumnya)
-        // Pastikan Anda sudah mengimpor model dan kelas lainnya jika diperlukan.
-        // Contoh: use App\Models\Pengaduan; use Illuminate\Support\Facades\Auth;
-        // Kode ini tidak saya lampirkan karena sudah ada di PublicFormController.php
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Anda harus login untuk membuat pengaduan.');
+        }
+
+        $validated = $request->validate([
+            'nama_pelapor'   => 'required|string|max:255',
+            'kontak_pelapor' => 'required|string|max:20',
+            'isi_pengaduan'  => 'required|string',
+            'bukti_foto'     => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $filePath = $request->file('bukti_foto')->store('pengaduan', 'public');
+
+        Pengaduan::create([
+            'nama_pelapor'   => $validated['nama_pelapor'],
+            'kontak_pelapor' => $validated['kontak_pelapor'],
+            'isi_pengaduan'  => $validated['isi_pengaduan'],
+            'bukti_foto'     => $filePath,
+            'user_id'        => Auth::id(),
+            'status'         => 'Diterima',
+        ]);
+
+        return redirect()->back()->with('success', 'Pengaduan Anda berhasil dikirim! Terima kasih.');
     }
 }

@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PengaduanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,8 +55,7 @@ Route::get('/kelurahan-by-kecamatan/{kecamatan}', [FasumController::class, 'kelu
 Route::view('/sebaran-komplek','public.sebaran')->name('sebaran');
 Route::view('/kontak','public.kontak')->name('kontak');
 Route::view('/e-proposal-psu','public.eproposal')->name('eproposal');
-Route::view('/pengaduan-masyarakat','public.pengaduan')->name('pengaduan');
-
+Route::get('/pengaduan-masyarakat', [PengaduanController::class, 'showPengaduanForm'])->name('pengaduan');
 /*
 |--------------------------------------------------------------------------
 | Form handlers (POST)
