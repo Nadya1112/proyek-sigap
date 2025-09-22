@@ -39,9 +39,9 @@
                 <div class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
                     @php
                         $statTotal = $total ?? 0;
-                        $statSelesai = $selesai ?? 0; // Sudah ditindaklanjuti
-                        $statProses = $proses ?? 0; // Dalam proses
-                        $statBelum = $belum ?? 0; // Belum ditindaklanjuti
+                        $statDiterima = $diterima ?? 0; // Pengaduan sudah diterima
+                        $statProses = $proses ?? 0; // Pengaduan dalam proses
+                        $statSelesai = $selesai ?? 0; // Pengaduan sudah selesai
                     @endphp
 
                     <div
@@ -58,8 +58,8 @@
                  bg-white/18 ring-1 ring-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]
                  transition-all duration-300
                  hover:-translate-y-1 hover:shadow-xl hover:ring-white/45">
-                        <p class="text-3xl md:text-4xl font-extrabold text-white leading-none">{{ $statSelesai }}</p>
-                        <p class="mt-3 text-[11px] tracking-wide uppercase text-white/85">Sudah Ditindaklanjuti</p>
+                        <p class="text-3xl md:text-4xl font-extrabold text-white leading-none">{{ $statDiterima }}</p>
+                        <p class="mt-3 text-[11px] tracking-wide uppercase text-white/85">Sudah Diterima</p>
                     </div>
 
                     <div
@@ -76,8 +76,8 @@
                  bg-white/18 ring-1 ring-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]
                  transition-all duration-300
                  hover:-translate-y-1 hover:shadow-xl hover:ring-white/45">
-                        <p class="text-3xl md:text-4xl font-extrabold text-white leading-none">{{ $statBelum }}</p>
-                        <p class="mt-3 text-[11px] tracking-wide uppercase text-white/85">Belum Ditindaklanjuti</p>
+                        <p class="text-3xl md:text-4xl font-extrabold text-white leading-none">{{ $statSelesai }}</p>
+                        <p class="mt-3 text-[11px] tracking-wide uppercase text-white/85">Sudah Selesai</p>
                     </div>
                 </div>
             </div>
@@ -129,13 +129,17 @@
                             @enderror
                         </div>
 
-                        <div>
-                            <label for="bukti_foto" class="form-label">Unggah Bukti Foto</label>
-                            <input type="file" id="bukti_foto" name="bukti_foto" class="form-input" required
-                                accept="image/*">
-                            <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG, GIF. Maksimal 2MB.</p>
+                        <div class="md:col-span-2">
+                            <label for="bukti_foto" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                                Unggah Bukti Foto <span class="font-normal text-gray-500">(Format: JPG, PNG, GIF. Maksimal
+                                    2MB)</span>
+                            </label>
+                            <input id="bukti_foto" type="file" name="bukti_foto" accept="image/*" required
+                                class="w-full rounded-xl border border-gray-200 bg-gray-50
+                          file:mr-4 file:rounded-lg file:border-0 file:bg-[#FFA72B] file:px-4 file:py-2 file:text-white
+                          hover:file:brightness-95 focus:border-[#F39B28] focus:ring-2 focus:ring-[#F39B28]/40 transition" />
                             @error('bukti_foto')
-                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -147,13 +151,13 @@
                         </div>
                     </form>
                 @else
-                    <div class="text-center border-2 border-dashed border-gray-300 p-12 rounded-lg">
+                    <div class="text-center border-2 border-dashed border-gray-300 p-12">
                         <h3 class="text-xl font-bold text-gray-700">Akses Ditolak</h3>
                         <p class="text-gray-600 mt-2 mb-4">Anda harus login terlebih dahulu untuk dapat mengirimkan pengaduan.
                         </p>
-                        <a href="{{ route('login') }}" class="btn-gradient">
+                        <a href="{{ route('login') }}" class="btn-gradient rounded-lg">
                             <span class="relative z-10">Login Sekarang</span>
-                            <div class="btn-gradient-hover"></div>
+                            <div class="btn-gradient-hover rounded-lg"></div>
                         </a>
                     </div>
                 @endauth
