@@ -39,9 +39,9 @@
                 <div class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
                     @php
                         $statTotal = $total ?? 0;
-                        $statDiterima = $diterima ?? 0; // Pengaduan sudah diterima
-                        $statProses = $proses ?? 0; // Pengaduan dalam proses
-                        $statSelesai = $selesai ?? 0; // Pengaduan sudah selesai
+                        $statDiterima = $diterima ?? 0;
+                        $statProses = $proses ?? 0;
+                        $statSelesai = $selesai ?? 0;
                     @endphp
 
                     <div
