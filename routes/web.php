@@ -10,6 +10,7 @@ use App\Http\Controllers\UserDashboardController;     // <- controller baru (di 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -98,4 +99,9 @@ Route::middleware(['auth','nocache'])->group(function () {
     // === DASHBOARD PENGGUNA ===
     Route::get('/dashboard-pengguna', [UserDashboardController::class, 'index'])
         ->name('user.dashboard');
+    
+    // *** HALAMAN PROFIL AKUN *** //
+    Route::get('/profil', [ProfileController::class, 'index'])->name('profil.index');
+    Route::post('/profil/detail', [ProfileController::class, 'updateDetail'])->name('profil.update.detail');
+    Route::post('/profil/password', [ProfileController::class, 'updatePassword'])->name('profil.update.password');
 });

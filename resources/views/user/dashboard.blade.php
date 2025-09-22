@@ -9,7 +9,7 @@
 {{-- ====================================================================== --}}
 <header class="relative overflow-hidden" style="background: linear-gradient(135deg, #F59E0B 0%, #F97316 50%, #EA580C 100%);">
     {{-- Latar belakang pola SVG subtle --}}
-    <div class="absolute inset-0 pointer-events-none" style="background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.05)" points="0,1000 1000,0 1000,1000"/></svg>');"></div>
+    <div class="absolute inset-0 pointer-events-none" style="background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.05)" points="0,1000 1000,0 1000,1000"/></svg></div>
 
     <div class="container mx-auto px-6 py-12 md:py-16 relative">
         <div class="max-w-4xl mx-auto text-center text-white">
@@ -88,7 +88,8 @@
                             <p class="text-sm text-gray-500 mt-1">Ajukan proposal untuk bantuan prasarana, sarana, dan utilitas umum.</p>
                         </div>
                     </a>
-                     <a href="{{ route('home') }}#profil" class="group flex items-center gap-5 p-4 rounded-xl bg-gray-50 border-2 border-transparent hover:border-gray-400 hover:bg-gray-100 transition-all duration-300">
+
+                     <a href="{{ route('profil.index') }}#profil" class="group flex items-center gap-5 p-4 rounded-xl bg-gray-50 border-2 border-transparent hover:border-gray-400 hover:bg-gray-100 transition-all duration-300">
                         <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-gray-200 text-gray-600 grid place-content-center transition-all duration-300 group-hover:scale-110">
                              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
