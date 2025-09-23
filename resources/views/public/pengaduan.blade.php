@@ -151,14 +151,32 @@
                         </div>
                     </form>
                 @else
-                    <div class="text-center border-2 border-dashed border-gray-300 p-12">
-                        <h3 class="text-xl font-bold text-gray-700">Akses Ditolak</h3>
-                        <p class="text-gray-600 mt-2 mb-4">Anda harus login terlebih dahulu untuk dapat mengirimkan pengaduan.
+                    <div class="text-center bg-orange-50/50 rounded-xl p-8 md:p-12 border border-orange-200/80">
+                        {{-- Icon --}}
+                        <div
+                            class="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-lg mb-5">
+                            <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H4.5a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                            </svg>
+                        </div>
+
+                        <h3 class="text-2xl font-bold text-gray-800">Silakan Masuk Terlebih Dahulu</h3>
+                        <p class="text-gray-600 mt-2 mb-6 max-w-md mx-auto">
+                            Anda harus memiliki akun dan masuk untuk dapat membuat pengaduan baru.
                         </p>
-                        <a href="{{ route('login') }}" class="btn-gradient rounded-lg">
-                            <span class="relative z-10">Login Sekarang</span>
-                            <div class="btn-gradient-hover rounded-lg"></div>
-                        </a>
+
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <a href="{{ route('login') }}" class="btn-gradient rounded-lg px-8 py-3">
+                                <span class="relative z-10 font-semibold">Masuk ke Akun</span>
+                                <div class="btn-gradient-hover rounded-lg"></div>
+                            </a>
+                            <a href="{{ url('/register') }}"
+                                class="font-semibold text-orange-600 hover:text-orange-700 transition">
+                                Buat Akun Baru
+                            </a>
+                        </div>
                     </div>
                 @endauth
             </div>
