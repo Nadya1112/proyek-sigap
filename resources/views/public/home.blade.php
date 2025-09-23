@@ -573,8 +573,8 @@
                 </p>
 
                 <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                    <a href="{{ route('eproposal') }}" class="cta-btn-primary">
-                        <span>Mulai Sekarang</span>
+                    <a href="{{ route('register') }}" class="cta-btn-primary">
+                        <span>Daftar Sekarang</span>
                         <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -582,7 +582,7 @@
                         </svg>
                     </a>
 
-                    <a href="{{ route('kontak') }}" class="cta-btn-secondary">
+                    <a href="https://wa.me/6281935288889" class="cta-btn-secondary">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
