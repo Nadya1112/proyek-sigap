@@ -8,99 +8,111 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    public function showLoginForm(Request $request)
+    /** Buat soal captcha & simpan ke session */
+    private function makeCaptcha(): array
     {
-        // Buat soal captcha setiap kali halaman login dibuka
-        [$a, $b] = $this->generateCaptcha($request);
+        $a = random_int(1, 9);
+        $b = random_int(1, 9);
 
-        // Tampilkan angka ke view
+        session([
+            'captcha' => [
+                'a'   => $a,
+                'b'   => $b,
+                'sum' => $a + $b,
+            ],
+        ]);
+
+        return [$a, $b];
+    }
+
+    /** GET /login (guest) */
+    public function showLoginForm()
+    {
+        // siapkan captcha di setiap kunjungan halaman login
+        [$a, $b] = $this->makeCaptcha();
+
+        // kirim $a dan $b ke view (login.blade.php kamu memang memakainya)
         return view('auth.login', compact('a', 'b'));
     }
 
+    /** POST /login */
     public function authenticate(Request $request)
     {
-        // Validasi input (tetap seperti punyamu + tambahkan captcha)
-        $validated = $request->validate([
-            'login'    => ['required','string'], // email / username / phone
-            'password' => ['required','string'],
-            'captcha'  => ['required','numeric'],
-        ], [
-            'captcha.required' => 'Jawaban verifikasi wajib diisi.',
-            'captcha.numeric'  => 'Jawaban verifikasi harus berupa angka.',
+        // ✅ sesuai form kamu: 'login' (email/HP), 'password', 'captcha'
+        $request->validate([
+            'login'    => ['required', 'string'],
+            'password' => ['required', 'string'],
+            'captcha'  => ['required', 'numeric'],
         ]);
 
-        // Cek captcha lebih dulu (TANPA mengubah algoritma loginmu)
-        $expected = (int) $request->session()->get('login_captcha_sum', -1);
-        if ((int) $validated['captcha'] !== $expected) {
-            // Soal baru untuk percobaan berikutnya
-            $this->generateCaptcha($request);
+        // Validasi CAPTCHA
+        $expected = (int) (session('captcha.sum') ?? -1);
+        if ((int) $request->input('captcha') !== $expected) {
+            // regenerate soal baru supaya tidak bisa brute force
+            $this->makeCaptcha();
 
             return back()
-                ->withErrors(['captcha' => 'Jawaban verifikasi salah. Silakan coba lagi.'])
-                ->onlyInput('login'); // login tetap diisi, password dikosongkan
+                ->withErrors(['captcha' => 'Jawaban verifikasi tidak sesuai.'])
+                ->withInput();
         }
 
-        // Algoritma loginmu tetap sama
-        $field = 'email'; // Asumsi login selalu menggunakan email
+        $login    = trim((string) $request->input('login'));
+        $password = (string) $request->input('password');
+        $remember = $request->boolean('remember');
 
-        if (Auth::attempt([$field => $validated['login'], 'password' => $validated['password']], $request->boolean('remember'))) {
-            $request->session()->regenerate();
+        // Siapkan beberapa kemungkinan kredensial:
+        // 1) jika 'login' adalah email valid -> cek dengan kolom email
+        // 2) cek dengan kolom kontak (apa adanya)
+        // 3) cek dengan kolom kontak (hanya digit, kalau user memasukkan format dengan spasi/tanda)
+        $attempts = [];
 
-            // Hapus captcha dari session setelah sukses
-            $request->session()->forget(['login_captcha_sum', 'login_captcha_a', 'login_captcha_b']);
-            
-            // ==================================================================
-            // === BAGIAN YANG DIUBAH: LOGIKA REDIRECT BERDASARKAN ROLE ===
-            // ==================================================================
-            $user = Auth::user();
+        if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+            $attempts[] = ['email' => $login, 'password' => $password];
+        }
 
-            // Cek jika role user adalah 'admin'
-            if ($user->role === 'admin') {
-                // Arahkan ke dashboard Filament (biasanya /admin)
-                return redirect()->intended(config('filament.path'));
+        $attempts[] = ['kontak' => $login, 'password' => $password];
+
+        $digits = preg_replace('/\D+/', '', $login);
+        if ($digits !== $login && $digits !== '') {
+            $attempts[] = ['kontak' => $digits, 'password' => $password];
+        }
+
+        // Coba autentikasi dengan setiap kemungkinan di atas
+        foreach ($attempts as $creds) {
+            if (Auth::attempt($creds, $remember)) {
+                $request->session()->regenerate();
+                session()->forget('captcha'); // bersihkan captcha agar tidak mengganggu alur selanjutnya
+
+                $user = Auth::user();
+
+                // Role-based redirect (sesuai permintaanmu)
+                if ($user->role === 'admin') {
+                    try {
+                        return redirect()->route('filament.admin.pages.dashboard'); // Filament v3
+                    } catch (\Throwable $e) {
+                        return redirect()->to('/admin'); // fallback panel default
+                    }
+                }
+                // pengguna -> landing page (home.blade)
+                return redirect()->route('home');
             }
-
-            // Jika bukan admin (masyarakat), arahkan ke halaman home
-            return redirect()->intended(route('home'));
-            // ==================================================================
-
         }
 
-        // Kredensial salah -> buat soal baru lagi
-        $this->generateCaptcha($request);
+        // Gagal login -> regen captcha + pesan
+        $this->makeCaptcha();
 
         return back()
-            ->withErrors(['login' => 'Kredensial tidak sesuai.'])
-            ->onlyInput('login');
+            ->withErrors(['login' => 'Kredensial tidak cocok.'])
+            ->withInput();
     }
 
+    /** POST /logout */
     public function logout(Request $request)
     {
-        // 1. Keluarkan pengguna dari sistem autentikasi
         Auth::logout();
-
-        // 2. Batalkan sesi yang sedang berjalan (mencegah tombol back)
         $request->session()->invalidate();
-
-        // 3. Buat ulang token sesi untuk keamanan
         $request->session()->regenerateToken();
-        
-        // 4. Arahkan pengguna ke landing page (home)
+
         return redirect()->route('home');
-    }
-    /**
-     * Generate captcha penjumlahan dan simpan hasilnya di session.
-     * @return array{int,int} [$a,$b]
-     */
-    private function generateCaptcha(Request $request): array
-    {
-        $a = random_int(10, 49);
-        $b = random_int(1, 9);
-
-        $request->session()->put('login_captcha_sum', $a + $b);
-        $request->session()->put('login_captcha_a', $a);
-        $request->session()->put('login_captcha_b', $b);
-
-        return [$a, $b];
     }
 }
