@@ -41,17 +41,29 @@ class LoginController extends Controller
         }
 
         // Algoritma loginmu tetap sama
-        $field = filter_var($validated['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'email';
-        // contoh bila nanti pakai username:
-        // $field = filter_var($validated['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $field = 'email'; // Asumsi login selalu menggunakan email
 
         if (Auth::attempt([$field => $validated['login'], 'password' => $validated['password']], $request->boolean('remember'))) {
             $request->session()->regenerate();
 
             // Hapus captcha dari session setelah sukses
             $request->session()->forget(['login_captcha_sum', 'login_captcha_a', 'login_captcha_b']);
+            
+            // ==================================================================
+            // === BAGIAN YANG DIUBAH: LOGIKA REDIRECT BERDASARKAN ROLE ===
+            // ==================================================================
+            $user = Auth::user();
 
+            // Cek jika role user adalah 'admin'
+            if ($user->role === 'admin') {
+                // Arahkan ke dashboard Filament (biasanya /admin)
+                return redirect()->intended(config('filament.path'));
+            }
+
+            // Jika bukan admin (masyarakat), arahkan ke halaman home
             return redirect()->intended(route('home'));
+            // ==================================================================
+
         }
 
         // Kredensial salah -> buat soal baru lagi
