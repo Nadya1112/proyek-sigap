@@ -13,6 +13,9 @@
 
     <!-- Enhanced CSS -->
     <link rel="stylesheet" href="{{ asset('css/enhanced-ui.css') }}">
+
+    <!-- Feather Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 </head>
 
 <body class="bg-gray-50">
@@ -61,107 +64,82 @@
                     <!-- User Dropdown -->
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open"
-                            class="flex items-center gap-3 text-gray-700 hover:text-sigap-yellow transition-colors duration-300">
+                            class="flex items-center gap-3 text-gray-700 hover:text-sigap-yellow transition-colors duration-300 focus:outline-none">
                             <div
-                                class="w-8 h-8 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center">
-                                <span class="text-white font-semibold text-sm">
+                                class="w-10 h-10 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center transform transition-transform duration-300 hover:scale-110">
+                                <span class="text-white font-bold text-base">
                                     {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
                                 </span>
                             </div>
-                            <span class="font-medium">{{ auth()->user()->name }}</span>
-                            <svg class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-180': open }"
+                            <span class="font-semibold">{{ auth()->user()->name }}</span>
+                            <svg class="w-5 h-5 transition-transform duration-300" :class="{ 'rotate-180': open }"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
 
                         <!-- Dropdown Menu -->
-                        <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200"
-                            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                            x-transition:leave="transition ease-in duration-75"
-                            x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50">
+                        <div x-show="open" @click.away="open = false"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-lg border border-gray-100 z-50">
 
                             <!-- User Info -->
                             <div class="px-4 py-3 border-b border-gray-100">
-                                <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-4">
                                     <div
-                                        class="w-12 h-12 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center">
-                                        <span class="text-white font-bold text-lg">
+                                        class="w-14 h-14 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center">
+                                        <span class="text-white font-bold text-xl">
                                             {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
                                         </span>
                                     </div>
                                     <div>
-                                        <p class="font-semibold text-gray-800">{{ auth()->user()->name }}</p>
+                                        <p class="font-bold text-gray-800 text-lg">{{ auth()->user()->name }}</p>
                                         <p class="text-sm text-gray-500">{{ auth()->user()->email }}</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="py-2">
-                                    {{-- DASHBOARD PENGGUNA --}}
-                                    <a href="{{ route('user.dashboard') }}"
-                                        class="dropdown-item {{ request()->routeIs('user.dashboard') ? 'bg-gray-50' : '' }}">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 5a2 2 0 012-2h2a2 2 0 012 2v6H8V5z"/>
-                                        </svg>
-                                        Dashboard
-                                    </a>
+                            <div class="space-y-1 p-2">
+                                <a href="{{ route('user.dashboard') }}"
+                                    class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:text-sigap-yellow {{ request()->routeIs('user.dashboard') ? 'bg-gray-100 text-sigap-yellow' : 'hover:bg-gray-50' }}">
+                                    <i data-feather="grid" class="w-5 h-5"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                                <a href="{{ route('profil.index') }}#profil" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-sigap-yellow">
+                                    <i data-feather="user" class="w-5 h-5"></i>
+                                    <span>Profil Saya</span>
+                                </a>
+                                <a href="{{ route('eproposal') }}" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-sigap-yellow">
+                                    <i data-feather="file-text" class="w-5 h-5"></i>
+                                    <span>Proposal Saya</span>
+                                </a>
+                                <a href="{{ route('pengaduan') }}" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-sigap-yellow">
+                                    <i data-feather="message-square" class="w-5 h-5"></i>
+                                    <span>Pengaduan Saya</span>
+                                </a>
 
-                                    {{-- PROFIL (sementara menuju anchor di home; ganti ke route profil bila sudah ada) --}}
-                                    <a href="{{ route('profil.index') }}#profil" class="dropdown-item">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                        </svg>
-                                        Profil Saya
-                                    </a>
+                                <div class="my-1 h-px bg-gray-200"></div>
 
-                                    {{-- PROPOSAL SAYA (saat ada halaman index khusus, ganti ke route tersebut) --}}
-                                    <a href="{{ route('eproposal') }}" class="dropdown-item">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                        </svg>
-                                        Proposal Saya
-                                    </a>
-
-                                    {{-- PENGADUAN SAYA (saat ada halaman index khusus, ganti ke route tersebut) --}}
-                                    <a href="{{ route('pengaduan') }}" class="dropdown-item">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                                        </svg>
-                                        Pengaduan Saya
-                                    </a>
-
-                                    <div class="border-t border-gray-100 my-2"></div>
-
-                                    {{-- LOGOUT --}}
-                                    <form method="POST" action="{{ route('logout') }}">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item text-red-600 hover:bg-red-50">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                                        </svg>
-                                        Keluar
-                                        </button>
-                                    </form>
-                                    </div>
-
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50">
+                                        <i data-feather="log-out" class="w-5 h-5"></i>
+                                        <span>Keluar</span>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 @else
                     <!-- Login Button -->
                     <div class="flex items-center gap-3">
-                        {{-- MASUK: arahkan ke route login --}}
                         <a href="{{ route('login') }}" class="btn-gradient">
                             <span class="relative z-10">Masuk</span>
-                            <div class="btn-gradient-hover"></div>
                         </a>
                     </div>
                 @endauth
@@ -291,6 +269,10 @@
 
     <!-- Enhanced JavaScript -->
     <script src="{{ asset('js/enhanced-ui.js') }}"></script>
+
+    <script>
+        feather.replace()
+    </script>
 </body>
 
 </html>
