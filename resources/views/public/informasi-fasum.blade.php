@@ -4,45 +4,57 @@
 
 @section('content')
     <!-- Page Header -->
-    <header class="page-header">
-        <div class="container mx-auto px-6">
-            <div class="text-center max-w-4xl mx-auto">
-                <div class="header-badge">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                        </path>
-                    </svg>
-                    Informasi FASUM
-                </div>
-                <h1 class="page-header-title">Data Prasarana, Sarana & Utilitas Umum</h1>
-                <p class="page-header-desc">
-                    Temukan informasi lengkap mengenai status FASUM komplek perumahan di Kota Banjarmasin.
-                    Data real-time yang akurat dan terpercaya untuk kemudahan masyarakat.
-                </p>
+    <section class="relative overflow-hidden">
+        <div class="relative"
+            style="background: linear-gradient(135deg, #F7A623 0%, #FF7A00 45%, #F25C3B 70%, #F04949 100%);">
+            {{-- glow kiri-atas --}}
+            <div class="pointer-events-none absolute -top-6 -left-10 w-[360px] h-[360px] opacity-70"
+                style="background: radial-gradient(closest-side, rgba(255,179,73,0.55) 0%, rgba(255,179,73,0.26) 34%, rgba(255,179,73,0.10) 60%, transparent 72%); filter: blur(2px);">
+            </div>
+            {{-- glow kanan-bawah --}}
+            <div class="pointer-events-none absolute -bottom-10 -right-8 w-[340px] h-[340px] opacity-65"
+                style="background: radial-gradient(closest-side, rgba(255,120,120,0.45) 0%, rgba(255,120,120,0.22) 35%, rgba(255,120,120,0.10) 58%, transparent 75%); filter: blur(2px);">
+            </div>
 
-                <!-- Quick Stats -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-                    <div class="quick-stat">
-                        <div class="stat-number">{{ $totalKomplek ?? '0' }}</div>
-                        <div class="stat-label">Total Komplek</div>
+            <div class="container mx-auto px-6 py-14 md:py-20 relative text-white">
+                <div class="text-center max-w-4xl mx-auto">
+                    <div class="header-badge">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        Informasi FASUM
                     </div>
-                    <div class="quick-stat">
-                        <div class="stat-number">{{ $sudahDiserahkan ?? '0' }}</div>
-                        <div class="stat-label">Sudah Diserahkan</div>
-                    </div>
-                    <div class="quick-stat">
-                        <div class="stat-number">{{ $prosesPenyerahan ?? '0' }}</div>
-                        <div class="stat-label">Proses Penyerahan</div>
-                    </div>
-                    <div class="quick-stat">
-                        <div class="stat-number">{{ $belumDiserahkan ?? '0' }}</div>
-                        <div class="stat-label">Belum Diserahkan</div>
+                    <h1 class="page-header-title">Data Prasarana, Sarana & Utilitas Umum</h1>
+                    <p class="page-header-desc">
+                        Temukan informasi lengkap mengenai status FASUM komplek perumahan di Kota Banjarmasin.
+                        Data real-time yang akurat dan terpercaya untuk kemudahan masyarakat.
+                    </p>
+
+                    <!-- Quick Stats -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                        <div class="quick-stat">
+                            <div class="stat-number">{{ $totalKomplek ?? '0' }}</div>
+                            <div class="stat-label">Total Komplek</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="stat-number">{{ $sudahDiserahkan ?? '0' }}</div>
+                            <div class="stat-label">Sudah Diserahkan</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="stat-number">{{ $prosesPenyerahan ?? '0' }}</div>
+                            <div class="stat-label">Proses Penyerahan</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="stat-number">{{ $belumDiserahkan ?? '0' }}</div>
+                            <div class="stat-label">Belum Diserahkan</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </header>
+    </section>
 
     <!-- Main Content -->
     <main class="py-8 lg:py-16 bg-gray-50">

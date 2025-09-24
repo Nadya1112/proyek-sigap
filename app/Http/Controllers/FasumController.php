@@ -55,7 +55,7 @@ class FasumController extends Controller
 
         $kompleks = $query
             ->orderBy('nama_komplek')
-            ->paginate(10)
+            ->paginate(12)
             ->appends($request->query());
 
         // Data dropdown kecamatan selalu lengkap
