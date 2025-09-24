@@ -22,6 +22,8 @@ class User extends Authenticatable implements FilamentUser
         // kolom verifikasi
         'verification_code',
         'verification_expires_at',
+
+        'email_verified_at'
     ];
 
     protected $hidden = [

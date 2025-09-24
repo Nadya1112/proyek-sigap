@@ -104,4 +104,27 @@ Route::middleware(['auth','nocache'])->group(function () {
     Route::get('/profil', [ProfileController::class, 'index'])->name('profil.index');
     Route::post('/profil/detail', [ProfileController::class, 'updateDetail'])->name('profil.update.detail');
     Route::post('/profil/password', [ProfileController::class, 'updatePassword'])->name('profil.update.password');
+
 });
+
+// --- RUTE UNTUK LUPA KATA SANDI ---
+
+// Menampilkan form untuk memasukkan email
+Route::get('/forgot-password', [\App\Http\Controllers\Auth\PasswordResetLinkController::class, 'create'])
+    ->middleware('guest')
+    ->name('password.request');
+
+// Mengirim link reset ke email
+Route::post('/forgot-password', [\App\Http\Controllers\Auth\PasswordResetLinkController::class, 'store'])
+    ->middleware('guest')
+    ->name('password.email');
+
+// Menampilkan form untuk membuat password baru (setelah klik link di email)
+Route::get('/reset-password/{token}', [\App\Http\Controllers\Auth\NewPasswordController::class, 'create'])
+    ->middleware('guest')
+    ->name('password.reset');
+
+// Menyimpan password baru
+Route::post('/reset-password', [\App\Http\Controllers\Auth\NewPasswordController::class, 'store'])
+    ->middleware('guest')
+    ->name('password.store');

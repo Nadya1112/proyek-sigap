@@ -71,7 +71,7 @@
           @error('password') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
 
           {{-- Lupa password DI BAWAH kolom password --}}
-          <a href="{{ url('/password/forgot') }}" class="block text-right text-[13px] text-[#F39B28] hover:underline mt-1">
+          <a href="{{ route('password.request') }}" class="block text-right text-[13px] text-[#F39B28] hover:underline mt-1">
             Lupa kata sandi?
           </a>
         </div>
