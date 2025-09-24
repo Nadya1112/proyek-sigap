@@ -32,38 +32,48 @@ class VerifyEmailController extends Controller
 
     public function verify(Request $request)
     {
+        // 1. Validasi input dari form verifikasi (email dan kode)
         $data = $request->validate([
             'email' => ['required', 'email'],
             'code'  => ['required', 'digits:4'],
         ]);
 
-        $user = User::where('email', $data['email'])->first();
-        if (!$user) {
-            return back()->withErrors(['email' => 'Email tidak ditemukan.'])->withInput();
+        // 2. Ambil data pendaftaran yang sebelumnya kita simpan di session
+        $registrationData = $request->session()->get('registration_data');
+
+        // 3. Lakukan serangkaian pengecekan keamanan
+        if (!$registrationData || $registrationData['email'] !== $data['email']) {
+            return back()->withErrors(['email' => 'Sesi pendaftaran tidak valid atau email tidak cocok. Silakan daftar ulang.'])->withInput();
         }
 
-        // Jika sudah verified, arahkan ke login
-        if ($user->email_verified_at) {
-            return redirect()->route('login')->with('status', 'Email sudah terverifikasi. Silakan masuk.');
+        if (Carbon::parse($registrationData['verification_expires_at'])->isPast()) {
+            return back()->withErrors(['code' => 'Kode verifikasi sudah kedaluwarsa. Silakan kirim ulang kode.'])->withInput();
         }
 
-        // Bersihkan kemungkinan spasi/garis/karakter non-digit
         $inputCode = preg_replace('/\D/', '', $data['code']);
-
-        if (!$user->verification_code || $user->verification_code !== $inputCode) {
-            return back()->withErrors(['code' => 'Kode verifikasi salah.'])->withInput();
+        if ($registrationData['verification_code'] !== $inputCode) {
+            return back()->withErrors(['code' => 'Kode verifikasi yang Anda masukkan salah.'])->withInput();
         }
 
-        if ($user->verification_expires_at && Carbon::parse($user->verification_expires_at)->isPast()) {
-            return back()->withErrors(['code' => 'Kode verifikasi sudah kedaluwarsa.'])->withInput();
-        }
+        // =====================================================================
+        // === PROSES PEMBUATAN AKUN BARU SETELAH SEMUA PENGECEKAN BERHASIL ===
+        // =====================================================================
+        
+        // 4. Buat user baru di database menggunakan data dari session
+        $user = User::create([
+            'name' => $registrationData['name'],
+            'email' => $registrationData['email'],
+            'kontak' => $registrationData['kontak'],
+            'password' => $registrationData['password'], // Password sudah di-hash
+            'email_verified_at' => now(), // Langsung set terverifikasi
+            'role' => 'pengguna' // Atur role default untuk pengguna baru
+        ]);
 
-        $user->email_verified_at        = now();
-        $user->verification_code        = null;
-        $user->verification_expires_at  = null;
-        $user->save();
+        // 5. Hapus data dari session agar tidak bisa dipakai lagi
+        $request->session()->forget('registration_data');
 
-        return redirect()->route('login')->with('status', 'Email berhasil diverifikasi. Silakan masuk.');
+        // 6. Arahkan ke halaman login dengan pesan sukses
+        return redirect()->route('login')->with('status', 'Verifikasi berhasil! Silakan masuk dengan akun baru Anda.');
     }
 
     public function resend(Request $request)

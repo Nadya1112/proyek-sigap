@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
-use Illuminate\Support\Facades\Schema;
 
 class RegisterController extends Controller
 {
@@ -17,54 +16,49 @@ class RegisterController extends Controller
         return view('auth.register');
     }
 
-    public function store(Request $request)
+   public function store(Request $request)
     {
-        // Validasi
-        $rules = [
-            'name'     => ['required','string','max:255'],
-            'email'    => ['required','string','lowercase','email','max:255','unique:users,email'],
-            'password' => ['required','confirmed', Password::min(8)],
-        ];
-
-        if (Schema::hasColumn('users', 'username')) {
-            $rules['username'] = ['required','string','max:50','unique:users,username'];
-        }
-        if (Schema::hasColumn('users', 'phone')) {
-            $rules['phone'] = ['required','string','max:20','unique:users,phone'];
-        }
-
-        $data = $request->validate($rules, [
-            'name.required'         => 'Nama wajib diisi.',
-            'email.required'        => 'Email wajib diisi.',
-            'email.email'           => 'Format email tidak valid.',
-            'email.unique'          => 'Email sudah terdaftar.',
-            'username.required'     => 'Username wajib diisi.',
-            'phone.required'        => 'Nomor HP wajib diisi.',
-            'password.required'     => 'Kata sandi wajib diisi.',
-            'password.confirmed'    => 'Konfirmasi kata sandi tidak cocok.',
+        // 1. Validasi input dari form pendaftaran
+        $validated = $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
+            'kontak'   => ['required', 'string', 'max:20', 'unique:users,kontak'],
+            'password' => ['required', 'confirmed', Password::min(8)],
+            'terms'    => ['accepted']
+        ], [
+            // (Anda bisa tambahkan pesan custom di sini jika perlu)
+            'kontak.required'   => 'Nomor HP wajib diisi.',
+            'terms.accepted'    => 'Anda harus menyetujui Syarat & Ketentuan.',
         ]);
 
-        // Simpan user
-        $user = new User();
-        $user->name  = $data['name'];
-        $user->email = $data['email'];
-        if (isset($data['username'])) $user->username = $data['username'];
-        if (isset($data['phone']))    $user->phone    = $data['phone'];
-        $user->password = Hash::make($data['password']);
+        // 2. Siapkan semua data yang akan disimpan nanti (termasuk kode verifikasi)
+        $registrationData = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'kontak' => $validated['kontak'],
+            'password' => Hash::make($validated['password']), // Langsung hash passwordnya
+            'verification_code' => (string) random_int(1000, 9999),
+            'verification_expires_at' => now()->addMinutes(10),
+        ];
 
-        // Generate kode verifikasi (4 digit) + masa berlaku
-        $code = (string) random_int(1000, 9999);
-        $user->verification_code       = $code;
-        $user->verification_expires_at = now()->addMinutes(10);
+        // 3. Simpan semua data di atas ke dalam SESSION, BUKAN DATABASE
+        $request->session()->put('registration_data', $registrationData);
 
-        $user->save();
+        // 4. Kirim email verifikasi menggunakan data dari session
+        try {
+            // Buat objek user sementara HANYA untuk dikirim ke email
+            $tempUser = new User($registrationData);
+            
+            Mail::to($registrationData['email'])->send(new VerifyEmailCodeMail($tempUser));
 
-        // Kirim email
-        Mail::to($user->email)->send(new \App\Mail\VerifyEmailCodeMail($user));
-        // Mail::to($user->email)->send(new VerifyEmailCodeMail($user->name, $code));
-
-        // Arahkan ke halaman verifikasi (bawa email agar auto-terisi)
-        return redirect()->route('verification.show', ['email' => $user->email])
-            ->with('status', 'Kode verifikasi dikirim ke email Anda.');
+        } catch (\Exception $e) {
+            // Jika email gagal terkirim (misal: config .env salah), hentikan proses
+            // dan beri pesan error yang jelas.
+            return back()->withInput()->withErrors(['email' => 'Gagal mengirim email verifikasi. Silakan coba lagi nanti.']);
+        }
+        
+        // 5. Arahkan pengguna ke halaman verifikasi seperti biasa
+        return redirect()->route('verification.show', ['email' => $validated['email']])
+            ->with('status', 'Pendaftaran hampir selesai! Kode verifikasi telah dikirim ke email Anda.');
     }
 }
