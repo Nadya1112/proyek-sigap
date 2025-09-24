@@ -101,11 +101,19 @@ Route::middleware(['auth','nocache'])->group(function () {
         ->name('user.dashboard');
     
     // *** HALAMAN PROFIL AKUN *** //
-    Route::get('/profil', [ProfileController::class, 'index'])->name('profil.index');
+    // Menampilkan halaman profil utama, sekarang bisa menerima token opsional
+    Route::get('/profil/{token?}', [ProfileController::class, 'index'])->name('profil.index');
+    
+    // Memperbarui detail (Nama, Email, Kontak) - Tetap sama
     Route::post('/profil/detail', [ProfileController::class, 'updateDetail'])->name('profil.update.detail');
-    Route::post('/profil/password', [ProfileController::class, 'updatePassword'])->name('profil.update.password');
+    
+    // Rute BARU untuk mengirim link reset dari halaman profil
+    Route::post('/profil/keamanan/kirim-link', [ProfileController::class, 'sendResetLink'])->name('profil.keamanan.kirim-link');
+    
+    // Rute BARU untuk menyimpan password baru setelah link di-klik
+    Route::post('/profil/keamanan/reset', [ProfileController::class, 'resetPassword'])->name('profil.keamanan.reset');
 
-});
+    });
 
 // --- RUTE UNTUK LUPA KATA SANDI ---
 

@@ -67,14 +67,22 @@
         </div>
 
         {{-- Konfirmasi Password Baru --}}
-        <div>
+        {{-- ======================================================= --}}
+        {{-- === BAGIAN YANG DIPERBARUI ADA DI SINI === --}}
+        {{-- ======================================================= --}}
+        <div x-data="{ show:false }">
           <label class="block text-[13px] font-semibold text-gray-700 mb-1.5">Konfirmasi Kata Sandi Baru</label>
-          <input
-            type="password" name="password_confirmation" required
-            placeholder="Ulangi kata sandi baru"
-            class="w-full rounded-2xl border border-gray-200 bg-[#F7F8FA] text-[14px] placeholder:text-gray-400
-                   px-4 py-3 transition
-                   focus:bg-white focus:border-[#F39B28] focus:ring-2 focus:ring-[#F39B28]/45 outline-none"/>
+          <div class="relative">
+            <input
+              :type="show ? 'text' : 'password'" name="password_confirmation" required
+              placeholder="Ulangi kata sandi baru"
+              class="w-full rounded-2xl border border-gray-200 bg-[#F7F8FA] text-[14px] placeholder:text-gray-400
+                     px-4 py-3 pr-11 transition
+                     focus:bg-white focus:border-[#F39B28] focus:ring-2 focus:ring-[#F39B28]/45 outline-none"/>
+            <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-gray-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12s-3.75 6.75-9.75 6.75S2.25 12 2.25 12z"/><circle cx="12" cy="12" r="3.25" stroke-width="1.6"/></svg>
+            </button>
+          </div>
         </div>
 
         {{-- Tombol Reset --}}
@@ -86,6 +94,7 @@
           Reset Kata Sandi
         </button>
       </form>
+
     </div>
   </div>
 </div>
