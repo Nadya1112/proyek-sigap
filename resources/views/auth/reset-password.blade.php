@@ -86,7 +86,6 @@
           Reset Kata Sandi
         </button>
       </form>
-
     </div>
   </div>
 </div>
