@@ -24,11 +24,11 @@ class RegisterController extends Controller
             'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
             'kontak'   => ['required', 'string', 'max:20', 'unique:users,kontak'],
             'password' => ['required', 'confirmed', Password::min(8)],
-            'terms'    => ['accepted']
+            'syaratdanketentuan'    => ['accepted']
         ], [
             // (Anda bisa tambahkan pesan custom di sini jika perlu)
             'kontak.required'   => 'Nomor HP wajib diisi.',
-            'terms.accepted'    => 'Anda harus menyetujui Syarat & Ketentuan.',
+            'syaratdanketentuan.accepted'    => 'Anda harus menyetujui Syarat & Ketentuan.',
         ]);
 
         // 2. Siapkan semua data yang akan disimpan nanti (termasuk kode verifikasi)
