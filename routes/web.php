@@ -56,6 +56,14 @@ Route::view('/sebaran-komplek','public.sebaran')->name('sebaran');
 Route::view('/kontak','public.kontak')->name('kontak');
 Route::view('/e-proposal-psu','public.eproposal')->name('eproposal');
 Route::get('/pengaduan-masyarakat', [PengaduanController::class, 'showPengaduanForm'])->name('pengaduan');
+
+
+
+// Rute untuk halaman Syarat & Ketentuan dan Kebijakan Privasi
+Route::view('/syarat-dan-ketentuan', 'public.syaratdanketentuan')->name('syaratdanketentuan');
+Route::view('/kebijakan-privasi', 'public.kebijakanprivasi')->name('kebijakanprivasi');
+
+
 /*
 |--------------------------------------------------------------------------
 | Form handlers (POST)
@@ -63,6 +71,9 @@ Route::get('/pengaduan-masyarakat', [PengaduanController::class, 'showPengaduanF
 */
 Route::post('/e-proposal-psu', [PublicFormController::class,'proposal'])->name('eproposal.store');
 Route::post('/pengaduan-masyarakat', [PublicFormController::class,'pengaduan'])->name('pengaduan.store');
+
+Route::get('/auth/google/redirect', [\App\Http\Controllers\Auth\LoginController::class, 'redirectToGoogle'])->name('auth.google.redirect');
+Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\LoginController::class, 'handleGoogleCallback']);
 
 /*
 |--------------------------------------------------------------------------

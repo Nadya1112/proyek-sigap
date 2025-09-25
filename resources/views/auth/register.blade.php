@@ -115,11 +115,11 @@
           </div>
         </div>
 
-        {{-- S&K (wajib) --}}
+{{-- S&K (wajib) --}}
         <label class="inline-flex items-start gap-3 text-[13px] text-gray-600">
-          <input required type="checkbox" name="terms"
+          <input required type="checkbox" name="syaratdanketentuan"
                  class="mt-[3px] rounded border-gray-300 text-[#F39B28] focus:ring-[#F39B28]">
-          <span>Saya menyetujui <a href="#" class="text-[#F39B28] hover:underline">Syarat & Ketentuan</a> serta <a href="#" class="text-[#F39B28] hover:underline">Kebijakan Privasi</a>.</span>
+          <span>Saya menyetujui <a href="{{ route('syaratdanketentuan') }}" target="_blank" class="text-[#F39B28] hover:underline">Syarat & Ketentuan</a> serta <a href="{{ route('kebijakanprivasi') }}" target="_blank" class="text-[#F39B28] hover:underline">Kebijakan Privasi</a>.</span>
         </label>
 
         {{-- Tombol Daftar --}}

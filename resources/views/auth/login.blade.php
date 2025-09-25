@@ -107,7 +107,7 @@
         </button>
       </form>
 
-      {{-- Divider "atau" --}}
+      <!-- {{-- Divider "atau" --}}
       <div class="relative mt-7">
         <div class="absolute inset-0 flex items-center">
           <div class="w-full border-t border-gray-200"></div>
@@ -115,9 +115,9 @@
         <div class="relative flex justify-center">
           <span class="bg-white px-3 text-[12px] text-gray-400">atau</span>
         </div>
-      </div>
+      </div> -->
 
-      {{-- Tombol Google (SVG inline agar rapi) --}}
+      <!-- {{-- Tombol Google (SVG inline agar rapi) --}}
       <a href="#"
          class="mt-6 w-full inline-flex justify-center items-center gap-2 rounded-2xl border border-gray-300 bg-white py-3
                 text-[14px] font-medium text-gray-700 hover:bg-gray-50
@@ -129,7 +129,7 @@
           <path fill="#EA4335" d="M272 106.1c39.5-.6 77.3 14 106.2 41.2l79.3-79.3C407.4 22.1 342 0 272 0 164.9 0 74.8 60.4 31 147.5l90.6 70.1C142.8 154.2 202.1 106.1 272 106.1z"/>
         </svg>
         <span>Masuk dengan Google</span>
-      </a>
+      </a> -->
 
       {{-- Link daftar --}}
       <p class="mt-6 text-center text-[13px] text-gray-500">
