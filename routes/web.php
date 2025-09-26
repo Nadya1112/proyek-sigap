@@ -124,6 +124,9 @@ Route::middleware(['auth','nocache'])->group(function () {
     // Rute BARU untuk menyimpan password baru setelah link di-klik
     Route::post('/profil/keamanan/reset', [ProfileController::class, 'resetPassword'])->name('profil.keamanan.reset');
 
+    // RUTE BARU UNTUK MENGHAPUS AKUN
+    Route::delete('/profil/hapus', [ProfileController::class, 'destroy'])->name('profil.destroy');
+
     });
 
 // --- RUTE UNTUK LUPA KATA SANDI ---

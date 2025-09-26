@@ -50,7 +50,7 @@ class ProfileController extends Controller
         $user->kontak = $validated['kontak'];
         $user->save();
 
-        return back()->with('status', 'detail-updated');
+        return back()->withErrors(/*...*/)->with('active_tab', 'informasi');
     }
 
     /**
@@ -106,7 +106,34 @@ class ProfileController extends Controller
         }
 
         // Jika token tidak valid, kembali dengan error
-        return back()->withInput($request->only('email'))
-                     ->withErrors(['email' => __($status)]);
+        return back()->withInput(/*...*/)->withErrors(/*...*/)->with('active_tab', 'keamanan');
+    }
+
+    public function destroy(Request $request)
+    {
+        // 1. Validasi bahwa password yang dimasukkan tidak kosong
+                $request->validate([
+            'password_confirm' => ['required', 'string'],
+        ]);
+
+        $user = Auth::user();
+
+        if (!Hash::check($request->password_confirm, $user->password)) {
+            // Jika tidak cocok, kembalikan dengan pesan error DAN data tab aktif
+            return back()
+                ->withErrors(['password_confirm' => 'Password yang Anda masukkan salah.'])
+                ->with('active_tab', 'bahaya'); // <--- Tambahan ini sangat penting
+        }pro
+        // 3. Jika password cocok, lanjutkan proses penghapusan
+        Auth::logout(); // Logout pengguna
+
+        $user->delete(); // Hapus data pengguna dari database
+
+        // Hancurkan session dan buat token baru
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // Arahkan ke halaman utama dengan pesan sukses
+        return back()->withErrors(['password_confirm' => 'Password yang Anda masukkan salah.'])->with('active_tab', 'bahaya');
     }
 }

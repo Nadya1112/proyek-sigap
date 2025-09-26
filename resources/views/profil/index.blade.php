@@ -11,8 +11,9 @@
         <p class="mt-3 text-lg text-gray-600">Kelola informasi akun, preferensi, dan keamanan Anda di satu tempat.</p>
     </div>
 
-    {{-- Wrapper dengan Alpine.js, sekarang tab aktif ditentukan oleh adanya token --}}
-    <div x-data="{ tab: '{{ $token ? 'keamanan' : 'informasi' }}' }" class="mt-10 max-w-4xl mx-auto">
+    {{-- Wrapper dengan Alpine.js yang sudah diperbarui --}}
+    {{-- Atribut x-data sekarang memeriksa apakah ada error, dan mengaktifkan tab + form delete jika ya --}}
+    <div x-data="{ tab: '{{ $errors->has('password_confirm') ? 'bahaya' : ($token ? 'keamanan' : session('active_tab', 'informasi')) }}', showDeleteConfirm: {{ $errors->has('password_confirm') ? 'true' : 'false' }} }" class="mt-10 max-w-4xl mx-auto">
         
         {{-- Notifikasi --}}
         @if (session('status'))
@@ -56,7 +57,7 @@
 
         {{-- Konten Tab --}}
         <div class="mt-8">
-            {{-- Tab 1: Informasi Akun (Tidak ada perubahan) --}}
+            {{-- Tab 1: Informasi Akun --}}
             <div x-show="tab === 'informasi'" x-transition:enter="transition-all ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0">
                 <form action="{{ route('profil.update.detail') }}" method="POST">
                     @csrf
@@ -101,9 +102,7 @@
                 </form>
             </div>
             
-            {{-- ======================================================= --}}
-            {{-- === TAB 2: KEAMANAN (INI YANG DIUBAH TOTAL) === --}}
-            {{-- ======================================================= --}}
+            {{-- Tab 2: Keamanan --}}
             <div x-show="tab === 'keamanan'" x-transition:enter="transition-all ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0">
 
                 {{-- TAMPILKAN FORM INI JIKA ADA TOKEN DARI EMAIL --}}
@@ -174,27 +173,50 @@
                 @endif
             </div>
             
-            {{-- Tab 3: Zona Berbahaya (Tidak ada perubahan) --}}
+            {{-- Tab 3: Zona Berbahaya --}}
             <div x-show="tab === 'bahaya'" x-transition:enter="transition-all ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0">
-                <div class="bg-white rounded-2xl shadow-xl border border-gray-200/60 overflow-hidden">
-                    <div class="p-6 md:p-8">
-                        <div class="flex items-center gap-4">
-                           <div class="w-12 h-12 rounded-full bg-red-100 grid place-content-center">
-                              <svg class="w-6 h-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
-                           </div>
-                           <div>
-                               <h2 class="text-xl font-bold text-gray-800">Hapus Akun</h2>
-                               <p class="mt-1 text-sm text-gray-600">Setelah akun Anda dihapus, semua data akan hilang secara permanen.</p>
-                           </div>
-                       </div>
-                   </div>
-                   <div class="bg-gray-50 px-6 py-4 flex justify-between items-center">
+                <div x-data="{ showDeleteConfirm: false }" class="bg-white rounded-2xl shadow-xl border border-gray-200/60 overflow-hidden">
+                     <div class="p-6 md:p-8">
+                         <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-red-100 grid place-content-center">
+                               <svg class="w-6 h-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-800">Hapus Akun</h2>
+                                <p class="mt-1 text-sm text-gray-600">Setelah akun Anda dihapus, semua data akan hilang secara permanen.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {{-- Formulir Konfirmasi Inline --}}
+                    <div x-show="showDeleteConfirm" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2" style="display: none;">
+                        <form action="{{ route('profil.destroy') }}" method="POST" class="p-6 md:p-8 border-t border-gray-200">
+                            @csrf
+                            @method('DELETE')
+                            
+                            <p class="text-sm text-center font-semibold text-gray-700">Untuk melanjutkan, silakan masukkan password Anda saat ini.</p>
+                            <div class="mt-4 max-w-sm mx-auto">
+                                <label for="password_confirm_inline" class="sr-only">Password</label>
+                                <input type="password" name="password_confirm" id="password_confirm_inline" placeholder="Masukkan password Anda" class="w-full px-4 py-2 text-center border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500" required>
+                                @error('password_confirm') <p class="mt-2 text-xs text-red-600 text-center">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div class="mt-5 flex justify-center gap-3">
+                                <button type="button" @click="showDeleteConfirm = false" class="rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Batal</button>
+                                <button type="submit" class="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500">Ya, Hapus Akun Saya</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="bg-gray-50 px-6 py-4 flex justify-between items-center">
                        <p class="text-sm text-red-700 font-semibold">Tindakan ini tidak dapat diurungkan.</p>
-                       <button type="button" onclick="alert('Fitur hapus akun akan segera tersedia.')" class="bg-red-600 text-white font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-red-700 transition shadow-md hover:shadow-lg">Hapus Akun Permanen</button>
+                       {{-- Tombol ini sekarang berfungsi sebagai toggle --}}
+                       <button type="button" @click="showDeleteConfirm = !showDeleteConfirm" class="bg-red-600 text-white font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-red-700 transition shadow-md hover:shadow-lg">Hapus Akun Permanen</button>
                    </div>
                 </div>
             </div>
         </div>
     </div>
+
 </main>
 @endsection
