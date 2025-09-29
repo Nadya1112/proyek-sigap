@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PengaduanController;
+use App\Http\Controllers\EproposalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,7 +55,8 @@ Route::get('/kelurahan-by-kecamatan/{kecamatan}', [FasumController::class, 'kelu
 
 Route::view('/sebaran-komplek','public.sebaran')->name('sebaran');
 Route::view('/kontak','public.kontak')->name('kontak');
-Route::view('/e-proposal-psu','public.eproposal')->name('eproposal');
+Route::get('/e-proposal-psu', [EproposalController::class, 'showForm'])->name('eproposal');
+// Route::view('/e-proposal-psu','public.eproposal')->name('eproposal');
 Route::get('/pengaduan-masyarakat', [PengaduanController::class, 'showPengaduanForm'])->name('pengaduan');
 
 
@@ -69,7 +71,8 @@ Route::view('/kebijakan-privasi', 'public.kebijakanprivasi')->name('kebijakanpri
 | Form handlers (POST)
 |--------------------------------------------------------------------------
 */
-Route::post('/e-proposal-psu', [PublicFormController::class,'proposal'])->name('eproposal.store');
+Route::post('/e-proposal-psu', [EproposalController::class, 'store'])->name('eproposal.store');
+// Route::post('/e-proposal-psu', [PublicFormController::class,'proposal'])->name('eproposal.store');
 Route::post('/pengaduan-masyarakat', [PublicFormController::class,'pengaduan'])->name('pengaduan.store');
 
 Route::get('/auth/google/redirect', [\App\Http\Controllers\Auth\LoginController::class, 'redirectToGoogle'])->name('auth.google.redirect');

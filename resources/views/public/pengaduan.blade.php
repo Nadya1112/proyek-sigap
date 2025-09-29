@@ -164,7 +164,7 @@
 
                         <h3 class="text-2xl font-bold text-gray-800">Silakan Masuk Terlebih Dahulu</h3>
                         <p class="text-gray-600 mt-2 mb-6 max-w-md mx-auto">
-                            Anda harus memiliki akun dan masuk untuk dapat membuat pengaduan baru.
+                            Anda harus memiliki akun dan masuk untuk dapat membuat pengaduan.
                         </p>
 
                         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">

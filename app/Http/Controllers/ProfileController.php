@@ -112,7 +112,7 @@ class ProfileController extends Controller
     public function destroy(Request $request)
     {
         // 1. Validasi bahwa password yang dimasukkan tidak kosong
-                $request->validate([
+        $request->validate([
             'password_confirm' => ['required', 'string'],
         ]);
 
@@ -123,7 +123,8 @@ class ProfileController extends Controller
             return back()
                 ->withErrors(['password_confirm' => 'Password yang Anda masukkan salah.'])
                 ->with('active_tab', 'bahaya'); // <--- Tambahan ini sangat penting
-        }pro
+        }
+
         // 3. Jika password cocok, lanjutkan proses penghapusan
         Auth::logout(); // Logout pengguna
 
