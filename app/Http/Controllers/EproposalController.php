@@ -30,7 +30,7 @@ class EproposalController extends Controller
 
         // 3. KIRIM DATA STATS DAN KECAMATANS KE VIEW
         return view('public.eproposal', compact('stats', 'kecamatans'));
-        // return view('public.eproposal', $stats);
+
     }
 
     /**

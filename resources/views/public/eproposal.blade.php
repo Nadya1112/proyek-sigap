@@ -106,8 +106,8 @@
                   </div>
                   
                   <div class="md:col-span-2">
-                    <label for="alamat" class="form-label">Detail Alamat (Blok/Nomor Rumah)</label>
-                    <input id="alamat" name="alamat" value="{{ old('alamat') }}" required placeholder="Contoh: Blok C Nomor 12" class="form-input"/>
+                    <label for="alamat" class="form-label">Detail Alamat</label>
+                    <input id="alamat" name="alamat" value="{{ old('alamat') }}" required class="form-input"/>
                     @error('alamat')<p class="form-error">{{ $message }}</p>@enderror
                   </div>
 
@@ -136,6 +136,31 @@
             </div>
         @else
             {{-- Kartu notifikasi login --}}
+        {{-- ======================================================= --}}
+            {{-- === KARTU NOTIFIKASI LOGIN YANG HILANG (DIPERBAIKI) === --}}
+            {{-- ======================================================= --}}
+            <div class="text-center bg-orange-50/50 rounded-xl p-8 md:p-12 border border-orange-200/80">
+                <div class="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-lg mb-5">
+                    <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H4.5a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                    </svg>
+                </div>
+
+                <h3 class="text-2xl font-bold text-gray-800">Silakan Masuk Terlebih Dahulu</h3>
+                <p class="text-gray-600 mt-2 mb-6 max-w-md mx-auto">
+                    Anda harus memiliki akun dan masuk untuk dapat mengajukan proposal baru.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="{{ route('login') }}" class="btn-gradient rounded-lg px-8 py-3">
+                        <span class="relative z-10 font-semibold">Masuk ke Akun</span>
+                        <div class="btn-gradient-hover rounded-lg"></div>
+                    </a>
+                    <a href="{{ route('register') }}" class="font-semibold text-orange-600 hover:text-orange-700 transition">
+                        Buat Akun Baru
+                    </a>
+                </div>
+            </div> 
         @endauth
     </div>
   </div>
