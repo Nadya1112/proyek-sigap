@@ -15,23 +15,24 @@ class EproposalController extends Controller
     /**
      * Menampilkan form E-Proposal beserta data statistik.
      */
-    public function showForm()
+public function showForm()
     {
-        // Logika untuk mengambil statistik (sesuaikan status jika perlu)
+        // Logika statistik disesuaikan agar relevan dengan alur proposal di admin
         $stats = [
-            'total'      => Proposal::count(),
-            'diverifikasi' => Proposal::where('status', 'diverifikasi')->count(),
-            'diproses'   => Proposal::where('status', 'diproses')->count(),
-            'terkirim'   => Proposal::where('status', 'terkirim')->count(),
+            'total'         => \App\Models\Proposal::count(),
+            'diajukan'       => \App\Models\Proposal::where('status', 'Diajukan')->count(),
+            'diverifikasi'  => \App\Models\Proposal::where('status', 'Diverifikasi')->count(),
+            'disetujui'     => \App\Models\Proposal::where('status', 'Disetujui')->count(),
         ];
 
-        // 2. AMBIL SEMUA DATA KECAMATAN DARI DATABASE
-        $kecamatans = Kecamatan::orderBy('nama_kecamatan', 'asc')->get();
+        // Ambil data kecamatan untuk dropdown jika pengguna sudah login
+        $kecamatans = [];
+        if (auth()->check()) {
+            $kecamatans = \App\Models\Kecamatan::orderBy('nama_kecamatan', 'asc')->get();
+        }
 
-        // 3. KIRIM DATA STATS DAN KECAMATANS KE VIEW
         return view('public.eproposal', compact('stats', 'kecamatans'));
-
-    }
+    }   
 
     /**
      * Menyimpan data proposal baru dari form.

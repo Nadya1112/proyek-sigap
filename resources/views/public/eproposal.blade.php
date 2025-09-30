@@ -20,24 +20,32 @@
         <p class="mt-4 text-base md:text-lg text-white/90 max-w-3xl mx-auto">
           Ajukan proposal bantuan prasarana, sarana, dan utilitas perumahan. Data Anda kami proses dengan transparan dan cepat.
         </p>
+        {{-- ... (kode hero section di atasnya) --}}
+        
         <div class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+            {{-- Card 1: Total Proposal --}}
             <div class="group rounded-[14px] px-8 py-6 text-center bg-white/18 ring-1 ring-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-white/45">
               <p class="text-3xl md:text-4xl font-extrabold text-white leading-none">{{ $stats['total'] ?? 0 }}</p>
               <p class="mt-3 text-[11px] tracking-wide uppercase text-white/85">Total Proposal</p>
             </div>
+            {{-- Card 2: Proposal Diajukan --}}
+            <div class="group rounded-[14px] px-8 py-6 text-center bg-white/18 ring-1 ring-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-white/45">
+              <p class="text-3xl md:text-4xl font-extrabold text-white leading-none">{{ $stats['diajukan'] ?? 0 }}</p>
+              <p class="mt-3 text-[11px] tracking-wide uppercase text-white/85">Proposal Diajukan</p>
+            </div>
+            {{-- Card 3: Sudah Diverifikasi --}}
             <div class="group rounded-[14px] px-8 py-6 text-center bg-white/18 ring-1 ring-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-white/45">
               <p class="text-3xl md:text-4xl font-extrabold text-white leading-none">{{ $stats['diverifikasi'] ?? 0 }}</p>
               <p class="mt-3 text-[11px] tracking-wide uppercase text-white/85">Sudah Diverifikasi</p>
             </div>
+            {{-- Card 4: Sudah Disetujui --}}
             <div class="group rounded-[14px] px-8 py-6 text-center bg-white/18 ring-1 ring-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-white/45">
-              <p class="text-3xl md:text-4xl font-extrabold text-white leading-none">{{ $stats['diproses'] ?? 0 }}</p>
-              <p class="mt-3 text-[11px] tracking-wide uppercase text-white/85">Proses Peninjauan</p>
-            </div>
-            <div class="group rounded-[14px] px-8 py-6 text-center bg-white/18 ring-1 ring-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-white/45">
-              <p class="text-3xl md:text-4xl font-extrabold text-white leading-none">{{ $stats['terkirim'] ?? 0 }}</p>
-              <p class="mt-3 text-[11px] tracking-wide uppercase text-white/85">Belum Diverifikasi</p>
+              <p class="text-3xl md:text-4xl font-extrabold text-white leading-none">{{ $stats['disetujui'] ?? 0 }}</p>
+              <p class="mt-3 text-[11px] tracking-wide uppercase text-white/85">Sudah Disetujui</p>
             </div>
         </div>
+
+        {{-- ... (sisa kode hero section di bawahnya) ... --}}
     </div>
   </div>
 </section>
@@ -136,31 +144,34 @@
             </div>
         @else
             {{-- Kartu notifikasi login --}}
-        {{-- ======================================================= --}}
-            {{-- === KARTU NOTIFIKASI LOGIN YANG HILANG (DIPERBAIKI) === --}}
-            {{-- ======================================================= --}}
-            <div class="text-center bg-orange-50/50 rounded-xl p-8 md:p-12 border border-orange-200/80">
-                <div class="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-lg mb-5">
-                    <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H4.5a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                    </svg>
-                </div>
+       
+                    <div class="text-center bg-orange-50/50 rounded-xl p-8 md:p-12 border border-orange-200/80">
+                        {{-- Icon --}}
+                        <div
+                            class="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-lg mb-5">
+                            <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H4.5a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                            </svg>
+                        </div>
 
-                <h3 class="text-2xl font-bold text-gray-800">Silakan Masuk Terlebih Dahulu</h3>
-                <p class="text-gray-600 mt-2 mb-6 max-w-md mx-auto">
-                    Anda harus memiliki akun dan masuk untuk dapat mengajukan proposal baru.
-                </p>
+                        <h3 class="text-2xl font-bold text-gray-800">Silakan Masuk Terlebih Dahulu</h3>
+                        <p class="text-gray-600 mt-2 mb-6 max-w-md mx-auto">
+                            Anda harus memiliki akun dan masuk untuk dapat membuat pengaduan.
+                        </p>
 
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="{{ route('login') }}" class="btn-gradient rounded-lg px-8 py-3">
-                        <span class="relative z-10 font-semibold">Masuk ke Akun</span>
-                        <div class="btn-gradient-hover rounded-lg"></div>
-                    </a>
-                    <a href="{{ route('register') }}" class="font-semibold text-orange-600 hover:text-orange-700 transition">
-                        Buat Akun Baru
-                    </a>
-                </div>
-            </div> 
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <a href="{{ route('login') }}" class="btn-gradient rounded-lg px-8 py-3">
+                                <span class="relative z-10 font-semibold">Masuk ke Akun</span>
+                                <div class="btn-gradient-hover rounded-lg"></div>
+                            </a>
+                            <a href="{{ url('/register') }}"
+                                class="font-semibold text-orange-600 hover:text-orange-700 transition">
+                                Buat Akun Baru
+                            </a>
+                        </div>
+                    </div>
         @endauth
     </div>
   </div>
