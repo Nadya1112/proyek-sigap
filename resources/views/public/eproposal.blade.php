@@ -18,7 +18,7 @@
           Pengajuan Proposal Bantuan PSU
         </h1>
         <p class="mt-4 text-base md:text-lg text-white/90 max-w-3xl mx-auto">
-          Ajukan proposal bantuan prasarana, sarana, dan utilitas perumahan. Data Anda kami proses dengan transparan dan cepat.
+          Ajukan proposal bantuan prasarana, sarana, dan utilitas perumahan. Data anda akan kami proses dengan transparan dan cepat.
         </p>
         {{-- ... (kode hero section di atasnya) --}}
         
@@ -109,13 +109,13 @@
 
                   <div class="md:col-span-2">
                     <label for="nama_perumahan" class="form-label">Nama Perumahan</label>
-                    <input id="nama_perumahan" name="nama_perumahan" value="{{ old('nama_perumahan') }}" required class="form-input"/>
+                    <input id="nama_perumahan" name="nama_perumahan" value="{{ old('nama_perumahan') }}" required class="form-input" placeholder="Perumahan Griya / Komplek Griya"/>
                     @error('nama_perumahan')<p class="form-error">{{ $message }}</p>@enderror
                   </div>
                   
                   <div class="md:col-span-2">
                     <label for="alamat" class="form-label">Detail Alamat</label>
-                    <input id="alamat" name="alamat" value="{{ old('alamat') }}" required class="form-input"/>
+                    <input id="alamat" name="alamat" value="{{ old('alamat') }}" required class="form-input" placeholder="Jln. Griya, Komplek Griya, No. 12, Blok A, Kel.. , Kec.. "/>
                     @error('alamat')<p class="form-error">{{ $message }}</p>@enderror
                   </div>
 
