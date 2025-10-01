@@ -130,6 +130,9 @@ Route::middleware(['auth','nocache'])->group(function () {
     // RUTE BARU UNTUK MENGHAPUS AKUN
     Route::delete('/profil/hapus', [ProfileController::class, 'destroy'])->name('profil.destroy');
 
+    // RUTE UNTUK MENDETEKSI KEMIRIPAN NAMA KOMPLEK PERUMAHAN
+    Route::get('/search-kompleks', [EproposalController::class, 'searchKompleks'])->name('kompleks.search');
+
     });
 
 // --- RUTE UNTUK LUPA KATA SANDI ---

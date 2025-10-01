@@ -65,7 +65,7 @@
               </div>
             @endif
 
-            <div x-data="dependentDropdown()">
+           <div x-data="proposalForm()">
                 <form action="{{ route('eproposal.store') }}" method="POST" enctype="multipart/form-data"
                       class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                   @csrf
@@ -95,22 +95,41 @@
                   
                   <div>
                     <label for="kelurahan_id" class="form-label">Kelurahan</label>
-                    <select id="kelurahan_id" name="kelurahan_id" x-model="kelurahanId" required class="form-input" :disabled="loading || kelurahans.length === 0">
-                        <option value="">-- Pilih Kelurahan --</option>
-                        <template x-if="loading">
+                    <select id="kelurahan_id" name="kelurahan_id" x-model="kelurahanId" required class="form-input" :disabled="loadingKelurahan || !kecamatanId">
+                        <option value="" x-show="!kecamatanId">-- Pilih Kecamatan Dulu --</option>
+                        <option value="" x-show="kecamatanId && !loadingKelurahan && kelurahans.length > 0">-- Pilih Kelurahan --</option>
+                        <template x-if="loadingKelurahan">
                             <option>Memuat...</option>
                         </template>
                         <template x-for="kelurahan in kelurahans" :key="kelurahan.id">
-                            <option :value="kelurahan.id" x-text="kelurahan.nama_kelurahan"></option>
+                            <option :value="kelurahan.id" x-text="kelurahan.nama_kelurahan" :selected="kelurahan.id == kelurahanId"></option>
                         </template>
                     </select>
                     @error('kelurahan_id')<p class="form-error">{{ $message }}</p>@enderror
                   </div>
 
-                  <div class="md:col-span-2">
+                  <div class="md:col-span-2 relative">
                     <label for="nama_perumahan" class="form-label">Nama Perumahan</label>
-                    <input id="nama_perumahan" name="nama_perumahan" value="{{ old('nama_perumahan') }}" required class="form-input" placeholder="Perumahan Griya / Komplek Griya"/>
+                    <input id="nama_perumahan" name="nama_perumahan" type="text" autocomplete="off"
+                           x-model="searchQuery"
+                           @input.debounce.250ms="searchKompleks"
+                           @focus="showSuggestions = true"
+                           @keydown.escape.window="showSuggestions = false"
+                           placeholder="Contoh: Komplek Griya Permata"
+                           required class="form-input"/>
+                    
+                    <div x-show="searchQuery && !searchQuery.toLowerCase().includes('komplek') && !searchQuery.toLowerCase().includes('perumahan')" class="mt-1 text-xs text-amber-600">
+                        PERINGATAN : Harus menyertakan kata "Komplek" atau "Perumahan".
+                    </div>
                     @error('nama_perumahan')<p class="form-error">{{ $message }}</p>@enderror
+
+                    <div x-show="showSuggestions && suggestions.length > 0" @click.away="showSuggestions = false" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto" x-transition>
+                        <ul>
+                            <template x-for="suggestion in suggestions" :key="suggestion.id">
+                                <li @click="selectSuggestion(suggestion)" class="px-4 py-2 cursor-pointer hover:bg-gray-100" x-text="suggestion.nama_komplek"></li>
+                            </template>
+                        </ul>
+                    </div>
                   </div>
                   
                   <div class="md:col-span-2">
@@ -226,6 +245,68 @@
                 if (this.kecamatanId) {
                     this.fetchKelurahans();
                 }
+            }
+        }
+    }
+
+   function proposalForm() {
+        return {
+            // Data untuk dropdown lokasi
+            kecamatanId: '{{ old('kecamatan_id') }}',
+            kelurahanId: '{{ old('kelurahan_id') }}',
+            kelurahans: [],
+            loadingKelurahan: false,
+
+            // Data untuk pencarian komplek
+            searchQuery: '{{ old('nama_perumahan') }}',
+            suggestions: [],
+            showSuggestions: false,
+            loadingKompleks: false,
+
+            // Fungsi yang dijalankan saat form dimuat
+            init() {
+                // Jika ada data kecamatan lama saat halaman dimuat (misal karena validation error),
+                // panggil fetchKelurahans agar dropdown kelurahan terisi kembali.
+                if (this.kecamatanId) {
+                    this.fetchKelurahans();
+                }
+            },
+
+            // Fungsi untuk mengambil data kelurahan berdasarkan kecamatan
+            fetchKelurahans() {
+                this.kelurahans = []; // Kosongkan kelurahan setiap kali kecamatan berubah
+                if (!this.kecamatanId) return;
+
+                this.loadingKelurahan = true;
+                fetch(`/kelurahan-by-kecamatan/${this.kecamatanId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        this.kelurahans = data;
+                        this.loadingKelurahan = false;
+                    });
+            },
+
+            // Fungsi untuk mencari nama komplek yang mirip
+            searchKompleks() {
+                if (this.searchQuery.length < 3) {
+                    this.suggestions = [];
+                    this.showSuggestions = false;
+                    return;
+                }
+                this.loadingKompleks = true;
+                fetch(`/search-kompleks?q=${this.searchQuery}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        this.suggestions = data;
+                        this.showSuggestions = true;
+                        this.loadingKompleks = false;
+                    });
+            },
+
+            // Fungsi saat saran dipilih
+            selectSuggestion(suggestion) {
+                this.searchQuery = suggestion.nama_komplek;
+                this.showSuggestions = false;
             }
         }
     }

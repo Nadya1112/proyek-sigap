@@ -7,6 +7,7 @@ use App\Models\Proposal; // Pastikan model Proposal ada dan benar
 use App\Models\Komplek; // Pastikan model Komplek ada dan benar
 use App\Models\Kecamatan;
 use App\Models\Kelurahan;
+use App\Rules\ContainsKomplekOrPerumahan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -48,7 +49,7 @@ public function showForm()
             'nama_pengaju'   => 'required|string|max:255',
             'kontak_pengaju' => 'required|string|max:20',
             'kelurahan_id'   => 'required|exists:kelurahans,id', // Validasi kelurahan
-            'nama_perumahan' => 'required|string|max:255',
+            'nama_perumahan' => ['required', 'string', 'max:255', new ContainsKomplekOrPerumahan],
             'alamat'         => 'required|string',
             'proposal'       => 'required|file|mimes:pdf,doc,docx|max:10240',
             'catatan'        => 'nullable|string',
@@ -86,4 +87,20 @@ public function showForm()
 
         return redirect()->back()->with('success', 'Proposal Anda berhasil dikirim! Terima kasih.');
     }
+
+    public function searchKompleks(Request $request)
+    {
+        $query = Str::squish($request->get('q'));
+        if (!$query) {
+            return response()->json([]);
+        }
+
+        $kompleks = komplek::where('nama_komplek', 'like', "%{$query}%")
+            ->limit(5)
+            ->distrinct()
+            ->get(['id', 'nama_komplek']);
+
+        return response()->json($kompleks);
+    }
+
 }
