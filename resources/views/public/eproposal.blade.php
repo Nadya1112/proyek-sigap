@@ -112,7 +112,7 @@
                     <label for="nama_perumahan" class="form-label">Nama Perumahan</label>
                     <input id="nama_perumahan" name="nama_perumahan" type="text" autocomplete="off"
                            x-model="searchQuery"
-                           @input.debounce.250ms="searchKompleks"
+                           @input.debounce.190ms="searchKompleks"
                            @focus="showSuggestions = true"
                            @keydown.escape.window="showSuggestions = false"
                            placeholder="Contoh: Komplek Griya Permata"

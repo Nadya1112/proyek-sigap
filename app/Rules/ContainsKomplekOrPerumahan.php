@@ -11,7 +11,7 @@ class ContainsKomplekOrPerumahan implements ValidationRule
     {
         $lowerValue = strtolower($value);
         if (strpos($lowerValue, 'komplek') === false && strpos($lowerValue, 'perumahan') === false) {
-            $fail('Harus menyertakan kata "Komplek" atau "Perumahan".');
+            $fail('Nama perumahan harus menyertakan kata "Komplek" atau "Perumahan".');
         }
     }
 }
