@@ -11,27 +11,15 @@ class RegulasiController extends Controller
 
     public function index(Request $request)
     {
-        $folderId = env('GOOGLE_DRIVE_FOLDER_ID');
-        $q = trim((string) $request->get('q', ''));
-        $files = $this->gdrive->listFiles($folderId, $q ?: null);
+        // Logika pencarian dihapus dari sini karena akan ditangani oleh frontend
+        $files = $this->gdrive->listFiles();
 
-        // Urutkan: terbaru dulu
-        usort($files, fn($a,$b) => strcmp($b['mtime'] ?? '', $a['mtime'] ?? ''));
-
+        // Urutkan berdasarkan waktu modifikasi terbaru
+        usort($files, fn($a, $b) => strcmp($b['modified'] ?? '', $a['modified'] ?? ''));
+        
+        // Kirim semua dokumen ke view
         return view('public.regulasi', [
-            'docs' => collect($files)->map(function($f){
-                // Ekstrak tahun dari nama (opsional)
-                preg_match('/\b(19|20)\d{2}\b/', $f['name'], $m);
-                return [
-                    'id'      => $f['id'],
-                    'title'   => preg_replace('/\.\w+$/','',$f['name']),
-                    'year'    => isset($m[0]) ? (int) $m[0] : null,
-                    'size_kb' => isset($f['size']) ? (int) round($f['size']/1024) : null,
-                    'mime'    => $f['mime'] ?? null,
-                    'mtime'   => $f['mtime'] ?? null,
-                ];
-            }),
-            'q' => $q,
+            'docs' => $files,
         ]);
     }
 

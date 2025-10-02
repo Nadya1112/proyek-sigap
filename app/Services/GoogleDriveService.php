@@ -15,18 +15,18 @@ class GoogleDriveService
     public function __construct()
     {
         // Ambil path JSON & folder id dari config
-        $jsonPath = config('services.gdrive.service_account_json');
+         $jsonPath = config('services.gdrive.service_account_json');
         $folderId = config('services.gdrive.folder_id');
 
         // Validasi konfigurasi agar error-nya eksplisit
         if (!$jsonPath) {
-            throw new \RuntimeException("Config 'services.gdrive.service_account_json' kosong.");
+            throw new \RuntimeException("Config 'services.gdrive.service_account_json' kosong. Periksa file config/services.php dan .env Anda.");
         }
         if (!file_exists($jsonPath)) {
-            throw new \RuntimeException("File service account JSON tidak ditemukan: {$jsonPath}");
+            throw new \RuntimeException("File service account JSON tidak ditemukan di path: {$jsonPath}");
         }
         if (!$folderId) {
-            throw new \RuntimeException("Config 'services.gdrive.folder_id' kosong.");
+            throw new \RuntimeException("Config 'services.gdrive.folder_id' kosong. Periksa file config/services.php dan .env Anda.");
         }
 
         // Normalisasi folderId: buang querystring/URL penuh jika user salah paste
@@ -58,9 +58,19 @@ class GoogleDriveService
     }
 
     /** List file di folder */
-    public function listFiles(): array
+    public function listFiles(?string $searchTerm = null): array
     {
-        $q = sprintf("'%s' in parents and trashed=false", $this->folderId);
+        $queryParts = [
+            sprintf("'%s' in parents", $this->folderId),
+            "trashed=false"
+        ];
+
+        // Jika ada kata kunci pencarian, tambahkan ke query
+        if ($searchTerm) {
+            $queryParts[] = sprintf("fullText contains '%s'", addslashes($searchTerm));
+        }
+
+        $q = implode(' and ', $queryParts);
         $files = $this->drive->files->listFiles([
             'q' => $q,
             'fields' => 'files(id, name, mimeType, size, modifiedTime)',

@@ -4,7 +4,7 @@
 
 @section('content')
 
-{{-- ===== HERO: tanpa kartu statistik ===== --}}
+{{-- ===== HERO ===== --}}
 <section class="relative overflow-hidden">
   <div class="relative"
        style="background: linear-gradient(135deg, #F7A623 0%, #FF7A00 45%, #F25C3B 70%, #F04949 100%);">
@@ -20,7 +20,6 @@
         </svg>
         Pusat Informasi
       </span>
-
       <h1 class="mt-4 text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.10)]">
         Informasi Dokumen Regulasi Resmi
       </h1>
@@ -31,90 +30,90 @@
   </div>
 </section>
 
-{{-- ===== KONTEN: Judul + pencarian + daftar dokumen di tengah ===== --}}
-<section class="relative z-10 -mt-8 md:-mt-12 mb-24">
-  <div class="container mx-auto px-6 max-w-5xl">
-    <div class="rounded-xl bg-white ring-1 ring-gray-100
-                shadow-[0_18px_30px_-22px_rgba(0,0,0,0.14),0_8px_18px_-16px_rgba(0,0,0,0.08)]">
+{{-- ===== KONTEN: Diperbarui dengan Alpine.js untuk Live Search ===== --}}
+<main class="py-16 lg:py-24 bg-gray-50">
+  <div class="container mx-auto px-6">
+    <div 
+        {{-- 1. Inisialisasi Alpine.js dengan data dokumen dari controller --}}
+        x-data="{
+            searchQuery: '',
+            allDocs: {{ json_encode($docs) }},
+            get filteredDocs() {
+                if (this.searchQuery.trim() === '') {
+                    return this.allDocs;
+                }
+                return this.allDocs.filter(
+                    doc => doc.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+                );
+            }
+        }" 
+        class="max-w-5xl mx-auto"
+    >
+      <div class="rounded-xl bg-white ring-1 ring-gray-100 shadow-xl p-6 md:p-10">
 
-      <div class="px-6 md:px-10 py-8">
-        {{-- Judul di atas daftar --}}
         <div class="text-center">
           <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Daftar Dokumen</h2>
-          <p class="text-sm text-gray-500 mt-2">Gunakan pencarian untuk menemukan dokumen lebih cepat.</p>
+          <p class="text-gray-500 mt-2">Gunakan pencarian untuk menemukan dokumen lebih cepat.</p>
         </div>
 
-        {{-- Pencarian (center) --}}
-        <div x-data="{q:'{{ addslashes($q ?? '') }}'}" class="mt-6 flex justify-center">
+        {{-- 2. Input pencarian diikat ke variabel 'searchQuery' --}}
+        <div class="mt-6 flex justify-center">
           <div class="relative w-full max-w-lg">
-            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <circle cx="11" cy="11" r="7" stroke-width="2"></circle>
               <path d="M21 21l-4.3-4.3" stroke-width="2" stroke-linecap="round"></path>
             </svg>
-            <input x-model="q" placeholder="Cari judul dokumen..."
-                   class="w-full rounded-xl border border-gray-200 bg-gray-50 pl-9 pr-3 py-2.5
-                          focus:bg-white focus:border-[#F39B28] focus:ring-2 focus:ring-[#F39B28]/35 outline-none transition"/>
+            <input x-model="searchQuery" placeholder="Ketik satu suku kata untuk mencari..."
+                   class="w-full rounded-full border-2 border-gray-200 bg-gray-50 pl-12 pr-4 py-3
+                          focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-400/30 outline-none transition"/>
           </div>
         </div>
 
-        {{-- List dokumen (rata tengah) --}}
-        <ul class="mt-7 max-w-3xl mx-auto divide-y divide-gray-100">
-          @forelse ($docs as $doc)
-            @php
-              $title = $doc['title'] ?? '';
-              $year  = $doc['year']  ?? null;
-              // size_kb dari controller, kalau tidak ada pakai key 'size' (service mengembalikan KB)
-              $size  = $doc['size_kb'] ?? ($doc['size'] ?? null); 
-              $ext   = strtoupper($doc['ext'] ?? 'PDF');
-              $id    = $doc['id'];
-            @endphp
-            <li
-              x-show="!q || '{{ strtolower($title) }}'.includes(q.toLowerCase())"
-              class="group flex items-stretch justify-between gap-4 px-2 md:px-1 py-3 md:py-4">
-
-              <div class="flex items-center gap-3 min-w-0">
-                {{-- Icon --}}
-                <div class="flex-shrink-0 w-9 h-9 rounded-lg bg-orange-50 ring-1 ring-orange-100 grid place-content-center">
-                  <svg class="w-5 h-5 text-[#F16A00]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        {{-- 3. Daftar dokumen sekarang di-loop menggunakan 'filteredDocs' dari Alpine.js --}}
+        <ul class="mt-8 max-w-4xl mx-auto divide-y divide-gray-100">
+          <template x-for="doc in filteredDocs" :key="doc.id">
+            <li class="group flex items-center justify-between gap-4 px-2 py-4 transition-colors hover:bg-gray-50/80 rounded-lg">
+              <div class="flex items-center gap-4 min-w-0">
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-50 ring-1 ring-orange-100 grid place-content-center">
+                  <svg class="w-5 h-5 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path d="M7 3h6l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke-width="1.7"/>
                     <path d="M13 3v6h6" stroke-width="1.7"/>
                   </svg>
                 </div>
-
                 <div class="min-w-0">
-                  <p class="text-gray-800 font-medium truncate">{{ $title }}</p>
-                  <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 ring-1 ring-orange-200">
-                      {{ $ext }}
-                    </span>
-                    @if($year)<span>{{ $year }}</span>@endif
-                    @if(!is_null($size))<span>• {{ number_format($size) }} KB</span>@endif
+                  <p class="text-gray-800 font-semibold truncate" x-text="doc.title"></p>
+                  <div class="mt-1 flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 font-medium" x-text="doc.ext.toUpperCase()"></span>
+                    <span x-show="doc.year" x-text="doc.year"></span>
+                    <span x-show="doc.size"><span class="mx-1">•</span> <span x-text="`${Math.round(doc.size)} KB`"></span></span>
                   </div>
                 </div>
               </div>
 
               <div class="flex items-center">
-                <a href="{{ route('regulasi.download', $id) }}"
-                  class="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-white text-sm font-semibold
-                          bg-gradient-to-r from-[#FFA72B] to-[#F16A00] shadow-sm
-                          hover:brightness-95 active:scale-[.99] transition">
+                <a :href="`{{ route('regulasi.download', '') }}/${doc.id}`"
+                   class="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-white text-sm font-semibold
+                          bg-gradient-to-r from-orange-500 to-orange-600 shadow-md
+                          hover:from-orange-600 hover:to-orange-700 active:scale-[.98] transition-all transform group-hover:scale-105">
                   <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                          d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/>
+                    <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/>
                   </svg>
                   Unduh
                 </a>
               </div>
             </li>
-          @empty
-            <li class="py-8">
-              <p class="text-center text-sm text-gray-500">Belum ada dokumen yang dipublikasikan.</p>
+          </template>
+          
+          {{-- Pesan jika tidak ada hasil pencarian --}}
+          <template x-if="filteredDocs.length === 0">
+            <li class="py-10 text-center">
+                <p class="text-gray-500">Dokumen dengan kata kunci "<strong x-text="searchQuery"></strong>" tidak ditemukan.</p>
             </li>
-          @endforelse
+          </template>
         </ul>
       </div>
     </div>
   </div>
-</section>
+</main>
 
 @endsection
