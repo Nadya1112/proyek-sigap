@@ -32,20 +32,17 @@ return [
     
         'gdrive' => [
         // Simpan ENV berisi path relatif di bawah storage/, lalu bungkus dengan storage_path()
-        'service_account_json' => storage_path(env('GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON', 'app/keys/sigap-drive-service.json')),
+        'service_account_json' => storage_path(env('GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON')),
         'folder_id'            => env('GOOGLE_DRIVE_FOLDER_ID'),
     ],
 
-    // =======================================================
-    // === BLOK KODE INI UNTUK GOOGLE ===
-    // =======================================================
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
     
-    'gdrive' => [
-        // ... (konfigurasi gdrive Anda)
-    ],
+    // 'gdrive' => [
+    //     // ... (konfigurasi gdrive Anda)
+    // ],
 ];

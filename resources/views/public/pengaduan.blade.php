@@ -153,8 +153,7 @@
                 @else
                     <div class="text-center bg-orange-50/50 rounded-xl p-8 md:p-12 border border-orange-200/80">
                         {{-- Icon --}}
-                        <div
-                            class="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-lg mb-5">
+                        <div class="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-lg mb-5">
                             <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -164,7 +163,7 @@
 
                         <h3 class="text-2xl font-bold text-gray-800">Silakan Masuk Terlebih Dahulu</h3>
                         <p class="text-gray-600 mt-2 mb-6 max-w-md mx-auto">
-                            Anda harus memiliki akun dan masuk untuk dapat membuat pengaduan baru.
+                            Anda harus memiliki akun dan masuk untuk dapat membuat pengaduan.
                         </p>
 
                         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">

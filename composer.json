@@ -1,6 +1,11 @@
 {
     "require": {
+<<<<<<< HEAD
         "php": "^8.3.26",
+=======
+        "php": "^8.1",
+        "doctrine/dbal": "^4.3",
+>>>>>>> aec4143f0defc82d366ee094a3515009d1fe6f2d
         "filament/filament": "^3.2",
         "google/apiclient": "^2.15",
         "guzzlehttp/guzzle": "^7.0.1",

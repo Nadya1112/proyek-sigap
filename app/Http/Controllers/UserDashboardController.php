@@ -97,7 +97,7 @@ if ($proposalTable) {
             'id','status','created_at',
             DB::raw("
                 COALESCE(
-                    NULLIF(TRIM(dokumen_proposal), ''),
+                    NULLIF(TRIM(proposal), ''),
                     LEFT(COALESCE(catatan,''), 80)
                 ) AS judul
             ")
