@@ -53,26 +53,5 @@ class WilayahSeeder extends Seeder
             }
         } else {
             $this->command->warn("Peringatan: File 'public/data/kecamatan.json' tidak ditemukan. Seeding Kecamatan dilewati.");
-        }
-
-
-        /*
-        // --- BAGIAN 2: MEMASUKKAN DATA KOMPLEKS (CONTOH MANUAL) ---
-        // BAGIAN INI KITA NONAKTIFKAN SEMENTARA SESUAI PERMINTAAN ANDA
-
-        // Ambil data kecamatan yang sudah ada di database untuk relasi
-        $kecamatanSelatan = Kecamatan::where('nama_kecamatan', 'Banjarmasin Selatan')->first();
-
-        if ($kecamatanSelatan) {
-             Kompleks::create([
-                'nama_komplek' => 'Komplek Tata Banua Indah',
-                'alamat' => 'Jl. Gubernur Soebardjo',
-                'kelurahan_id' => 1, // Ganti dengan ID kelurahan yang sesuai
-                'kecamatan_id' => $kecamatanSelatan->id, // Menggunakan ID dari data di atas
-                'status_aset' => 'Sudah Diserahkan',
-                'area' => MultiPolygon::fromWkt('MULTIPOLYGON(((114.605 -3.341, 114.605 -3.345, 114.609 -3.345, 114.609 -3.341, 114.605 -3.341)))'),
-            ]);
-        }
-        */
-    }
+        }    }
 }
