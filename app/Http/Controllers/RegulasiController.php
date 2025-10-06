@@ -2,30 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\GoogleDriveService;
+use App\Models\Regulasi; // Gunakan model Regulasi
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class RegulasiController extends Controller
 {
-    public function __construct(private GoogleDriveService $gdrive) {}
-
     public function index(Request $request)
     {
-        // Logika pencarian dihapus dari sini karena akan ditangani oleh frontend
-        $files = $this->gdrive->listFiles();
+        // Ambil data dari database, bukan Google Drive
+        $query = Regulasi::query()->orderBy('created_at', 'desc');
 
-        // Urutkan berdasarkan waktu modifikasi terbaru
-        usort($files, fn($a, $b) => strcmp($b['modified'] ?? '', $a['modified'] ?? ''));
+        if ($request->has('q') && $request->q != '') {
+            $query->where('judul', 'like', '%' . $request->q . '%');
+        }
         
-        // Kirim semua dokumen ke view
-        return view('public.regulasi', [
-            'docs' => $files,
-        ]);
+        $docs = $query->get();
+        $q = $request->q ?? '';
+
+        return view('public.regulasi', compact('docs', 'q'));
     }
 
-        public function download(string $id)
+    public function download(string $id)
         {
-            $url = $this->gdrive->exportDownloadUrl($id);
-            return redirect()->away($url);
+            // 1. Cari data regulasi di database berdasarkan ID yang diberikan
+            $regulasi = \App\Models\Regulasi::find($id);
+
+            // 2. Jika data tidak ditemukan, tampilkan halaman error 404
+            if (!$regulasi) {
+                abort(404, 'Dokumen tidak ditemukan.');
+            }
+
+            // 3. Jika ditemukan, gunakan path dari database untuk mengunduh file dari storage
+            // Pastikan nama file yang diunduh adalah nama aslinya
+            return Storage::disk('public')->download($regulasi->path, $regulasi->nama_file_asli);
         }
 }
