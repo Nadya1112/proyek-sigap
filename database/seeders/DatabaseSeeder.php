@@ -13,6 +13,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        $this->call([
+            WilayahSeeder::class,  // Seeder baru untuk data Kecamatan & Kompleks
+            DocumentSeeder::class, // Seeder yang sudah ada
+            FasumSeeder::class,    // Seeder yang sudah ada
+        ]);
     }
 }
