@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Mail\VerifyEmailCodeMail;
+use App\Http\Controllers\Auth\LoginController;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\VerifyEmailCodeMail;
 
 class VerifyEmailController extends Controller
 {
@@ -19,9 +21,8 @@ class VerifyEmailController extends Controller
             return redirect()->route('register');
         }
 
-        // Cek jika pengguna mencoba mengakses halaman ini tanpa melalui pendaftaran
         if (!$request->session()->has('registration_data')) {
-             return redirect()->route('register')->withErrors(['email' => 'Sesi pendaftaran tidak ditemukan. Silakan daftar ulang.']);
+            return redirect()->route('register')->withErrors(['email' => 'Sesi pendaftaran tidak ditemukan. Silakan daftar ulang.']);
         }
 
         return view('auth.verify-email', compact('email'));
@@ -31,7 +32,8 @@ class VerifyEmailController extends Controller
     {
         $data = $request->validate([
             'email' => ['required', 'email'],
-            'code'  => ['required', 'digits:4'],
+            // DIUBAH: nama field validasi disamakan dengan controller sebelumnya
+            'verification_code' => ['required', 'numeric', 'digits:4'],
         ]);
 
         $registrationData = $request->session()->get('registration_data');
@@ -40,62 +42,51 @@ class VerifyEmailController extends Controller
             return back()->withErrors(['email' => 'Sesi pendaftaran tidak valid atau email tidak cocok.'])->withInput();
         }
 
-        // =====================================================================
-        // === PENGECEKAN WAKTU KEDALUWARSA YANG SUDAH AKTIF ===
-        // =====================================================================
         if (Carbon::parse($registrationData['verification_expires_at'])->isPast()) {
-            return back()->withErrors(['code' => 'Kode verifikasi sudah kedaluwarsa. Silakan minta kode baru.'])->withInput();
+            return back()->withErrors(['verification_code' => 'Kode verifikasi sudah kedaluwarsa.'])->withInput();
         }
 
-        $inputCode = preg_replace('/\D/', '', $data['code']);
+        // DIUBAH: Gunakan perbandingan biasa, bukan Hash::check
+        if ($registrationData['verification_code'] !== $data['verification_code']) {
+            return back()->withErrors(['verification_code' => 'Kode verifikasi yang Anda masukkan salah.'])->withInput();
+        }
+
+        // Hapus data verifikasi dari array sebelum membuat user
+        unset($registrationData['verification_code'], $registrationData['verification_expires_at']);
         
-        // Diubah agar menggunakan Hash::check jika Anda menerapkan hashing
-        if (!\Illuminate\Support\Facades\Hash::check($inputCode, $registrationData['verification_code'])) {
-            return back()->withErrors(['code' => 'Kode verifikasi yang Anda masukkan salah.'])->withInput();
-        }
+        // Tambahkan waktu verifikasi email
+        $registrationData['email_verified_at'] = now();
 
-        $user = User::create([
-            'name' => $registrationData['name'],
-            'email' => $registrationData['email'],
-            'kontak' => $registrationData['kontak'],
-            'password' => $registrationData['password'],
-            'email_verified_at' => now(),
-            'role' => 'pengguna'
-        ]);
+        $user = User::create($registrationData);
 
         $request->session()->forget('registration_data');
+        
+        // Login-kan pengguna secara otomatis
+        Auth::login($user);
 
-        return redirect()->route('login')->with('status', 'Verifikasi berhasil! Silakan masuk dengan akun baru Anda.');
+        // Arahkan ke dashboard setelah verifikasi berhasil
+        return redirect()->route('user.dashboard')->with('status', 'Verifikasi berhasil! Selamat datang.');
     }
 
     public function resend(Request $request)
     {
-        $request->validate([
-            'email' => ['required', 'email'],
-        ]);
+        $request->validate(['email' => ['required', 'email']]);
 
-        // =====================================================================
-        // === LOGIKA RESEND DIPERBAIKI AGAR MENGGUNAKAN SESSION ===
-        // =====================================================================
         $registrationData = $request->session()->get('registration_data');
 
-        // Pastikan ada sesi dan emailnya cocok
         if (!$registrationData || $registrationData['email'] !== $request->email) {
             return redirect()->route('register')->withErrors(['email' => 'Gagal mengirim ulang kode. Sesi tidak ditemukan.']);
         }
 
-        // Buat kode dan waktu kedaluwarsa yang baru (2 MENIT)
-        $plainTextCode = (string) random_int(1000, 9999);
-        $registrationData['verification_code'] = \Illuminate\Support\Facades\Hash::make($plainTextCode);
-        $registrationData['verification_expires_at'] = now()->addMinutes(2);
+        // DIUBAH: Buat kode teks biasa (plain text), jangan di-hash
+        $newCode = (string) random_int(1000, 9999);
+        $registrationData['verification_code'] = $newCode;
+        $registrationData['verification_expires_at'] = now()->addMinutes(10);
 
-        // Perbarui data di session
         $request->session()->put('registration_data', $registrationData);
 
-        // Kirim ulang email dengan kode baru
+        // Kirim kode baru ke email
         $tempUser = new User($registrationData);
-        $tempUser->verification_code = $plainTextCode; // Kirim kode asli ke email
-        
         Mail::to($registrationData['email'])->send(new VerifyEmailCodeMail($tempUser));
 
         return redirect()

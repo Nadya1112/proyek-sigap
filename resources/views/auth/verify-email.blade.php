@@ -1,169 +1,113 @@
-@extends('layouts.auth')
+@extends('layouts.public')  {{-- Sesuaikan dengan layout Anda --}}
 
-@section('title','Verifikasi Email - SIGAP KOMPLEK')
+@section('title', 'Verifikasi Email')
 
 @section('content')
-<div class="min-h-screen flex items-center justify-center relative px-4">
+<div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div class="max-w-md w-full">
 
-  {{-- Latar Belakang --}}
-  <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-    <div class="absolute -top-24 -left-24 w-[520px] h-[520px] rounded-full opacity-20 blur-3xl"
-         style="background: radial-gradient(50% 50% at 30% 30%, rgba(255,160,67,.50) 0%, rgba(255,160,67,.08) 60%, transparent 70%);"></div>
-  </div>
-
-  {{-- CARD --}}
-  <div class="w-full max-w-md md:max-w-lg bg-white rounded-[26px] shadow-xl border border-gray-100 mx-auto">
-    <div class="px-8 pt-9 pb-9">
-
-      {{-- Ikon Email --}}
-      <div class="flex justify-center mb-5">
-        <div class="w-16 h-16 rounded-full bg-orange-100 grid place-content-center">
-            <svg class="w-8 h-8 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-            </svg>
-        </div>
-      </div>
-
-      <h1 class="text-center text-[20px] font-extrabold text-gray-800 tracking-wide">
-        Verifikasi Email Anda
-      </h1>
-      <p class="mt-1 text-center text-[13px] text-gray-500">
-        Kami telah mengirim kode verifikasi 4 digit ke <strong>{{ $email }}</strong>.
-      </p>
-
-      {{-- Alert status --}}
-      @if (session('status'))
-        <div class="mt-4 text-sm text-green-700 bg-green-50 border border-green-200 rounded-xl px-4 py-2">
-          {{ session('status') }}
-        </div>
-      @endif
-      @if ($errors->any())
-        <div class="mt-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-2">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-      @endif
-
-
-      {{-- FORM KODE --}}
-      <div x-data="verificationController('{{ session('registration_data.verification_expires_at', now()->addMinutes(10)) }}')" x-init="init()">
-        <form method="POST" action="{{ route('verification.verify') }}" class="mt-7 space-y-6">
-            @csrf
-            <input type="hidden" name="email" value="{{ $email }}"/>
-            {{-- Input tersembunyi yang akan diisi oleh Alpine.js --}}
-            <input type="hidden" name="code" x-model="otpCode">
-
-            <div>
-                <label class="block text-center text-[13px] font-semibold text-gray-700 mb-2">Masukkan kode verifikasi</label>
-                {{-- KOLOM INPUT 4 KOTAK --}}
-                <div class="flex justify-center gap-3">
-                    <template x-for="i in 4" :key="i">
-                        <input
-                            type="text"
-                            maxlength="1"
-                            inputmode="numeric"
-                            class="w-14 h-14 text-center text-2xl font-bold rounded-2xl border-2 border-gray-200 bg-[#F7F8FA] transition
-                                   focus:bg-white focus:border-[#F39B28] focus:ring-2 focus:ring-[#F39B28]/45 outline-none"
-                            x-on:keydown="handleKeyDown($event, i-1)"
-                            x-on:input="handleInput($event, i-1)"
-                            :id="'otp-' + i"
-                        >
-                    </template>
+        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10">
+            <div class="text-center">
+                <div class="w-20 h-20 rounded-full bg-orange-100 grid place-content-center mx-auto mb-4">
+                    <svg class="w-10 h-10 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
+                    </svg>
                 </div>
-            </div>
-
-            <button type="submit"
-                    class="w-full rounded-2xl py-3 text-white font-semibold shadow-sm
-                           bg-gradient-to-r from-[#FFA72B] to-[#F16A00]
-                           hover:brightness-95 active:scale-[.99]
-                           focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#F39B28] transition">
-              Verifikasi Akun
-            </button>
-        </form>
-        
-        <div class="mt-5 text-center text-[13px] text-gray-500">
-            {{-- Tampilkan timer atau tombol kirim ulang --}}
-            <div x-show="!expired" x-text="countdown" class="transition-opacity duration-300"></div>
-
-            <div x-show="expired" style="display: none;" class="transition-opacity duration-300">
-                <p>Tidak menerima kode?
-                    <form method="POST" action="{{ route('verification.resend') }}" class="inline">
-                        @csrf
-                        <input type="hidden" name="email" value="{{ $email }}"/>
-                        <button type="submit" class="text-[#F39B28] font-semibold hover:underline">
-                          Kirim ulang kode
-                        </button>
-                    </form>
+                <h1 class="text-2xl font-bold text-gray-800">Verifikasi Email Anda</h1>
+                <p class="text-gray-500 mt-2">
+                    Kami telah mengirim kode verifikasi 4 digit ke <strong class="text-gray-700">{{ $email }}</strong>.
                 </p>
             </div>
+
+            @if ($errors->any())
+            <div class="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
+                <strong class="font-bold">Oops!</strong>
+                <span class="block sm:inline">{{ $errors->first() }}</span>
+            </div>
+            @endif
+
+            @if (session('status'))
+            <div class="mt-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg relative" role="alert">
+                <span class="block sm:inline">{{ session('status') }}</span>
+            </div>
+            @endif
+
+            {{-- FORM UTAMA YANG AKAN DIKIRIM --}}
+            <form id="verification-form" method="POST" action="{{ route('verification.verify') }}" class="mt-6">
+                @csrf
+                <p class="text-center text-sm font-medium text-gray-600 mb-2">Masukkan kode verifikasi</p>
+
+                {{-- INPUT TERSEMBUNYI UNTUK MENYIMPAN KODE LENGKAP --}}
+                <input type="hidden" name="verification_code" id="verification_code">
+                <input type="hidden" name="email" value="{{ $email }}">
+
+                {{-- 4 KOTAK INPUT YANG DILIHAT PENGGUNA --}}
+                <div class="flex justify-center gap-3" id="otp-inputs">
+                    <input type="text" class="otp-input w-14 h-14 text-center text-2xl font-bold text-gray-800 bg-gray-100 border-2 border-gray-200 rounded-lg focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition" maxlength="1">
+                    <input type="text" class="otp-input w-14 h-14 text-center text-2xl font-bold text-gray-800 bg-gray-100 border-2 border-gray-200 rounded-lg focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition" maxlength="1">
+                    <input type="text" class="otp-input w-14 h-14 text-center text-2xl font-bold text-gray-800 bg-gray-100 border-2 border-gray-200 rounded-lg focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition" maxlength="1">
+                    <input type="text" class="otp-input w-14 h-14 text-center text-2xl font-bold text-gray-800 bg-gray-100 border-2 border-gray-200 rounded-lg focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition" maxlength="1">
+                </div>
+
+                <div class="mt-6">
+                    <button type="submit" class="w-full rounded-xl py-3 text-white font-semibold bg-gradient-to-r from-[#FFA728] to-[#F25C3B] shadow-sm hover:brightness-95 active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#F59E0B] transition">
+                        Verifikasi Akun
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-5 text-center text-sm text-gray-500">
+                <p>Tidak menerima kode?</p>
+                {{-- FORM UNTUK KIRIM ULANG KODE --}}
+                <form method="POST" action="{{ route('verification.resend') }}" class="inline">
+                    @csrf
+                    <input type="hidden" name="email" value="{{ $email }}">
+                    <button type="submit" class="text-orange-600 hover:text-orange-700 font-semibold hover:underline">
+                        Kirim ulang kode
+                    </button>
+                </form>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
-@endsection
+
+{{-- SCRIPT PENTING UNTUK MENGGABUNGKAN KODE --}}
 <script>
-          function verificationController(expiresAtTimestamp) {
-              return {
-                  otpCode: '',
-                  expiresAt: new Date(expiresAtTimestamp),
-                  countdown: 'Memuat...',
-                  expired: false,
-                  
-                  init() {
-                      this.startCountdown();
-                  },
+    const otpInputs = document.querySelectorAll('.otp-input');
+    const hiddenInput = document.getElementById('verification_code');
+    const form = document.getElementById('verification-form');
 
-                  startCountdown() {
-                      const interval = setInterval(() => {
-                          const now = new Date();
-                          const timeLeft = Math.round((this.expiresAt - now) / 1000);
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            // Hanya proses jika input adalah angka
+            if (e.target.value.match(/^[0-9]$/)) {
+                // Pindah ke input selanjutnya jika belum yang terakhir
+                if (index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            }
+            updateHiddenInput();
+        });
 
-                          if (timeLeft <= 0) {
-                              clearInterval(interval);
-                              this.expired = true;
-                              this.countdown = 'Waktu habis!';
-                              return;
-                          }
+        input.addEventListener('keydown', (e) => {
+            // Pindah ke input sebelumnya saat menekan backspace jika input kosong
+            if (e.key === 'Backspace' && index > 0 && !e.target.value) {
+                otpInputs[index - 1].focus();
+            }
+        });
+    });
 
-                          const minutes = Math.floor(timeLeft / 60);
-                          let seconds = timeLeft % 60;
-                          seconds = seconds < 10 ? '0' + seconds : seconds;
-
-                          this.countdown = `Kode akan kedaluwarsa dalam ${minutes}:${seconds}`;
-                      }, 1000);
-                  },
-
-                  handleInput(event, index) {
-                      const input = event.target;
-                      const value = input.value;
-
-                      if (value.match(/^[0-9]$/)) {
-                          if (index < 3) {
-                              document.getElementById(`otp-${index + 2}`).focus();
-                          }
-                      } else {
-                          input.value = '';
-                      }
-                      this.updateOtpCode();
-                  },
-
-                  handleKeyDown(event, index) {
-                      if (event.key === "Backspace" && index > 0 && event.target.value === '') {
-                          document.getElementById(`otp-${index}`).focus();
-                      }
-                  },
-
-                  updateOtpCode() {
-                      let code = '';
-                      for (let i = 1; i <= 4; i++) {
-                          code += document.getElementById(`otp-${i}`).value;
-                      }
-                      this.otpCode = code;
-                  }
-              }
-          }
+    function updateHiddenInput() {
+        let otp = '';
+        otpInputs.forEach(input => {
+            otp += input.value;
+        });
+        hiddenInput.value = otp;
+    }
+    
+    // Pastikan untuk update hidden input sebelum form disubmit
+    form.addEventListener('submit', function() {
+        updateHiddenInput();
+    });
 </script>
+@endsection

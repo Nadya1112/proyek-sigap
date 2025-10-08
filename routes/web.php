@@ -73,6 +73,10 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'showForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'store'])->name('register.post');
     // ... rute verifikasi email ...
+    Route::get('/verify-email', [VerifyEmailController::class, 'showForm'])->name('verification.show');
+    Route::post('/verify-email', [VerifyEmailController::class, 'verify'])->name('verification.verify');
+        Route::post('/verify-email/resend', [VerifyEmailController::class, 'resend'])->name('verification.resend');
+
 });
 
 // Logout
