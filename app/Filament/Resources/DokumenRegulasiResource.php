@@ -34,10 +34,10 @@ class DokumenRegulasiResource extends Resource
                     ->required(fn (string $context): bool => $context === 'create')
                     ->disk('public') // Simpan di disk 'public' (storage/app/public)
                     ->directory('regulasi') // Simpan di dalam folder 'regulasi'
-                    ->storeFileNamesIn('nama_file_asli') // Simpan nama asli file ke kolom 'nama_file_asli'
+                    ->storeFileNamesIn('nama_file_asli') // Simpan nama asli file
                     ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
                     ->maxSize(10240) // 10MB
-                    // Simpan tipe dan ukuran file secara otomatis saat file diunggah
+                    // Isi tipe dan ukuran file secara otomatis
                     ->afterStateUpdated(function ($state, callable $set) {
                         if ($state) {
                             $set('tipe_file', $state->getClientOriginalExtension());
@@ -46,7 +46,6 @@ class DokumenRegulasiResource extends Resource
                     })
                     ->columnSpanFull(),
                 
-                // Field ini akan diisi otomatis, jadi kita sembunyikan dari form
                 Forms\Components\Hidden::make('nama_file_asli'),
                 Forms\Components\Hidden::make('tipe_file'),
                 Forms\Components\Hidden::make('ukuran_file'),
@@ -55,7 +54,6 @@ class DokumenRegulasiResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Filament akan otomatis mengambil data dari tabel 'regulasis'
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('judul')->searchable()->sortable(),
@@ -90,30 +88,11 @@ class DokumenRegulasiResource extends Resource
     
     public static function getPages(): array
     {
-        // Kembalikan halaman Create dan Edit agar berfungsi normal
+        // Hubungkan ke halaman standar Filament
         return [
             'index' => Pages\ListDokumenRegulasis::route('/'),
             'create' => Pages\CreateDokumenRegulasi::route('/create'),
             'edit' => Pages\EditDokumenRegulasi::route('/{record}/edit'),
         ];
     }
-}
-
-// Sesuaikan nama class Pages agar sesuai standar Filament
-namespace App\Filament\Resources\DokumenRegulasiResource\Pages;
-use App\Filament\Resources\DokumenRegulasiResource;
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Pages\CreateRecord;
-use Filament\Resources\Pages\EditRecord;
-
-class ListDokumenRegulasis extends ListRecords {
-    protected static string $resource = DokumenRegulasiResource::class;
-    protected function getHeaderActions(): array { return [Actions\CreateAction::make()]; }
-}
-class CreateDokumenRegulasi extends CreateRecord {
-    protected static string $resource = DokumenRegulasiResource::class;
-}
-class EditDokumenRegulasi extends EditRecord {
-    protected static string $resource = DokumenRegulasiResource::class;
 }

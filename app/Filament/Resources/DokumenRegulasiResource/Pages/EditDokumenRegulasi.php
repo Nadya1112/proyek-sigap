@@ -9,11 +9,4 @@ use Filament\Resources\Pages\EditRecord;
 class EditDokumenRegulasi extends EditRecord
 {
     protected static string $resource = DokumenRegulasiResource::class;
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            Actions\DeleteAction::make(),
-        ];
-    }
 }
