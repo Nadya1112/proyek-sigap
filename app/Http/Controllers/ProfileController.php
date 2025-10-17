@@ -12,14 +12,9 @@ use Illuminate\Auth\Events\PasswordReset;
 
 class ProfileController extends Controller
 {
-    /**
-     * Menampilkan halaman profil pengguna.
-     * Method ini sekarang menerima token opsional dari URL.
-     */
     public function index(Request $request, $token = null)
     {
         $user = Auth::user();
-        // Kirim email dan token ke view untuk logika tampilan dinamis
         return view('profil.index', [
             'user' => $user,
             'token' => $token,
@@ -28,29 +23,24 @@ class ProfileController extends Controller
     }
 
     /**
-     * Memperbarui detail informasi pengguna. (Tidak ada perubahan)
+     * FUNGSI DIPERBARUI: Hanya untuk memperbarui username.
+     * Email dan kontak tidak lagi bisa diubah.
      */
     public function updateDetail(Request $request)
     {
-        // ... (Method ini tidak diubah, isinya tetap sama seperti milik Anda)
         $user = Auth::user();
 
+        // Validasi sekarang hanya untuk 'name'.
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'kontak' => 'nullable|string|max:20',
         ]);
-
-        if ($user->email !== $validated['email']) {
-            $user->email_verified_at = null;
-        }
         
+        // Simpan hanya 'name'.
         $user->name = $validated['name'];
-        $user->email = $validated['email'];
-        $user->kontak = $validated['kontak'];
         $user->save();
 
-        return back()->withErrors(/*...*/)->with('active_tab', 'informasi');
+        // Kembalikan dengan pesan sukses yang sesuai.
+        return back()->with('status', 'detail-updated');
     }
 
     /**

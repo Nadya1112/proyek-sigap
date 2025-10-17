@@ -103,7 +103,7 @@
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
+            <div id="daftar-pengaduan" class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
                 <div class="flex items-start justify-between gap-4">
                     <div>
                         <h2 class="text-lg font-bold text-gray-800">Daftar Pengaduan Saya</h2>
@@ -133,7 +133,7 @@
                 </div>
             </div>
 
-             <div class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
+             <div id="daftar-proposal" class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
                  <div class="flex items-start justify-between gap-4">
                     <div>
                         <h2 class="text-lg font-bold text-gray-800">Daftar E-Proposal Saya</h2>

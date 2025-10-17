@@ -114,11 +114,11 @@
                                     <i data-feather="user" class="w-5 h-5"></i>
                                     <span>Profil Saya</span>
                                 </a>
-                                <a href="{{ route('eproposal') }}" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-sigap-yellow">
+                                <a href="{{ route('user.dashboard') }}#daftar-proposal" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-orange-500">
                                     <i data-feather="file-text" class="w-5 h-5"></i>
                                     <span>Proposal Saya</span>
                                 </a>
-                                <a href="{{ route('pengaduan') }}" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-sigap-yellow">
+                                <a href="{{ route('user.dashboard') }}#daftar-pengaduan" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-orange-500">
                                     <i data-feather="message-square" class="w-5 h-5"></i>
                                     <span>Pengaduan Saya</span>
                                 </a>

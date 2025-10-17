@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use MatanYadaev\EloquentSpatial\Objects\MultiPolygon;
 use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
 
-// Sebaiknya ganti nama class dari 'Komplek' menjadi 'Kompleks'
-class Kompleks extends Model
+// DIUBAH: Nama class disesuaikan menjadi 'Komplek' (tanpa 's')
+// agar konsisten dengan pemanggilan di Controller Anda.
+class Komplek extends Model
 {
     // 2. Gunakan trait HasSpatial di sini
     use HasFactory, HasSpatial;
@@ -32,7 +33,7 @@ class Kompleks extends Model
         'foto_komplek',
         'jumlah_sertifikat',
         'status_aset',
-        'area', // 3. Tambahkan 'area' ke fillable
+        'area', // 3. 'area' tetap ada di fillable
     ];
 
     /**

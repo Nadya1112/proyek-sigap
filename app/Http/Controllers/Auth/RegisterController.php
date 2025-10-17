@@ -21,12 +21,14 @@ class RegisterController extends Controller
         // 1. Validasi input dari form pendaftaran
         $validated = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
-            'kontak'   => ['required', 'string', 'max:20', 'unique:users,kontak'],
+            'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email', 'regex:/@gmail\.com$/i'],
+            'kontak'   => ['required', 'string', 'min:10', 'max:20', 'unique:users,kontak'],
             'password' => ['required', 'confirmed', Password::min(8)],
             'syaratdanketentuan'    => ['accepted']
         ], [
-            // (Anda bisa tambahkan pesan custom di sini jika perlu)
+            // Pesan error custom untuk aturan baru
+            'email.regex'       => 'Pendaftaran hanya diizinkan untuk akun Google (@gmail.com).',
+            'kontak.min'        => 'Nomor HP harus memiliki minimal 10 digit.',
             'kontak.required'   => 'Nomor HP wajib diisi.',
             'syaratdanketentuan.accepted'    => 'Anda harus menyetujui Syarat & Ketentuan.',
         ]);

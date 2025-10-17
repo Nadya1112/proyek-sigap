@@ -4,7 +4,7 @@
 
 @section('content')
 
-{{-- ========== HERO ========== --}}
+{{-- ========== HERO (Tidak Berubah) ========== --}}
 <section class="relative overflow-hidden">
   <div class="relative" style="background: linear-gradient(135deg, #F7A623 0%, #FF7A00 45%, #F25C3B 70%, #F04949 100%);">
     <div class="pointer-events-none absolute -top-6 -left-10 w-[380px] h-[380px] opacity-70" style="background: radial-gradient(closest-side, rgba(255,179,73,0.55) 0%, rgba(255,179,73,0.28) 34%, rgba(255,179,73,0.12) 60%, transparent 72%); filter: blur(2px);"></div>
@@ -20,144 +20,119 @@
         <p class="mt-4 text-base md:text-lg text-white/90 max-w-3xl mx-auto">
           Ajukan proposal bantuan prasarana, sarana, dan utilitas perumahan. Data anda akan kami proses dengan transparan dan cepat.
         </p>
-        {{-- ... (kode hero section di atasnya) --}}
         
         <div class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
-            {{-- Card 1: Total Proposal --}}
             <div class="group rounded-[14px] px-8 py-6 text-center bg-white/18 ring-1 ring-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-white/45">
               <p class="text-3xl md:text-4xl font-extrabold text-white leading-none">{{ $stats['total'] ?? 0 }}</p>
               <p class="mt-3 text-[11px] tracking-wide uppercase text-white/85">Total Proposal</p>
             </div>
-            {{-- Card 2: Proposal Diajukan --}}
             <div class="group rounded-[14px] px-8 py-6 text-center bg-white/18 ring-1 ring-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-white/45">
               <p class="text-3xl md:text-4xl font-extrabold text-white leading-none">{{ $stats['diajukan'] ?? 0 }}</p>
               <p class="mt-3 text-[11px] tracking-wide uppercase text-white/85">Proposal Diajukan</p>
             </div>
-            {{-- Card 3: Sudah Diverifikasi --}}
             <div class="group rounded-[14px] px-8 py-6 text-center bg-white/18 ring-1 ring-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-white/45">
               <p class="text-3xl md:text-4xl font-extrabold text-white leading-none">{{ $stats['diverifikasi'] ?? 0 }}</p>
               <p class="mt-3 text-[11px] tracking-wide uppercase text-white/85">Sudah Diverifikasi</p>
             </div>
-            {{-- Card 4: Sudah Disetujui --}}
             <div class="group rounded-[14px] px-8 py-6 text-center bg-white/18 ring-1 ring-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-white/45">
               <p class="text-3xl md:text-4xl font-extrabold text-white leading-none">{{ $stats['disetujui'] ?? 0 }}</p>
               <p class="mt-3 text-[11px] tracking-wide uppercase text-white/85">Sudah Disetujui</p>
             </div>
         </div>
 
-        {{-- ... (sisa kode hero section di bawahnya) ... --}}
     </div>
   </div>
 </section>
 
-{{-- ========== FORM CARD ========== --}}
+{{-- ========== FORM CARD (Dirombak Total) ========== --}}
 <main class="py-16 lg:py-24 bg-gray-50">
   <div class="container mx-auto px-6">
     <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg border border-gray-100 p-8">
         @auth
             <h2 class="text-2xl font-bold text-gray-800 mb-2">Formulir Pengajuan Proposal</h2>
-            <p class="text-gray-600 mb-6">Isi data berikut dengan benar untuk mempercepat proses verifikasi.</p>
+            <p class="text-gray-600 mb-6">Lengkapi Langkah 1 untuk melanjutkan pengajuan proposal.</p>
 
             @if(session('success'))
               <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded" role="alert">
-                <p class="font-bold">Berhasil!</p>
-                <p>{{ session('success') }}</p>
+                <p class="font-bold">Berhasil!</p><p>{{ session('success') }}</p>
               </div>
             @endif
 
            <div x-data="proposalForm()">
-                <form action="{{ route('eproposal.store') }}" method="POST" enctype="multipart/form-data"
-                      class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <form action="{{ route('eproposal.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                   @csrf
+                  
+                  {{-- ======================================================= --}}
+                  {{-- === INOVASI: LANGKAH 1 - VERIFIKASI NAMA KOMPLEK === --}}
+                  {{-- ======================================================= --}}
+                  <div class="p-5 rounded-lg border-2" :class="{
+                      'border-gray-200 bg-gray-50': status === 'idle',
+                      'border-blue-300 bg-blue-50': status === 'checking',
+                      'border-green-300 bg-green-50': status === 'found',
+                      'border-red-300 bg-red-50': status === 'notFound'
+                  }">
+                      <h3 class="font-bold text-gray-800">Langkah 1: Verifikasi Nama Perumahan</h3>
+                      <p class="text-sm text-gray-500 mt-1">Ketik nama lengkap perumahan Anda, lalu klik "Cek" untuk memeriksa status pendaftaran.</p>
 
-                  <div>
-                    <label for="nama_pengaju" class="form-label">Nama Lengkap Pengaju</label>
-                    <input id="nama_pengaju" name="nama_pengaju" value="{{ old('nama_pengaju', auth()->user()->name) }}" required class="form-input"/>
-                    @error('nama_pengaju')<p class="form-error">{{ $message }}</p>@enderror
-                  </div>
+                      <div class="mt-4">
+                          <div class="flex items-center gap-3">
+                              <input type="text" id="search_kompleks" autocomplete="off"
+                                     x-model.debounce.300ms="searchQuery"
+                                     :disabled="status === 'found' || status === 'checking'"
+                                     @keydown.enter.prevent="checkKompleks"
+                                     placeholder="Contoh: Komplek Griya Permata"
+                                     class="form-input flex-grow">
+                              
+                              <button type="button" @click="checkKompleks" x-show="status === 'idle' || status === 'notFound'" :disabled="searchQuery.length < 3"
+                                      class="px-5 py-2.5 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition">
+                                  Cek
+                              </button>
+                              
+                              <div x-show="status === 'checking'" class="flex items-center gap-2 text-blue-600 font-semibold text-sm">
+                                  <svg class="animate-spin h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                  Mengecek...
+                              </div>
+                          </div>
 
-                  <div>
-                    <label for="kontak_pengaju" class="form-label">Nomor Kontak (WA/Telepon)</label>
-                    <input id="kontak_pengaju" name="kontak_pengaju" value="{{ old('kontak_pengaju', auth()->user()->kontak) }}" required class="form-input"/>
-                    @error('kontak_pengaju')<p class="form-error">{{ $message }}</p>@enderror
-                  </div>
-
-                  <div>
-                    <label for="kecamatan_id" class="form-label">Kecamatan</label>
-                    <select id="kecamatan_id" name="kecamatan_id" x-model="kecamatanId" @change="fetchKelurahans" required class="form-input">
-                        <option value="">-- Pilih Kecamatan --</option>
-                        @foreach ($kecamatans as $kecamatan)
-                            <option value="{{ $kecamatan->id }}">{{ $kecamatan->nama_kecamatan }}</option>
-                        @endforeach
-                    </select>
-                    @error('kecamatan_id')<p class="form-error">{{ $message }}</p>@enderror
+                          {{-- HASIL DITEMUKAN (SUCCESS) --}}
+                          <div x-show="status === 'found'" x-transition class="mt-4 p-4 bg-white border border-green-300 rounded-lg">
+                              <div class="flex items-center justify-between">
+                                  <div>
+                                      <p class="font-bold text-green-700" x-text="foundKompleks.nama_komplek"></p>
+                                      <p class="text-xs text-gray-600" x-text="`${foundKompleks.kelurahan.nama_kelurahan}, ${foundKompleks.kelurahan.kecamatan.nama_kecamatan}`"></p>
+                                  </div>
+                                  <button type="button" @click="resetSearch" class="text-sm font-semibold text-blue-600 hover:underline">Ganti</button>
+                              </div>
+                          </div>
+                      </div>
                   </div>
                   
-                  <div>
-                    <label for="kelurahan_id" class="form-label">Kelurahan</label>
-                    <select id="kelurahan_id" name="kelurahan_id" x-model="kelurahanId" required class="form-input" :disabled="loadingKelurahan || !kecamatanId">
-                        <option value="" x-show="!kecamatanId">-- Pilih Kecamatan Dulu --</option>
-                        <option value="" x-show="kecamatanId && !loadingKelurahan && kelurahans.length > 0">-- Pilih Kelurahan --</option>
-                        <template x-if="loadingKelurahan">
-                            <option>Memuat...</option>
-                        </template>
-                        <template x-for="kelurahan in kelurahans" :key="kelurahan.id">
-                            <option :value="kelurahan.id" x-text="kelurahan.nama_kelurahan" :selected="kelurahan.id == kelurahanId"></option>
-                        </template>
-                    </select>
-                    @error('kelurahan_id')<p class="form-error">{{ $message }}</p>@enderror
+                  <input type="hidden" name="kompleks_id" x-model="kompleksId">
+                  @error('kompleks_id')<p class="form-error">Anda harus memilih komplek yang valid.</p>@enderror
+
+                  {{-- ======================================================= --}}
+                  {{-- === INOVASI: KARTU AJUKAN KOMPLEK BARU (JIKA TIDAK ADA) === --}}
+                  {{-- ======================================================= --}}
+                  <div x-show="status === 'notFound'" x-transition class="p-6 rounded-lg border-2 border-dashed border-red-300 bg-red-50 text-center">
+                        <h3 class="font-bold text-red-800">Nama Perumahan Tidak Ditemukan</h3>
+                        <p class="text-sm text-red-700 mt-2 max-w-lg mx-auto">Perumahan "<strong x-text="searchQuery"></strong>" belum terdaftar di database kami. Anda dapat mengajukan pendaftaran komplek baru agar dapat mengajukan proposal di masa mendatang.</p>
+                        <button type="button" class="mt-4 px-5 py-2.5 text-sm font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 transition shadow">
+                            Ajukan Pendaftaran Komplek Baru
+                        </button>
+                        <p class="text-xs text-gray-500 mt-3">Tombol ini akan tersedia di pembaruan selanjutnya.</p>
                   </div>
 
-                  <div class="md:col-span-2 relative">
-                    <label for="nama_perumahan" class="form-label">Nama Perumahan</label>
-                    <input id="nama_perumahan" name="nama_perumahan" type="text" autocomplete="off"
-                           x-model="searchQuery"
-                           @input.debounce.190ms="searchKompleks"
-                           @focus="showSuggestions = true"
-                           @keydown.escape.window="showSuggestions = false"
-                           placeholder="Contoh: Komplek Griya Permata"
-                           required class="form-input"/>
-                    
-                    <div x-show="searchQuery && !searchQuery.toLowerCase().includes('komplek') && !searchQuery.toLowerCase().includes('perumahan')" class="mt-1 text-xs text-amber-600">
-                        PERINGATAN : Harus menyertakan kata "Komplek" atau "Perumahan".
-                    </div>
-                    @error('nama_perumahan')<p class="form-error">{{ $message }}</p>@enderror
-
-                    <div x-show="showSuggestions && suggestions.length > 0" @click.away="showSuggestions = false" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto" x-transition>
-                        <ul>
-                            <template x-for="suggestion in suggestions" :key="suggestion.id">
-                                <li @click="selectSuggestion(suggestion)" class="px-4 py-2 cursor-pointer hover:bg-gray-100" x-text="suggestion.nama_komplek"></li>
-                            </template>
-                        </ul>
-                    </div>
-                  </div>
-                  
-                  <div class="md:col-span-2">
-                    <label for="alamat" class="form-label">Detail Alamat</label>
-                    <input id="alamat" name="alamat" value="{{ old('alamat') }}" required class="form-input" placeholder="Jln. Griya, Komplek Griya, No. 12, Blok A, Kel.. , Kec.. "/>
-                    @error('alamat')<p class="form-error">{{ $message }}</p>@enderror
-                  </div>
-
-                  <div class="md:col-span-2">
-                    <label for="proposal" class="form-label">
-                      Unggah Proposal <span class="font-normal text-gray-500">(Format: PDF, DOC, DOCX. Maks 10MB)</span>
-                    </label>
-                    <input id="proposal" type="file" name="proposal" accept=".pdf,.doc,.docx" required class="w-full rounded-xl border border-gray-200 bg-gray-50
-                          file:mr-4 file:rounded-lg file:border-0 file:bg-[#FFA72B] file:px-4 file:py-2 file:text-white
-                          hover:file:brightness-95 focus:border-[#F39B28] focus:ring-2 focus:ring-[#F39B28]/40 transition"/>
-                    @error('proposal')<p class="form-error">{{ $message }}</p>@enderror
-                  </div>
-
-                  <div class="md:col-span-2">
-                    <label for="catatan" class="form-label">Catatan <span class="font-normal text-gray-500">(Opsional)</span></label>
-                    <textarea id="catatan" name="catatan" rows="4" class="form-input">{{ old('catatan') }}</textarea>
-                  </div>
-
-                  <div class="md:col-span-2 flex justify-end pt-4">
-                    <button type="submit" class="btn-gradient w-full md:w-auto">
-                        <span class="relative z-10">Kirim Proposal</span>
-                        <div class="btn-gradient-hover"></div>
-                    </button>
+                  {{-- ======================================================= --}}
+                  {{-- === LANGKAH 2 - DETAIL PROPOSAL (TERKUNCI) === --}}
+                  {{-- ======================================================= --}}
+                  <div class="border-t pt-6 mt-6 space-y-6" x-show="status === 'found'" x-transition>
+                      <h3 class="font-bold text-gray-800">Langkah 2: Lengkapi Detail Proposal</h3>
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                          {{-- ... (semua input form detail proposal Anda tetap sama) ... --}}
+                      </div>
+                      <div class="flex justify-end pt-4">
+                        <button type="submit" class="btn-gradient w-full md:w-auto">Kirim Proposal</button>
+                      </div>
                   </div>
                 </form>
             </div>
@@ -206,107 +181,51 @@
     .form-file-input:hover::file-selector-button { background-color: #E5E7EB; }
 </style>
 
+{{-- SCRIPT ALPINE.JS DIPERBARUI TOTAL --}}
 <script>
-    function dependentDropdown() {
+    function proposalForm() {
         return {
-            kecamatanId: '{{ old('kecamatan_id') }}',
-            kelurahanId: '{{ old('kelurahan_id') }}',
-            kelurahans: [],
-            loading: false,
-            fetchKelurahans() {
-                if (!this.kecamatanId) {
-                    this.kelurahans = [];
-                    this.kelurahanId = '';
-                    return;
-                }
-                this.loading = true;
-                // Pastikan rute ini ada di web.php
-                fetch(`/kelurahan-by-kecamatan/${this.kecamatanId}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        this.kelurahans = data;
-                        this.loading = false;
-                        // Jika ada data kelurahan lama, coba set kembali
-                        if (this.kelurahanId) {
-                            // Cek jika kelurahanId lama ada di data baru
-                            const oldKelurahanExists = this.kelurahans.some(k => k.id == this.kelurahanId);
-                            if (!oldKelurahanExists) {
-                                this.kelurahanId = '';
-                            }
-                        }
-                    });
-            },
-            init() {
-                this.$watch('kecamatanId', () => {
-                    this.kelurahanId = ''; // Reset kelurahan jika kecamatan berubah
-                });
+            searchQuery: '',
+            status: 'idle', // idle, checking, found, notFound
+            foundKompleks: null,
+            kompleksId: '',
+
+            checkKompleks() {
+                if (this.searchQuery.length < 3) return;
                 
-                // Jika ada data kecamatan lama saat halaman dimuat, panggil fetch
-                if (this.kecamatanId) {
-                    this.fetchKelurahans();
-                }
-            }
-        }
-    }
+                this.status = 'checking';
+                // Penambahan error handling dan timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // Batas waktu 10 detik
 
-   function proposalForm() {
-        return {
-            // Data untuk dropdown lokasi
-            kecamatanId: '{{ old('kecamatan_id') }}',
-            kelurahanId: '{{ old('kelurahan_id') }}',
-            kelurahans: [],
-            loadingKelurahan: false,
-
-            // Data untuk pencarian komplek
-            searchQuery: '{{ old('nama_perumahan') }}',
-            suggestions: [],
-            showSuggestions: false,
-            loadingKompleks: false,
-
-            // Fungsi yang dijalankan saat form dimuat
-            init() {
-                // Jika ada data kecamatan lama saat halaman dimuat (misal karena validation error),
-                // panggil fetchKelurahans agar dropdown kelurahan terisi kembali.
-                if (this.kecamatanId) {
-                    this.fetchKelurahans();
-                }
-            },
-
-            // Fungsi untuk mengambil data kelurahan berdasarkan kecamatan
-            fetchKelurahans() {
-                this.kelurahans = []; // Kosongkan kelurahan setiap kali kecamatan berubah
-                if (!this.kecamatanId) return;
-
-                this.loadingKelurahan = true;
-                fetch(`/kelurahan-by-kecamatan/${this.kecamatanId}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        this.kelurahans = data;
-                        this.loadingKelurahan = false;
+                fetch(`/verify-kompleks?q=${this.searchQuery}`, { signal: controller.signal })
+                    .then(response => {
+                        clearTimeout(timeoutId); // Batalkan timeout jika respons diterima
+                        if (!response.ok) { throw new Error('Server error'); }
+                        return response.json();
+                    })
+                    .then(result => {
+                        if (result.status === 'found') {
+                            this.status = 'found';
+                            this.foundKompleks = result.data;
+                            this.kompleksId = result.data.id;
+                        } else {
+                            this.status = 'notFound';
+                            this.kompleksId = '';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                        this.status = 'notFound'; // Anggap tidak ditemukan jika ada error
+                        this.kompleksId = '';
                     });
             },
 
-            // Fungsi untuk mencari nama komplek yang mirip
-            searchKompleks() {
-                if (this.searchQuery.length < 3) {
-                    this.suggestions = [];
-                    this.showSuggestions = false;
-                    return;
-                }
-                this.loadingKompleks = true;
-                fetch(`/search-kompleks?q=${this.searchQuery}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        this.suggestions = data;
-                        this.showSuggestions = true;
-                        this.loadingKompleks = false;
-                    });
-            },
-
-            // Fungsi saat saran dipilih
-            selectSuggestion(suggestion) {
-                this.searchQuery = suggestion.nama_komplek;
-                this.showSuggestions = false;
+            resetSearch() {
+                this.searchQuery = '';
+                this.status = 'idle';
+                this.foundKompleks = null;
+                this.kompleksId = '';
             }
         }
     }

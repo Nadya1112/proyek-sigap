@@ -88,17 +88,19 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->midd
 |--------------------------------------------------------------------------
 */
 // Dashboard & Profil (auth)
-Route::middleware(['auth', 'nocache'])->group(function () {
+    Route::middleware(['auth', 'nocache'])->group(function () {
     Route::view('/dashboard', 'public.dashboard')->name('dashboard');
     Route::get('/dashboard-pengguna', [UserDashboardController::class, 'index'])->name('user.dashboard');
     
     Route::get('/profil/{token?}', [ProfileController::class, 'index'])->name('profil.index');
     Route::post('/profil/detail', [ProfileController::class, 'updateDetail'])->name('profil.update.detail');
-    Route::post('/profil/keamanan/kirim-link', [ProfileController::class, 'sendResetLink'])->name('profil.keamanan.kirim-link');
-    Route::post('/profil/keamanan/reset', [ProfileController::class, 'resetPassword'])->name('profil.keamanan.reset');
+    Route::post('/profil/kirim-verifikasi', [ProfileController::class, 'sendVerification'])->name('profil.send_verification');
+    Route::post('/profil/verifikasi-email', [ProfileController::class, 'verifyEmail'])->name('profil.verify_email');
+    Route::post('/profil/keamanan/kirim-link', [ProfileController::class, 'sendResetLink'])->name('profil.keamanan.kirim-link');    Route::post('/profil/keamanan/reset', [ProfileController::class, 'resetPassword'])->name('profil.keamanan.reset');
     Route::delete('/profil/hapus', [ProfileController::class, 'destroy'])->name('profil.destroy');
     
-    Route::get('/search-kompleks', [EproposalController::class, 'searchKompleks'])->name('kompleks.search');
+
+    Route::get('/verify-kompleks', [EproposalController::class, 'verifyKompleks'])->name('kompleks.verify');
 });
 
 // Password Reset

@@ -55,8 +55,7 @@
         </div>
 
         {{-- Konten Tab --}}
-        <div class="mt-8">
-            {{-- Tab 1: Informasi Akun --}}
+       {{-- Tab 1: Informasi Akun --}}
             <div x-show="tab === 'informasi'" x-transition:enter="transition-all ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0">
                 <form action="{{ route('profil.update.detail') }}" method="POST">
                     @csrf
@@ -77,21 +76,24 @@
                                     <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500">
                                     @error('name') <span class="text-red-600 text-sm mt-1">{{ $message }}</span> @enderror
                                 </div>
+
+                                {{-- Kolom Email (Tidak Bisa Diedit) --}}
                                 <div>
                                     <label for="email" class="block text-sm font-semibold text-gray-700 mb-1">Alamat Email</label>
-                                    <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500">
-                                     @if (!$user->email_verified_at)
-                                        <p class="text-xs text-yellow-700 mt-2">Email Anda belum terverifikasi. Jika Anda mengubahnya, Anda akan perlu verifikasi ulang.</p>
-                                     @else
+                                    <input type="email" id="email" value="{{ $user->email }}" disabled class="w-full px-4 py-2 border border-gray-200 bg-gray-100 text-gray-500 rounded-md shadow-sm cursor-not-allowed">
+                                    @if ($user->email_verified_at)
                                         <p class="text-xs text-green-700 mt-2">Email sudah terverifikasi.</p>
-                                     @endif
-                                     @error('email') <span class="text-red-600 text-sm mt-1">{{ $message }}</span> @enderror
+                                    @else
+                                        <p class="text-xs text-yellow-700 mt-2">Email belum terverifikasi.</p>
+                                    @endif
                                 </div>
+
+                                {{-- Kolom Nomor HP (Tidak Bisa Diedit) --}}
                                 <div>
-                                    <label for="kontak" class="block text-sm font-semibold text-gray-700 mb-1">Nomor Kontak (WhatsApp)</label>
-                                    <input type="text" id="kontak" name="kontak" value="{{ old('kontak', $user->kontak) }}" placeholder="Contoh: 081234567890" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500">
-                                    @error('kontak') <span class="text-red-600 text-sm mt-1">{{ $message }}</span> @enderror
+                                    <label for="kontak" class="block text-sm font-semibold text-gray-700 mb-1">Nomor HP</label>
+                                    <input type="text" id="kontak" value="{{ $user->kontak }}" disabled class="w-full px-4 py-2 border border-gray-200 bg-gray-100 text-gray-500 rounded-md shadow-sm cursor-not-allowed">
                                 </div>
+
                             </div>
                         </div>
                         <div class="bg-gray-50 px-6 py-4 text-right">

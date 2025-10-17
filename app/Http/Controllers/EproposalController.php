@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Proposal;
 use App\Models\Komplek;
 use App\Models\Kecamatan;
-use App\Rules\ContainsKomplekOrPerumahan;
+use App\Models\Kelurahan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -21,10 +21,7 @@ class EproposalController extends Controller
             'disetujui'     => Proposal::where('status', 'Disetujui')->count(),
         ];
 
-        $kecamatans = [];
-        if (auth()->check()) {
-            $kecamatans = Kecamatan::orderBy('nama_kecamatan', 'asc')->get();
-        }
+        $kecamatans = Kecamatan::orderBy('nama_kecamatan')->get();
 
         return view('public.eproposal', compact('stats', 'kecamatans'));
     }
@@ -38,64 +35,56 @@ class EproposalController extends Controller
         $validated = $request->validate([
             'nama_pengaju'   => 'required|string|max:255',
             'kontak_pengaju' => 'required|string|max:20',
-            'kecamatan_id'   => 'required|exists:kecamatans,id',
-            'kelurahan_id'   => 'required|exists:kelurahans,id',
-            'nama_perumahan' => ['required', 'string', 'max:255', new ContainsKomplekOrPerumahan],
+            'kompleks_id'    => 'required|exists:kompleks,id', // Key validation
             'alamat'         => 'required|string',
             'proposal'       => 'required|file|mimes:pdf,doc,docx|max:10240',
             'catatan'        => 'nullable|string',
         ]);
 
-        // LOGIKA PENCARIAN & PEMBUATAN KOMPLEK YANG LEBIH BAIK
-        // Menghapus spasi berlebih dan membuat huruf kapital di awal setiap kata
-        $cleanNamaKomplek = Str::title(Str::squish($validated['nama_perumahan']));
-        
-        $komplek = Komplek::firstOrCreate(
-            // Cari berdasarkan nama yang sudah "dibersihkan" dan kelurahan
-            ['nama_komplek' => $cleanNamaKomplek, 'kelurahan_id' => $validated['kelurahan_id']],
-            // Jika tidak ada, buat baru dengan data ini
-            [
-                'kecamatan_id' => $validated['kecamatan_id'],
-                'status_aset'  => 'Belum Diserahkan',
-            ]
-        );
-
         $filePath = $request->file('proposal')->store('proposals', 'public');
 
         Proposal::create([
+            'user_id'        => Auth::id(),
+            'kompleks_id'    => $validated['kompleks_id'], // Correctly stores the ID
             'nama_pengaju'   => $validated['nama_pengaju'],
             'kontak_pengaju' => $validated['kontak_pengaju'],
-            'kompleks_id'    => $komplek->id,
-            'nama_perumahan' => $cleanNamaKomplek,
             'alamat'         => $validated['alamat'],
             'proposal'       => $filePath,
             'catatan'        => $validated['catatan'],
-            'user_id'        => Auth::id(),
             'status'         => 'Diajukan',
         ]);
 
-        return redirect()->back()->with('success', 'Proposal Anda berhasil dikirim! Terima kasih.');
+        return redirect()->route('eproposal')->with('success', 'Proposal Anda berhasil dikirim! Terima kasih.');
+    }
+
+    public function getKelurahan(Kecamatan $kecamatan)
+    {
+        // Mengambil kelurahan yang berelasi dengan kecamatan yang dipilih
+        return response()->json($kecamatan->kelurahans()->orderBy('nama_kelurahan')->get());
     }
 
     /**
-     * METHOD DIPERBARUI: Untuk mencari nama komplek dan menyertakan data lokasinya.
+     * NEW FUNCTION: To verify the existence of a housing complex name.
      */
-    public function searchKompleks(Request $request)
+    public function verifyKompleks(Request $request)
     {
-        $query = Str::squish($request->get('q'));
-        if (!$query || strlen($query) < 2) { // Dibuat lebih responsif
-            return response()->json([]);
+        $validated = $request->validate([
+            'q' => 'required|string',
+            'kelurahan_id' => 'required|exists:kelurahans,id',
+        ]);
+
+        $query = Str::squish($validated['q']);
+
+        // Cari komplek di dalam kelurahan yang dipilih, menggunakan LIKE untuk fleksibilitas
+        $kompleks = Komplek::where('kelurahan_id', $validated['kelurahan_id'])
+            ->where('nama_komplek', 'LIKE', "%{$query}%") // <-- Menggunakan LIKE
+            ->with('kelurahan.kecamatan')
+            ->first();
+
+        if ($kompleks) {
+            return response()->json(['status' => 'found', 'data' => $kompleks]);
+        } else {
+            return response()->json(['status' => 'notFound']);
         }
-
-        // Cari komplek dan ambil data lokasinya melalui relasi
-        $kompleks = Komplek::where('nama_komplek', 'LIKE', "%{$query}%")
-            ->with('kelurahan:id,kecamatan_id') // Eager load relasi
-            ->limit(5)
-            ->get(['id', 'nama_komplek', 'kelurahan_id']);
-
-        // Hilangkan duplikasi berdasarkan nama
-        $uniqueKompleks = $kompleks->unique('nama_komplek')->values();
-
-        return response()->json($uniqueKompleks);
     }
 }
