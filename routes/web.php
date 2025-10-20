@@ -100,7 +100,11 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->midd
     Route::delete('/profil/hapus', [ProfileController::class, 'destroy'])->name('profil.destroy');
     
 
-    Route::get('/verify-kompleks', [EproposalController::class, 'verifyKompleks'])->name('kompleks.verify');
+        // Rute baru untuk mengambil data kelurahan
+    Route::get('/get-kelurahan/{kecamatan}', [EproposalController::class, 'getKelurahan'])->name('get.kelurahan');
+
+    // Rute verifikasi komplek diubah menjadi POST untuk mengirim lebih banyak data
+    Route::post('/verify-kompleks', [EproposalController::class, 'verifyKompleks'])->name('kompleks.verify');
 });
 
 // Password Reset
