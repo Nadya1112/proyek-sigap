@@ -4,16 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-// 1. Import class-class yang dibutuhkan untuk GIS
-use MatanYadaev\EloquentSpatial\Objects\MultiPolygon;
-use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
+// 1. Import class-class yang dibutuhkan untuk GIS (dari paket GRIMZY)
+use Grimzy\LaravelMysqlSpatial\Eloquent\SpatialTrait; // <-- Ganti dengan ini
+use Grimzy\LaravelMysqlSpatial\Types\MultiPolygon; // <-- Ganti dengan ini
 
-// DIUBAH: Nama class disesuaikan menjadi 'Komplek' (tanpa 's')
-// agar konsisten dengan pemanggilan di Controller Anda.
 class Komplek extends Model
 {
-    // 2. Gunakan trait HasSpatial di sini
-    use HasFactory, HasSpatial;
+    // 2. Gunakan trait SpatialTrait di sini
+    use HasFactory, SpatialTrait; // <-- Ganti dengan ini
 
     /**
      * Mendefinisikan nama tabel secara eksplisit (praktik yang baik).
@@ -28,28 +26,23 @@ class Komplek extends Model
     protected $fillable = [
         'nomor',
         'nama_komplek',
-        'kelurahan_id',
-        'alamat',
-        'foto_komplek',
-        'jumlah_sertifikat',
-        'status_aset',
-        'area', // 3. 'area' tetap ada di fillable
+        // ... (pastikan semua kolom Anda ada di sini, termasuk 'area') ...
+        'area', 
     ];
 
     /**
-     * Casting tipe data, terutama untuk kolom spasial.
+     * Tentukan kolom spasial untuk paket grimzy
+     * @var array
+     */
+    protected $spatialFields = [
+        'area' // <-- Tambahkan ini
+    ];
+
+    /**
+     * Casting tipe data (jika diperlukan)
      * @var array
      */
     protected $casts = [
-        // 4. Casting kolom 'area' menjadi objek MultiPolygon
-        'area' => MultiPolygon::class,
+        'area' => MultiPolygon::class, // <-- Tambahkan ini jika perlu
     ];
-
-    /**
-     * Mendefinisikan relasi bahwa satu Kompleks dimiliki oleh satu Kelurahan.
-     */
-    public function kelurahan()
-    {
-        return $this->belongsTo(Kelurahan::class);
-    }
 }
