@@ -47,7 +47,7 @@
   </div>
 </section>
 
-{{-- ========== KONTEN UTAMA (Revisi Final + Jarak Rapi) ========== --}}
+{{-- ========== KONTEN UTAMA (Revisi Final + Jarak Rapi + Form Daftar Selalu Ada) ========== --}}
 <main class="py-16 lg:py-24 bg-gray-50">
   <div class="container mx-auto px-6">
     <div class="max-w-4xl mx-auto space-y-8"> {{-- Jarak antar elemen utama --}}
@@ -107,7 +107,7 @@
                               <div>
                                   <label for="kecamatan" class="form-label">1. Pilih Kecamatan</label>
                                   <select id="kecamatan" x-model="kecamatanId" @change="fetchKelurahans" class="form-input" :disabled="!!kompleksId">
-                                      <option value="">-- Pilih Kecamatan --</option>
+                                      <option value="">-Pilih Kecamatan-</option>
                                       @foreach($kecamatans as $kecamatan)
                                         <option value="{{ $kecamatan->id }}">{{ $kecamatan->nama_kecamatan }}</option>
                                       @endforeach
@@ -117,7 +117,7 @@
                               <div>
                                   <label for="kelurahan" class="form-label">2. Pilih Kelurahan</label>
                                   <select id="kelurahan" x-model="kelurahanId" @change="fetchKompleks" class="form-input" :disabled="!kecamatanId || kelurahansLoading || !!kompleksId">
-                                      <option value="">-- Pilih Kelurahan --</option>
+                                      <option value="">-Pilih Kelurahan-</option>
                                       <option x-show="kelurahansLoading" disabled>Memuat Kelurahan...</option>
                                       <template x-for="kelurahan in kelurahans" :key="kelurahan.id">
                                           <option :value="kelurahan.id" x-text="kelurahan.nama_kelurahan"></option>
@@ -129,14 +129,14 @@
                           <div x-show="kelurahanId" x-transition>
                               <label for="kompleks_select" class="form-label">3. Pilih Nama Perumahan</label>
                               <select id="kompleks_select" x-model="kompleksId" @change="handleKompleksSelection" class="form-input" :disabled="!kelurahanId || kompleksLoading || !!kompleksId">
-                                  <option value="">-- Pilih Nama Perumahan --</option>
+                                  <option value="">-- Pilih Nama Komplek Perumahan --</option>
                                   <option x-show="kompleksLoading" disabled>Memuat Komplek...</option>
-                                  <option x-show="isKompleksListEmpty" disabled value="">-- Tidak ada komplek terdaftar --</option>
+                                  <option x-show="isKompleksListEmpty" disabled value="">-Pilih Nama Komplek Perumahan-</option>
                                   <template x-for="komplek in kompleksList" :key="komplek.id">
                                       <option :value="komplek.id" x-text="komplek.nama_komplek"></option>
                                   </template>
                               </select>
-                              @error('kompleks_id')<p class="form-error">{{ $message }}</p>@enderror>
+                              @error('kompleks_id')<p class="form-error">Anda harus memilih komplek dari daftar.</p>@enderror
                           </div>
 
                            {{-- Tombol Reset --}}
@@ -145,20 +145,20 @@
                            </div>
                       </div>
 
-                      {{-- Kartu Ajukan Komplek Baru --}}
-                      <div x-show="showNotFoundCard" x-transition class="mb-6"> {{-- Tambah mb-6 --}}
-                          <div class="p-6 rounded-lg border-2 border-dashed border-red-300 bg-red-50 text-center">
-                                <h3 class="font-bold text-red-800">Nama Perumahan Belum Terdaftar</h3>
-                                <p class="text-sm text-red-700 mt-2 max-w-lg mx-auto">Tidak ada komplek perumahan yang terdaftar untuk Kelurahan <strong x-text="selectedKelurahanName || 'yang dipilih'"></strong>. Silakan lengkapi data di bawah untuk mengajukan pendaftaran.</p>
+                      {{-- Kartu Ajukan Komplek Baru (Selalu muncul jika kelurahan dipilih & komplek belum) --}}
+                      <div x-show="kelurahanId && !kompleksId" x-transition class="mb-6">
+                          <div class="p-6 rounded-lg border-2 border-dashed border-orange-300 bg-orange-50 text-center">
+                                <h3 class="font-bold text-orange-800">Perumahan Belum Terdaftar?</h3>
+                                <p class="text-sm text-orange-700 mt-2 max-w-lg mx-auto">Jika nama perumahan Anda tidak ada dalam daftar di atas untuk Kelurahan <strong x-text="selectedKelurahanName || 'yang dipilih'"></strong>, Anda dapat mengajukan pendaftaran komplek baru.</p>
                                 {{-- Form Pendaftaran --}}
                                 <div class="mt-6 text-left max-w-lg mx-auto space-y-4">
                                     <div>
                                         <label for="new_kompleks_name" class="form-label text-sm text-gray-700">Nama Perumahan Baru</label>
-                                        <input type="text" id="new_kompleks_name" placeholder="Contoh: Komplek Mawar Asri" class="form-input text-sm">
+                                        <input type="text" id="new_kompleks_name" placeholder="Contoh: Komplek Melati Indah" class="form-input text-sm">
                                     </div>
                                     <div>
                                         <label for="new_kompleks_alamat" class="form-label text-sm text-gray-700">Alamat Singkat Perumahan</label>
-                                        <input type="text" id="new_kompleks_alamat" placeholder="Contoh: Jl. Mawar RT 01 RW 02" class="form-input text-sm">
+                                        <input type="text" id="new_kompleks_alamat" placeholder="Contoh: Jl. Melati RT 05 RW 01" class="form-input text-sm">
                                     </div>
                                     <div class="grid grid-cols-2 gap-4">
                                         <div>
@@ -171,8 +171,10 @@
                                         </div>
                                     </div>
                                     <div class="pt-2 flex justify-between items-center gap-4">
-                                        <button type="button" @click="showNotFoundCard = false; resetSelection(false);" class="text-sm font-semibold text-gray-600 hover:underline">Batal</button>
-                                        <button type="button" class="px-5 py-2.5 text-sm font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 transition shadow">
+                                         {{-- Tombol Batal --}}
+                                        <button type="button" @click="resetSelection(false)" class="text-sm font-semibold text-gray-600 hover:underline">Batal</button>
+                                        {{-- Tombol Ajukan (Placeholder) --}}
+                                        <button type="button" class="px-5 py-2.5 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition shadow">
                                             Ajukan Pendaftaran Komplek Baru
                                         </button>
                                     </div>
@@ -184,8 +186,8 @@
                       {{-- Langkah 2 --}}
                       <fieldset :disabled="!kompleksId" class="border-t pt-6 mt-6"> {{-- Jarak diatur di sini --}}
                           <legend class="font-bold text-gray-800 mb-4">Langkah 2: Lengkapi Detail Proposal</legend>
-                          <div class="space-y-6"> {{-- Tambah space-y-6 untuk jarak antar baris form --}}
-                              <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"> {{-- Kurangi gap-y --}}
+                          <div class="space-y-6"> {{-- Jarak antar baris form --}}
+                              <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"> {{-- Jarak grid --}}
                                   {{-- Nama Pengaju --}}
                                   <div>
                                     <label for="nama_pengaju" class="form-label">Nama Lengkap Pengaju</label>
@@ -236,7 +238,7 @@
                           </div> {{-- Akhir space-y-6 dalam fieldset --}}
 
                           {{-- Tombol Kirim --}}
-                          <div class="flex justify-end pt-6"> {{-- Tambah pt-6 --}}
+                          <div class="flex justify-end pt-6"> {{-- Jarak dari field terakhir --}}
                             <button type="submit" class="btn-gradient w-full md:w-auto" :disabled="!kompleksId">Kirim Proposal</button>
                           </div>
                       </fieldset>
@@ -245,7 +247,26 @@
             @else
                 {{-- Kartu notifikasi login --}}
                 <div class="text-center bg-orange-50/50 rounded-xl p-8 md:p-12 border border-orange-200/80">
-                    {{-- ... (Konten notifikasi login tidak berubah) ... --}}
+                    <div class="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-lg mb-5">
+                        <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H4.5a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800">Silakan Masuk Terlebih Dahulu</h3>
+                    <p class="text-gray-600 mt-2 mb-6 max-w-md mx-auto">
+                        Anda harus memiliki akun dan masuk untuk dapat mengajukan proposal.
+                    </p>
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <a href="{{ route('login') }}" class="btn-gradient rounded-lg px-8 py-3">
+                            <span class="relative z-10 font-semibold">Masuk ke Akun</span>
+                        </a>
+                        <a href="{{ route('register') }}"
+                            class="font-semibold text-orange-600 hover:text-orange-700 transition hover:underline">
+                            Buat Akun Baru
+                        </a>
+                    </div>
                 </div>
             @endauth
         </div>
@@ -271,11 +292,11 @@
             kecamatanId: '', kelurahanId: '', kompleksId: '',
             kelurahans: [], kompleksList: [],
             kelurahansLoading: false, kompleksLoading: false,
-            showNotFoundCard: false, selectedKelurahanName: '',
+            // showNotFoundCard dihapus
+            selectedKelurahanName: '',
 
-            // Properti komputasi baru
+            // Properti komputasi: True jika TIDAK loading, KELURAHAN dipilih, DAN list komplek KOSONG
             get isKompleksListEmpty() {
-                // Dianggap kosong HANYA jika TIDAK loading, KELURAHAN sudah dipilih, DAN listnya benar-benar kosong
                 return !this.kompleksLoading && this.kelurahanId && this.kompleksList.length === 0;
             },
 
@@ -287,12 +308,12 @@
                 this.resetSelection(false);
                 this.kelurahanId = ''; this.kompleksId = '';
                 this.kelurahans = []; this.kompleksList = [];
-                this.showNotFoundCard = false;
+                // this.showNotFoundCard = false; // Dihapus
                 if (!this.kecamatanId) return;
 
                 this.kelurahansLoading = true;
                 fetch(`/get-kelurahan/${this.kecamatanId}`)
-                    .then(response => response.ok ? response.json() : Promise.reject('Failed load kelurahan'))
+                    .then(response => response.ok ? response.json() : [])
                     .then(data => { this.kelurahans = data; })
                     .catch(error => console.error('Error fetching kelurahan:', error))
                     .finally(() => this.kelurahansLoading = false);
@@ -300,7 +321,7 @@
 
             fetchKompleks() {
                 this.kompleksId = ''; this.kompleksList = [];
-                this.showNotFoundCard = false;
+                // this.showNotFoundCard = false; // Dihapus
                 if (!this.kelurahanId) return;
 
                 const selectedKel = this.kelurahans.find(k => k.id == this.kelurahanId);
@@ -308,23 +329,14 @@
 
                 this.kompleksLoading = true;
                 fetch(`/get-kompleks-by-kelurahan/${this.kelurahanId}`)
-                    .then(response => response.ok ? response.json() : Promise.reject('Failed load kompleks'))
+                    .then(response => response.ok ? response.json() : [])
                     .then(data => { this.kompleksList = data; })
-                    .catch(error => {
-                        console.error('Error fetching kompleks:', error);
-                        this.kompleksList = [];
-                    })
-                    .finally(() => {
-                        this.kompleksLoading = false;
-                        // Pindahkan pengecekan ke sini agar pasti dieksekusi setelah loading
-                        if (this.kompleksList.length === 0) {
-                            this.showNotFoundCard = true;
-                        }
-                    });
+                    .catch(error => { console.error('Error fetching kompleks:', error); this.kompleksList = []; })
+                    .finally(() => this.kompleksLoading = false); // Pengecekan kekosongan list dilakukan oleh isKompleksListEmpty
             },
 
             handleKompleksSelection() {
-                this.showNotFoundCard = false;
+                // this.showNotFoundCard = false; // Dihapus
             },
 
             resetSelection(resetKecamatan = true) {
@@ -333,7 +345,7 @@
                  this.kompleksId = '';
                  this.kelurahans = [];
                  this.kompleksList = [];
-                 this.showNotFoundCard = false;
+                 // this.showNotFoundCard = false; // Dihapus
                  this.selectedKelurahanName = '';
             }
         }
