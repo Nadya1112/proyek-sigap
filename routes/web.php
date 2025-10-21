@@ -9,10 +9,10 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\EproposalController;
 use App\Http\Controllers\FasumController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\PengaduanController;
+use App\Http\Controllers\PengaduanController; // Pastikan ini di-import
 use App\Http\Controllers\PetaSebaranController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\PublicFormController;
+// use App\Http\Controllers\PublicFormController; // Tidak dipakai untuk pengaduan
 use App\Http\Controllers\RegulasiController;
 use App\Http\Controllers\UserDashboardController;
 
@@ -32,16 +32,13 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::view('/fitur', 'public.fitur')->name('fitur');
 Route::get('/informasi-fasum', [FasumController::class, 'index'])->name('informasi-fasum');
 Route::get('/regulasi', [RegulasiController::class, 'index'])->name('regulasi');
-
-// DIPERBAIKI: Menggunakan Route::get (dengan ::)
 Route::get('/regulasi/unduh/{id}', [RegulasiController::class, 'download'])
     ->where('id', '[A-Za-z0-9_-]+')
     ->name('regulasi.download')
     ->middleware('throttle:60,1');
-
-Route::get('/kelurahan-by-kecamatan/{kecamatan}', [FasumController::class, 'kelurahanByKecamatan'])
-    ->name('kelurahan.byKecamatan');
-
+// Route ini sepertinya tidak dipakai lagi oleh EproposalController, tapi mungkin dipakai FasumController?
+// Route::get('/kelurahan-by-kecamatan/{kecamatan}', [FasumController::class, 'kelurahanByKecamatan'])
+//     ->name('kelurahan.byKecamatan');
 Route::get('/sebaran-komplek', [PetaSebaranController::class, 'index'])->name('sebaran');
 Route::view('/kontak', 'public.kontak')->name('kontak');
 Route::get('/e-proposal-psu', [EproposalController::class, 'showForm'])->name('eproposal');
@@ -55,7 +52,8 @@ Route::view('/kebijakan-privasi', 'public.kebijakanprivasi')->name('kebijakanpri
 |--------------------------------------------------------------------------
 */
 Route::post('/e-proposal-psu', [EproposalController::class, 'store'])->name('eproposal.store');
-Route::post('/pengaduan-masyarakat', [PublicFormController::class, 'pengaduan'])->name('pengaduan.store');
+// PERBAIKAN: Arahkan ke PengaduanController
+Route::post('/pengaduan-masyarakat', [PengaduanController::class, 'storePengaduan'])->name('pengaduan.store');
 
 /*
 |--------------------------------------------------------------------------
@@ -72,11 +70,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'authenticate'])->name('login.post');
     Route::get('/register', [RegisterController::class, 'showForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'store'])->name('register.post');
-    // ... rute verifikasi email ...
+    // Rute verifikasi email (untuk registrasi)
     Route::get('/verify-email', [VerifyEmailController::class, 'showForm'])->name('verification.show');
     Route::post('/verify-email', [VerifyEmailController::class, 'verify'])->name('verification.verify');
-        Route::post('/verify-email/resend', [VerifyEmailController::class, 'resend'])->name('verification.resend');
-
+    Route::post('/verify-email/resend', [VerifyEmailController::class, 'resend'])->name('verification.resend');
 });
 
 // Logout
@@ -87,30 +84,47 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->midd
 | Authenticated Routes
 |--------------------------------------------------------------------------
 */
-// Dashboard & Profil (auth)
-    Route::middleware(['auth', 'nocache'])->group(function () {
-    Route::view('/dashboard', 'public.dashboard')->name('dashboard');
+Route::middleware(['auth', 'nocache'])->group(function () { // PERBAIKAN: Indentasi dimulai di sini
+    // Dashboard
+    // Route::view('/dashboard', 'public.dashboard')->name('dashboard'); // Mungkin tidak terpakai?
     Route::get('/dashboard-pengguna', [UserDashboardController::class, 'index'])->name('user.dashboard');
-    
+
+    // Profil (Email tidak bisa diubah)
     Route::get('/profil/{token?}', [ProfileController::class, 'index'])->name('profil.index');
     Route::post('/profil/detail', [ProfileController::class, 'updateDetail'])->name('profil.update.detail');
-    Route::post('/profil/kirim-verifikasi', [ProfileController::class, 'sendVerification'])->name('profil.send_verification');
-    Route::post('/profil/verifikasi-email', [ProfileController::class, 'verifyEmail'])->name('profil.verify_email');
-    Route::post('/profil/keamanan/kirim-link', [ProfileController::class, 'sendResetLink'])->name('profil.keamanan.kirim-link');    Route::post('/profil/keamanan/reset', [ProfileController::class, 'resetPassword'])->name('profil.keamanan.reset');
+    // PERBAIKAN: Hapus rute verifikasi email profil
+    // Route::post('/profil/kirim-verifikasi', [ProfileController::class, 'sendVerification'])->name('profil.send_verification');
+    // Route::post('/profil/verifikasi-email', [ProfileController::class, 'verifyEmail'])->name('profil.verify_email');
+    Route::post('/profil/keamanan/kirim-link', [ProfileController::class, 'sendResetLink'])->name('profil.keamanan.kirim-link');
+    Route::post('/profil/keamanan/reset', [ProfileController::class, 'resetPassword'])->name('profil.keamanan.reset');
     Route::delete('/profil/hapus', [ProfileController::class, 'destroy'])->name('profil.destroy');
-    
-    
+
+    // E-Proposal Dropdown Data
     Route::get('/get-kelurahan/{kecamatanId}', [EproposalController::class, 'getKelurahan'])
-         ->where('kecamatanId', '[0-9]+') // Pastikan parameter adalah angka
+         ->where('kecamatanId', '[0-9]+')
          ->name('get.kelurahan');
-
     Route::get('/get-kompleks-by-kelurahan/{kelurahanId}', [EproposalController::class, 'getKompleksByKelurahan'])
-         ->where('kelurahanId', '[0-9]+') // Pastikan parameter adalah angka
+         ->where('kelurahanId', '[0-9]+')
          ->name('get.kompleks.by.kelurahan');
-});
 
-// Password Reset
+}); // Akhir grup middleware auth
+
+/*
+|--------------------------------------------------------------------------
+| Download Template (Public)
+|--------------------------------------------------------------------------
+*/
+Route::get('/unduh/template/proposal', [EproposalController::class, 'downloadTemplate'])
+    ->name('template.proposal.download');
+
+/*
+|--------------------------------------------------------------------------
+| Password Reset Routes (Guest)
+|--------------------------------------------------------------------------
+*/
 Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])->middleware('guest')->name('password.request');
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->middleware('guest')->name('password.email');
 Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->middleware('guest')->name('password.reset');
 Route::post('/reset-password', [NewPasswordController::class, 'store'])->middleware('guest')->name('password.store');
+
+// PERBAIKAN: Hapus kurung kurawal ekstra di sini

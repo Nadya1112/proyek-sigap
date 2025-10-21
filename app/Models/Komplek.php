@@ -1,48 +1,43 @@
 <?php
 
-namespace App\Models;
+namespace App\Models; // <-- Perbaikan di sini
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-// 1. Import class-class yang dibutuhkan untuk GIS (dari paket GRIMZY)
-use Grimzy\LaravelMysqlSpatial\Eloquent\SpatialTrait; // <-- Ganti dengan ini
-use Grimzy\LaravelMysqlSpatial\Types\MultiPolygon; // <-- Ganti dengan ini
+// Import dari paket MATAN YADAEV
+use MatanYadaev\EloquentSpatial\Objects\MultiPolygon;
+use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
 
 class Komplek extends Model
 {
-    // 2. Gunakan trait SpatialTrait di sini
-    use HasFactory, SpatialTrait; // <-- Ganti dengan ini
+    // Gunakan trait HasSpatial
+    use HasFactory, HasSpatial;
 
-    /**
-     * Mendefinisikan nama tabel secara eksplisit (praktik yang baik).
-     * @var string
-     */
     protected $table = 'kompleks';
 
-    /**
-     * Kolom yang boleh diisi secara massal.
-     * @var array
-     */
     protected $fillable = [
+        'kelurahan_id', // Pastikan semua kolom yang relevan ada di sini
         'nomor',
         'nama_komplek',
-        // ... (pastikan semua kolom Anda ada di sini, termasuk 'area') ...
-        'area', 
+        'foto_komplek',
+        'jumlah_sertifikat',
+        'status_aset',
+        'area',
     ];
 
-    /**
-     * Tentukan kolom spasial untuk paket grimzy
-     * @var array
-     */
-    protected $spatialFields = [
-        'area' // <-- Tambahkan ini
-    ];
+    // Properti $spatialFields tidak diperlukan oleh Matan Yadaev
 
-    /**
-     * Casting tipe data (jika diperlukan)
-     * @var array
-     */
     protected $casts = [
-        'area' => MultiPolygon::class, // <-- Tambahkan ini jika perlu
+        'area' => MultiPolygon::class, // Ini sudah benar
+        // 'created_at' => 'datetime', // Opsional
+        // 'updated_at' => 'datetime', // Opsional
     ];
+
+    /**
+      * Relasi ke Kelurahan.
+      */
+     public function kelurahan()
+     {
+         return $this->belongsTo(Kelurahan::class, 'kelurahan_id');
+     }
 }

@@ -10,6 +10,7 @@ use App\Models\Kelurahan; // Pastikan ini di-import
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; // Import DB Facade untuk query langsung
 use Illuminate\Support\Facades\Log; // Import Log Facade untuk debugging
+use Illuminate\Support\Facades\Storage; // <-- Import Storage Facade
 
 class EproposalController extends Controller
 {
@@ -104,5 +105,22 @@ class EproposalController extends Controller
 
         Log::info("Komplek ditemukan: " . $kompleks->count());
         return response()->json($kompleks);
+    }
+
+    public function downloadTemplate()
+    {
+        // Path relatif terhadap disk 'public' (storage/app/public)
+        $filePath = 'templates/template-proposal.docx';
+        $downloadName = 'Template-Proposal-PSU-SIGAP.docx'; // Nama file saat diunduh
+
+        // Cek apakah file ada di disk 'public'
+        if (Storage::disk('public')->exists($filePath)) {
+            // Jika ada, kembalikan sebagai respons download
+            return Storage::disk('public')->download($filePath, $downloadName);
+        } else {
+            // Jika file tidak ditemukan, tampilkan error 404
+            Log::error("File template tidak ditemukan di: " . $filePath);
+            abort(404, 'File template tidak ditemukan.');
+        }
     }
 }
