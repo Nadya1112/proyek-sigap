@@ -9,4 +9,12 @@ class Kelurahan extends Model
     public function kecamatan() {
         return $this->belongsTo(Kecamatan::class);
     }
+    /**
+     * Mendefinisikan relasi bahwa satu Kelurahan memiliki banyak Komplek.
+     */
+    public function kompleks() // Gunakan nama jamak
+    {
+        // 'kelurahan_id' adalah foreign key di tabel 'kompleks'
+        return $this->hasMany(Komplek::class, 'kelurahan_id');
+    }
 }

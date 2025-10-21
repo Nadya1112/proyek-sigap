@@ -99,12 +99,14 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->midd
     Route::post('/profil/keamanan/kirim-link', [ProfileController::class, 'sendResetLink'])->name('profil.keamanan.kirim-link');    Route::post('/profil/keamanan/reset', [ProfileController::class, 'resetPassword'])->name('profil.keamanan.reset');
     Route::delete('/profil/hapus', [ProfileController::class, 'destroy'])->name('profil.destroy');
     
+    
+    Route::get('/get-kelurahan/{kecamatanId}', [EproposalController::class, 'getKelurahan'])
+         ->where('kecamatanId', '[0-9]+') // Pastikan parameter adalah angka
+         ->name('get.kelurahan');
 
-        // Rute baru untuk mengambil data kelurahan
-    Route::get('/get-kelurahan/{kecamatan}', [EproposalController::class, 'getKelurahan'])->name('get.kelurahan');
-
-    // Rute verifikasi komplek diubah menjadi POST untuk mengirim lebih banyak data
-    Route::post('/verify-kompleks', [EproposalController::class, 'verifyKompleks'])->name('kompleks.verify');
+    Route::get('/get-kompleks-by-kelurahan/{kelurahanId}', [EproposalController::class, 'getKompleksByKelurahan'])
+         ->where('kelurahanId', '[0-9]+') // Pastikan parameter adalah angka
+         ->name('get.kompleks.by.kelurahan');
 });
 
 // Password Reset
