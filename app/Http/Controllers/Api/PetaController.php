@@ -2,73 +2,90 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller; // Pastikan ini ada
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // <-- PENTING: Untuk mengakses database
+use Illuminate\Support\Facades\DB;
 
 class PetaController extends Controller
 {
     /**
-     * Mengambil data sebaran komplek perumahan.
+     * API untuk sebaran komplek perumahan (Titik/Point)
      */
     public function kompleks(Request $request)
     {
-        // 1. Ambil semua data dari tabel 'komplek_perumahan'
-        $dataPerumahan = DB::table('komplek_perumahan')->get();
+        // Kode ini mengambil data 'kompleks' dan sudah benar
+        $dataPerumahan = DB::table('kompleks')
+            ->join('kelurahans', 'kompleks.kelurahan_id', '=', 'kelurahans.id')
+            ->join('kecamatans', 'kelurahans.kecamatan_id', '=', 'kecamatans.id')
+            ->select(
+                'kompleks.id',
+                'kompleks.nama_komplek',
+                'kompleks.latitude',
+                'kompleks.longitude',
+                'kelurahans.nama_kelurahan',
+                'kecamatans.nama_kecamatan'
+            )
+            ->whereNotNull('kompleks.latitude')
+            ->whereNotNull('kompleks.longitude')
+            ->get();
 
-        // 2. Siapkan array kosong untuk menampung data GeoJSON
         $features = [];
-
-        // 3. Looping setiap baris data dan ubah formatnya
         foreach ($dataPerumahan as $row) {
-            // Pastikan data latitude & longitude ada dan valid
-            if ($row->latitude && $row->longitude) {
+            $features[] = [
+                'type' => 'Feature',
+                'geometry' => [
+                    'type' => 'Point',
+                    'coordinates' => [(float)$row->longitude, (float)$row->latitude]
+                ],
+                'properties' => [
+                    'id' => $row->id,
+                    'nama' => $row->nama_komplek,
+                    'kelurahan' => $row->nama_kelurahan,
+                    'kecamatan' => $row->nama_kecamatan,
+                ]
+            ];
+        }
+        return response()->json(['type' => 'FeatureCollection', 'features' => $features]);
+    }
+
+    /**
+     * API untuk data poligon kecamatan (Area)
+     * INI ADALAH FUNGSI YANG HARUS DIPERBAIKI
+     */
+    public function kecamatan(Request $request)
+    {
+        // 1. Ambil SEMUA kecamatan yang memiliki data poligon
+        $dataKecamatan = DB::table('kecamatans') 
+                           ->whereNotNull('geojson_data')
+                           ->get(); 
+
+        $features = []; // Buat array kosong untuk "features"
+
+        // 2. Looping setiap kecamatan
+        foreach ($dataKecamatan as $row) {
+            
+            $geometry = null;
+            try {
+                // Decode string JSON dari database menjadi objek
+                $geometry = json_decode(trim($row->geojson_data), false, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                // Abaikan jika data JSON-nya rusak
+            }
+
+            // 3. Jika datanya valid, "bungkus" ke dalam format "Feature"
+            if ($geometry) {
                 $features[] = [
-                    'type' => 'Feature',
-                    'geometry' => [
-                        'type' => 'Point',
-                        // Format GeoJSON adalah [longitude, latitude]
-                        'coordinates' => [
-                            (float)$row->longitude, // Ambil dari kolom longitude
-                            (float)$row->latitude   // Ambil dari kolom latitude
-                        ]
-                    ],
-                    // Properti ini yang akan muncul di popup
-                    'properties' => [
-                        'id' => $row->id,
-                        'kelurahan' => $row->kelurahan,
-                        'kecamatan' => $row->kecamatan,
-                        'sumber' => $row->sumber,
+                    'type' => 'Feature', // <-- Ini adalah "Feature"
+                    'geometry' => $geometry, // <-- Ini data poligon Anda
+                    'properties' => [ // <-- Ini data pendukungnya
+                        'nama' => $row->nama_kecamatan,
+                        'warna' => $row->warna
                     ]
                 ];
             }
         }
-
-        // 4. Bungkus semua fitur dalam satu 'FeatureCollection'
-        $geoJsonData = [
-            'type' => 'FeatureCollection',
-            'features' => $features
-        ];
-
-        // 5. Kembalikan sebagai respons JSON
-        return response()->json($geoJsonData);
-    }
-
-    /**
-     * Mengambil data poligon kecamatan.
-     */
-    public function kecamatan(Request $request)
-    {
-        // TODO: Anda bisa mengisi ini nanti.
-        // Logikanya bisa mengambil dari file GeoJSON statis
-        // atau dari tabel database yang menyimpan poligon.
         
-        // Contoh jika mengambil dari file GeoJSON statis:
-        // $path = public_path('data/kecamatan.geojson');
-        // if (!file_exists($path)) {
-        //     return response()->json(['error' => 'File not found'], 404);
-        // }
-        // $data = json_decode(file_get_contents($path));
-        // return response()->json($data);
+        // 4. "Bungkus" semua "Feature" ke dalam "FeatureCollection"
+        return response()->json(['type' => 'FeatureCollection', 'features' => $features]);
     }
 }
