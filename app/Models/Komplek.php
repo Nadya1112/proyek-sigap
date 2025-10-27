@@ -5,13 +5,11 @@ namespace App\Models; // <-- Perbaikan di sini
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 // Import dari paket MATAN YADAEV
-use MatanYadaev\EloquentSpatial\Objects\MultiPolygon;
-use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
-
+// use MatanYadaev\EloquentSpatial\Objects\MultiPolygon;
 class Komplek extends Model
 {
     // Gunakan trait HasSpatial
-    use HasFactory, HasSpatial;
+    use HasFactory;
 
     protected $table = 'kompleks';
 

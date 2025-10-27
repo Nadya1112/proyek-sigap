@@ -14,8 +14,7 @@
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.23",
-        "laravel/tinker": "^2.5",
-        "matan-yadaev/eloquent-spatial": "^4.0"
+        "laravel/tinker": "^2.5"
     },
     "require-dev": {
         "spatie/laravel-ignition": "^2.4.2",

@@ -1331,7 +1331,6 @@
 
             try {
                 // Contoh pembuatan URL dinamis dari route()
-                const url = "{{ route('kelurahan.byKecamatan', ':id') }}".replace(':id', kecamatanId);
                 const res = await fetch(url, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
