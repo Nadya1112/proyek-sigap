@@ -115,21 +115,31 @@
                 </div>
                 <div class="mt-4 border-t border-gray-100">
                      @forelse($pengaduan['recent'] as $row)
-                        <div class="py-4 border-b border-gray-100 flex items-center justify-between gap-4">
-                            <div class="min-w-0">
-                                <p class="text-sm font-semibold text-gray-800 truncate">{{ $row->judul }}</p>
-                                <p class="text-xs text-gray-500 mt-1">Dibuat pada: {{ \Carbon\Carbon::parse($row->created_at)->format('d M Y, H:i') }}</p>
-                            </div>
-                            <span class="px-3 py-1 text-xs font-medium rounded-full flex-shrink-0 {{
-                                $row->status==='selesai' ? 'bg-green-100 text-green-800' :
-                                ($row->status==='draft' ? 'bg-gray-100 text-gray-800' : 'bg-orange-100 text-orange-800')
-                            }}">{{ ucfirst($row->status) }}</span>
-                        </div>
-                    @empty
-                        <div class="text-center py-10">
-                            <p class="text-sm text-gray-500">Anda belum pernah membuat pengaduan.</p>
-                        </div>
-                    @endforelse
+    @php
+        // Logika untuk warna badge berdasarkan status baru
+        $colorClass = match($row->status) {
+            \App\Models\Pengaduan::STATUS_SELESAI => 'bg-green-100 text-green-800',
+            \App\Models\Pengaduan::STATUS_DIPROSES => 'bg-orange-100 text-orange-800',
+            \App\Models\Pengaduan::STATUS_DIVERIFIKASI_JF => 'bg-blue-100 text-blue-800',
+            \App\Models\Pengaduan::STATUS_DITOLAK => 'bg-red-100 text-red-800',
+            default => 'bg-gray-100 text-gray-800', // Status Diterima
+        };
+    @endphp
+    <div class="py-4 border-b border-gray-100 flex items-center justify-between gap-4">
+        <div class="min-w-0">
+             {{-- Asumsi $row->judul tidak ada, ganti dengan isi pengaduan --}}
+            <p class="text-sm font-semibold text-gray-800 truncate">{{ Str::limit($row->isi_pengaduan, 50) }}</p>
+            <p class="text-xs text-gray-500 mt-1">Dibuat pada: {{ \Carbon\Carbon::parse($row->created_at)->format('d M Y, H:i') }}</p>
+        </div>
+        <span class="px-3 py-1 text-xs font-medium rounded-full flex-shrink-0 {{ $colorClass }}">
+            {{ $row->status }} {{-- Status pengaduan bisa ditampilkan apa adanya --}}
+        </span>
+    </div>
+@empty
+    <div class="text-center py-10">
+        <p class="text-sm text-gray-500">Anda belum pernah membuat pengaduan.</p>
+    </div>
+@endforelse
                 </div>
             </div>
 
@@ -144,23 +154,40 @@
                     </a>
                 </div>
                  <div class="mt-4 border-t border-gray-100">
-                     @forelse($proposal['recent'] as $row)
-                        <div class="py-4 border-b border-gray-100 flex items-center justify-between gap-4">
-                            <div class="min-w-0">
-                                <p class="text-sm font-semibold text-gray-800 truncate">{{ $row->judul }}</p>
-                                <p class="text-xs text-gray-500 mt-1">Diajukan pada: {{ \Carbon\Carbon::parse($row->created_at)->format('d M Y, H:i') }}</p>
-                            </div>
-                            <span class="px-3 py-1 text-xs font-medium rounded-full flex-shrink-0 {{
-                                $row->status==='disetujui' ? 'bg-green-100 text-green-800' :
-                                ($row->status==='ditolak' ? 'bg-red-100 text-red-800' :
-                                ($row->status==='draft' ? 'bg-gray-100 text-gray-800' : 'bg-orange-100 text-orange-800'))
-                            }}">{{ ucfirst($row->status) }}</span>
-                        </div>
-                    @empty
-                        <div class="text-center py-10">
-                            <p class="text-sm text-gray-500">Anda belum pernah mengajukan proposal.</p>
-                        </div>
-                    @endforelse
+                    @forelse($proposal['recent'] as $row)
+    @php
+        // Logika untuk menerjemahkan status internal ke status yang dilihat pengguna
+        $displayStatus = match($row->status) {
+            \App\Models\Proposal::STATUS_DISETUJUI_KADIS => 'Disetujui',
+            \App\Models\Proposal::STATUS_DISETUJUI_KABID => 'Pengecekan Final',
+            \App\Models\Proposal::STATUS_DIVERIFIKASI_JF => 'Diverifikasi',
+            default => $row->status, // Tampilkan apa adanya (Diajukan, Ditolak)
+        };
+
+        // Logika untuk warna badge berdasarkan status internal
+        $colorClass = match($row->status) {
+             \App\Models\Proposal::STATUS_DISETUJUI_KADIS => 'bg-green-100 text-green-800',
+             \App\Models\Proposal::STATUS_DISETUJUI_KABID => 'bg-blue-100 text-blue-800', // Pengecekan Final
+             \App\Models\Proposal::STATUS_DIVERIFIKASI_JF => 'bg-cyan-100 text-cyan-800', // Diverifikasi
+             \App\Models\Proposal::STATUS_DITOLAK => 'bg-red-100 text-red-800',
+             default => 'bg-orange-100 text-orange-800', // Status Diajukan
+        };
+    @endphp
+    <div class="py-4 border-b border-gray-100 flex items-center justify-between gap-4">
+        <div class="min-w-0">
+            {{-- Asumsi $row->judul tidak ada, ganti dengan relasi atau nama file --}}
+            <p class="text-sm font-semibold text-gray-800 truncate">Proposal: {{ $row->komplek->nama_komplek ?? 'Data Proposal' }}</p>
+            <p class="text-xs text-gray-500 mt-1">Diajukan pada: {{ \Carbon\Carbon::parse($row->created_at)->format('d M Y, H:i') }}</p>
+        </div>
+        <span class="px-3 py-1 text-xs font-medium rounded-full flex-shrink-0 {{ $colorClass }}">
+            {{ $displayStatus }}
+        </span>
+    </div>
+@empty
+    <div class="text-center py-10">
+        <p class="text-sm text-gray-500">Anda belum pernah mengajukan proposal.</p>
+    </div>
+@endforelse
                 </div>
             </div>
 

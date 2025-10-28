@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo; // Import BelongsTo
 
 class Pengaduan extends Model
 {
@@ -10,11 +11,19 @@ class Pengaduan extends Model
 
     protected $guarded = [];
 
-    /**
-     * Mendefinisikan relasi ke model User.
-     */
-    public function user()
+    public const STATUS_DITERIMA = 'Diterima';
+    public const STATUS_DIVERIFIKASI_JF = 'Diverifikasi JF';
+    public const STATUS_DIPROSES = 'Diproses';
+    public const STATUS_SELESAI = 'Selesai';
+    public const STATUS_DITOLAK = 'Ditolak';
+
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
+    
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 }
