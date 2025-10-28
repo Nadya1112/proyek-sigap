@@ -12,16 +12,15 @@ class PengaduanController extends Controller
      * Menampilkan form pengaduan beserta data statistik yang benar.
      */
     public function showPengaduanForm()
-    {
-        $stats = [
-            'total'    => Pengaduan::count(),
-            'diterima' => Pengaduan::where('status', 'Diterima')->count(),
-            'proses'   => Pengaduan::where('status', 'Diproses')->count(),
-            'selesai'  => Pengaduan::where('status', 'Selesai')->count(),
-        ];
-
-        return view('public.pengaduan', $stats);
-    }
+{
+    $stats = [
+        'total'    => Pengaduan::count(),
+        'diterima' => Pengaduan::whereIn('status', [Pengaduan::STATUS_DITERIMA, Pengaduan::STATUS_DIVERIFIKASI_JF])->count(), // Gabung Diterima & Diverifikasi
+        'proses'   => Pengaduan::where('status', Pengaduan::STATUS_DIPROSES)->count(),
+        'selesai'  => Pengaduan::where('status', Pengaduan::STATUS_SELESAI)->count(),
+    ];
+    return view('public.pengaduan', $stats);
+}
 
     /**
      * Menyimpan data pengaduan baru dari form.

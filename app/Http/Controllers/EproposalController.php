@@ -17,18 +17,17 @@ class EproposalController extends Controller
     /**
      * Menampilkan form, mengirim data Kecamatan awal.
      */
-    public function showForm()
-    {
-        $stats = [
-            'total'         => Proposal::count(),
-            'diajukan'       => Proposal::where('status', 'Diajukan')->count(),
-            'diverifikasi'  => Proposal::where('status', 'Diverifikasi')->count(),
-            'disetujui'     => Proposal::where('status', 'Disetujui')->count(),
-        ];
-        // Eksplisit ambil ID dan nama
-        $kecamatans = Kecamatan::orderBy('nama_kecamatan')->get(['id', 'nama_kecamatan']);
-        return view('public.eproposal', compact('stats', 'kecamatans'));
-    }
+public function showForm()
+{
+    $stats = [
+        'total'         => Proposal::count(),
+        'diajukan'       => Proposal::where('status', Proposal::STATUS_DIAJUKAN)->count(),
+        'diverifikasi'  => Proposal::where('status', Proposal::STATUS_DIVERIFIKASI_JF)->count(),
+        'disetujui'     => Proposal::whereIn('status', [Proposal::STATUS_DISETUJUI_KABID, Proposal::STATUS_DISETUJUI_KADIS])->count(),
+    ];
+    $kecamatans = Kecamatan::orderBy('nama_kecamatan')->get(['id', 'nama_kecamatan']);
+    return view('public.eproposal', compact('stats', 'kecamatans'));
+}
 
     /**
      * Menyimpan proposal (Logika ini sudah benar dan tidak berubah).
