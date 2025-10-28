@@ -36,21 +36,19 @@ class LoginController extends Controller
     }
 
     /** POST /login */
-    public function authenticate(Request $request)
+   public function authenticate(Request $request)
     {
-        // ✅ sesuai form kamu: 'login' (email/HP), 'password', 'captcha'
+        // ✅ Validasi form (tetap sama)
         $request->validate([
             'login'    => ['required', 'string'],
             'password' => ['required', 'string'],
             'captcha'  => ['required', 'numeric'],
         ]);
 
-        // Validasi CAPTCHA
+        // Validasi CAPTCHA (tetap sama)
         $expected = (int) (session('captcha.sum') ?? -1);
         if ((int) $request->input('captcha') !== $expected) {
-            // regenerate soal baru supaya tidak bisa brute force
             $this->makeCaptcha();
-
             return back()
                 ->withErrors(['captcha' => 'Jawaban verifikasi tidak sesuai.'])
                 ->withInput();
@@ -60,47 +58,45 @@ class LoginController extends Controller
         $password = (string) $request->input('password');
         $remember = $request->boolean('remember');
 
-        // Siapkan beberapa kemungkinan kredensial:
-        // 1) jika 'login' adalah email valid -> cek dengan kolom email
-        // 2) cek dengan kolom kontak (apa adanya)
-        // 3) cek dengan kolom kontak (hanya digit, kalau user memasukkan format dengan spasi/tanda)
+        // Logika login ganda (email/kontak) (tetap sama)
         $attempts = [];
-
         if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
             $attempts[] = ['email' => $login, 'password' => $password];
         }
-
         $attempts[] = ['kontak' => $login, 'password' => $password];
-
         $digits = preg_replace('/\D+/', '', $login);
         if ($digits !== $login && $digits !== '') {
             $attempts[] = ['kontak' => $digits, 'password' => $password];
         }
 
-        // Coba autentikasi dengan setiap kemungkinan di atas
+        // Coba autentikasi
         foreach ($attempts as $creds) {
             if (Auth::attempt($creds, $remember)) {
                 $request->session()->regenerate();
-                session()->forget('captcha'); // bersihkan captcha agar tidak mengganggu alur selanjutnya
+                session()->forget('captcha');
 
-                $user = Auth::user();
+                $user = Auth::user(); // Dapatkan user yang login
 
-                // Role-based redirect (sesuai permintaanmu)
-                if ($user->role === 'admin') {
+                // ==========================================================
+                // === PERUBAHAN UTAMA ADA DI SINI ===
+                // ==========================================================
+                // Kita ganti pengecekan $user->role === 'admin'
+                // dengan fungsi helper isAdmin() dari Model User.
+                if ($user->isAdmin()) { // Mengecek (Staff, JF PSU, Kabid, Kadis)
                     try {
-                        return redirect()->route('filament.admin.pages.dashboard'); // Filament v3
+                        return redirect()->route('filament.admin.pages.dashboard'); // Arahkan ke dashboard Filament
                     } catch (\Throwable $e) {
-                        return redirect()->to('/admin'); // fallback panel default
+                        return redirect()->to('/admin'); // Fallback
                     }
                 }
-                // pengguna -> landing page (home.blade)
-                return redirect()->route('home');
+                
+                // Jika BUKAN admin (role 'pengguna'), arahkan ke dashboard pengguna
+                return redirect()->route('user.dashboard');
             }
         }
 
-        // Gagal login -> regen captcha + pesan
+        // Gagal login (tetap sama)
         $this->makeCaptcha();
-
         return back()
             ->withErrors(['login' => 'Kredensial tidak cocok.'])
             ->withInput();
