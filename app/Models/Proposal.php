@@ -3,37 +3,29 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo; // Import BelongsTo
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Proposal extends Model
 {
     use HasFactory;
 
-    /**
-     * Definisikan konstanta untuk setiap status proposal baru.
-     */
+    // Konstanta status proposal baru
     public const STATUS_DIAJUKAN = 'Diajukan';
     public const STATUS_DIVERIFIKASI_JF = 'Diverifikasi JF';
     public const STATUS_DISETUJUI_KABID = 'Disetujui Kabid';
-    public const STATUS_DISETUJUI_KADIS = 'Disetujui Kadis'; // Status final "Disetujui"
+    public const STATUS_DISETUJUI_KADIS = 'Disetujui Kadis';
     public const STATUS_DITOLAK = 'Ditolak';
     
     protected $guarded = [];
 
-    /**
-     * Relasi ke User.
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    /**
-     * Relasi ke Komplek (DIAKTIFKAN).
-     */
-    public function komplek(): BelongsTo // Pastikan nama fungsi 'komplek' (sesuai panggilan Filament)
+    public function komplek(): BelongsTo
     {
-        // 'kompleks_id' adalah nama foreign key di tabel 'proposals'
+        // 'kompleks_id' adalah foreign key di tabel 'proposals'
         return $this->belongsTo(Komplek::class, 'kompleks_id');
     }
     

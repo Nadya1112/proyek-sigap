@@ -7,21 +7,20 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\HasMany; // Pastikan ini di-import
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable;
 
-    /**
-     * Definisikan konstanta untuk setiap role agar kode lebih mudah dibaca.
-     */
+    // Definisikan konstanta role baru Anda
+    public const ROLE_ADMIN = 'admin'; // Super Admin
     public const ROLE_STAFF = 'Staff';
     public const ROLE_JF_PSU = 'JF PSU';
     public const ROLE_KABID = 'Kabid';
     public const ROLE_KADIS = 'Kadis';
     public const ROLE_PENGGUNA = 'pengguna';
-    
+
     protected $fillable = [
         'name',
         'email',
@@ -31,13 +30,13 @@ class User extends Authenticatable implements FilamentUser
         'verification_code',
         'verification_expires_at',
         'email_verified_at',
-        'google_id', // Pastikan google_id ditambahkan jika Anda menggunakannya
+        'google_id', // Pastikan google_id ada di sini
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
-        'verification_code', // jangan tampilkan di array/json
+        'verification_code',
     ];
 
     protected function casts(): array
@@ -50,12 +49,13 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
-     * Izinkan semua role admin baru untuk mengakses panel Filament.
+     * Tentukan siapa yang bisa mengakses Panel Admin Filament.
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        // Periksa apakah role pengguna termasuk dalam daftar role admin yang diizinkan
+        // Izinkan semua role admin
         return in_array($this->role, [
+            self::ROLE_ADMIN,
             self::ROLE_STAFF,
             self::ROLE_JF_PSU,
             self::ROLE_KABID,
@@ -64,27 +64,26 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
-     * Fungsi Helper (Sangat Bermanfaat untuk Filament)
+     * Fungsi Helper untuk cek role
      */
+    public function isSuperAdmin(): bool { return $this->role === self::ROLE_ADMIN; }
     public function isStaff(): bool { return $this->role === self::ROLE_STAFF; }
     public function isJfPsu(): bool { return $this->role === self::ROLE_JF_PSU; }
     public function isKabid(): bool { return $this->role === self::ROLE_KABID; }
     public function isKadis(): bool { return $this->role === self::ROLE_KADIS; }
-    public function isAdmin(): bool { // Fungsi umum untuk semua admin
-        return in_array($this->role, [self::ROLE_STAFF, self::ROLE_JF_PSU, self::ROLE_KABID, self::ROLE_KADIS]);
+    
+    // Fungsi umum untuk semua admin (termasuk super admin)
+    public function isAdmin(): bool 
+    {
+        return $this->canAccessPanel(new Panel());
     }
 
-    /**
-     * Relasi ke Proposal (Satu User bisa memiliki banyak Proposal).
-     */
+    // Relasi
     public function proposals(): HasMany
     {
         return $this->hasMany(Proposal::class, 'user_id');
     }
 
-    /**
-     * Relasi ke Pengaduan (Satu User bisa memiliki banyak Pengaduan).
-     */
     public function pengaduans(): HasMany
     {
         return $this->hasMany(Pengaduan::class, 'user_id');

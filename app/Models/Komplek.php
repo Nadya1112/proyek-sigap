@@ -1,41 +1,36 @@
 <?php
 
-namespace App\Models; // <-- Perbaikan di sini
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-// Import dari paket MATAN YADAEV
-// use MatanYadaev\EloquentSpatial\Objects\MultiPolygon;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+// Hapus import untuk MatanYadaev
+
 class Komplek extends Model
 {
-    // Gunakan trait HasSpatial
-    use HasFactory;
+    use HasFactory; // Hapus HasSpatial untuk sementara
 
     protected $table = 'kompleks';
 
     protected $fillable = [
-        'kelurahan_id', // Pastikan semua kolom yang relevan ada di sini
+        'kelurahan_id',
         'nomor',
         'nama_komplek',
         'foto_komplek',
         'jumlah_sertifikat',
         'status_aset',
-        'area',
+        // 'area', // Dinonaktifkan sementara
     ];
 
-    // Properti $spatialFields tidak diperlukan oleh Matan Yadaev
+    // Casts untuk 'area' dinonaktifkan sementara
+    // protected $casts = [
+    //     'area' => MultiPolygon::class,
+    // ];
 
-    protected $casts = [
-        'area' => MultiPolygon::class, // Ini sudah benar
-        // 'created_at' => 'datetime', // Opsional
-        // 'updated_at' => 'datetime', // Opsional
-    ];
-
-    /**
-      * Relasi ke Kelurahan.
-      */
-     public function kelurahan()
-     {
+    public function kelurahan(): BelongsTo
+    {
          return $this->belongsTo(Kelurahan::class, 'kelurahan_id');
-     }
+    }
 }

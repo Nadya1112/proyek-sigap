@@ -11,6 +11,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model; // Import Model
+use Illuminate\Support\Facades\Auth; // Import Auth
+use Illuminate\Support\Facades\Storage; // Import Storage
 
 class ProposalResource extends Resource
 {
@@ -19,8 +21,31 @@ class ProposalResource extends Resource
     protected static ?string $navigationGroup = 'Pelayanan Publik';
     protected static ?int $navigationSort = 2;
 
+    // Helper function untuk cek hak ubah status
+    private static function canUpdateStatus(User $user, ?string $currentStatus): bool
+    {
+        if (!$currentStatus) return false; // Tidak bisa update jika status kosong
+        if ($user->isSuperAdmin()) return true; // Super admin bisa kapan saja
+
+        return match ($currentStatus) {
+            Proposal::STATUS_DIAJUKAN => $user->isStaff() || $user->isJfPsu(),
+            Proposal::STATUS_DIVERIFIKASI_JF => $user->isJfPsu() || $user->isKabid(),
+            Proposal::STATUS_DISETUJUI_KABID => $user->isKabid() || $user->isKadis(),
+            default => false, // Status final (Ditolak, Disetujui Kadis)
+        };
+    }
+    
+    // Helper function untuk cek hak hapus
+    private static function canDeleteAccess(User $user): bool
+    {
+        return $user->isSuperAdmin() || $user->isJfPsu() || $user->isKabid() || $user->isKadis();
+    }
+
     public static function form(Form $form): Form
     {
+        /** @var User $user */
+        $user = Auth::user();
+
         return $form
             ->schema([
                 Forms\Components\Section::make('Informasi Pengaju')
@@ -41,18 +66,31 @@ class ProposalResource extends Resource
                                 ->label('Unduh Dokumen Proposal')
                                 ->icon('heroicon-o-arrow-down-tray')
                                 ->color('primary')
-                                ->url(fn ($record) => $record?->proposal ? asset('storage/' . $record->proposal) : null, true)
+                                ->url(fn ($record) => $record?->proposal ? Storage::disk('public')->url($record->proposal) : null, true)
                                 ->visible(fn ($record) => !empty($record?->proposal)),
                         ])->label('Dokumen Proposal'),
                     ]),
                 
                 Forms\Components\Section::make('Tindakan Admin')
+                    // Hanya tampil jika user punya hak update status
+                    ->visible(fn (?Model $record) => $user->isSuperAdmin() || ($record && self::canUpdateStatus($user, $record->status)))
                     ->schema([
                         Forms\Components\Select::make('status')
-                            ->options(function (?Model $record, \Illuminate\Contracts\Auth\Authenticatable $user) {
-                                if (!$record) return []; // Kosong saat create
+                            ->options(function (?Model $record) use ($user) {
+                                if (!$record) return [];
                                 $currentStatus = $record->status;
-                                $options = [$currentStatus => $currentStatus]; // Status saat ini
+                                $options = [$currentStatus => "Saat ini: $currentStatus"]; // Status saat ini
+
+                                // Super Admin bisa melihat semua opsi
+                                if ($user->isSuperAdmin()) {
+                                    return [
+                                        Proposal::STATUS_DIAJUKAN => 'Diajukan',
+                                        Proposal::STATUS_DIVERIFIKASI_JF => 'Diverifikasi (JF PSU)',
+                                        Proposal::STATUS_DISETUJUI_KABID => 'Setujui (Kabid)',
+                                        Proposal::STATUS_DISETUJUI_KADIS => 'Setujui Final (Kadis)',
+                                        Proposal::STATUS_DITOLAK => 'Tolak',
+                                    ];
+                                }
 
                                 // Logika alur status berdasarkan role
                                 switch ($currentStatus) {
@@ -71,19 +109,9 @@ class ProposalResource extends Resource
                                 }
                                 return $options;
                             })
-                            ->required()
-                            ->disabled(function (?Model $record, \Illuminate\Contracts\Auth\Authenticatable $user) {
-                                if (!$record) return true;
-                                // Non-aktifkan jika status final atau jika user tidak punya hak
-                                return match ($record->status) {
-                                    Proposal::STATUS_DIAJUKAN => !$user->isStaff() && !$user->isJfPsu(),
-                                    Proposal::STATUS_DIVERIFIKASI_JF => !$user->isKabid() && !$user->isJfPsu(),
-                                    Proposal::STATUS_DISETUJUI_KABID => !$user->isKadis() && !$user->isKabid(),
-                                    default => true, // Status Ditolak atau Disetujui Kadis
-                                };
-                            }),
+                            ->required(),
                         
-                        Forms\Components\Textarea::make('catatan_admin') // Kolom baru untuk catatan admin
+                        Forms\Components\Textarea::make('catatan_admin')
                             ->label('Catatan Admin (Internal)')
                             ->columnSpanFull(),
                     ]),
@@ -100,47 +128,55 @@ class ProposalResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         Proposal::STATUS_DIAJUKAN => 'warning',
-                        Proposal::STATUS_DIVERIFIKASI_JF => 'info', // Baru
-                        Proposal::STATUS_DISETUJUI_KABID => 'primary', // Baru
-                        Proposal::STATUS_DISETUJUI_KADIS => 'success', // Status final
+                        Proposal::STATUS_DIVERIFIKASI_JF => 'info',
+                        Proposal::STATUS_DISETUJUI_KABID => 'primary',
+                        Proposal::STATUS_DISETUJUI_KADIS => 'success',
                         Proposal::STATUS_DITOLAK => 'danger',
                         default => 'gray',
                     })
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->label('Tanggal Masuk'),
             ])
-            ->filters([
-                //
-            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
-                    // Hanya role tertentu yang bisa menghapus
-                    ->visible(fn (\Illuminate\Contracts\Auth\Authenticatable $user) =>
-                        $user->isJfPsu() || $user->isKabid() || $user->isKadis()
-                    ),
+                    ->visible(fn (User $user) => self::canDeleteAccess($user)),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        // Hanya role tertentu yang bisa bulk delete
-                        ->visible(fn (\Illuminate\Contracts\Auth\Authenticatable $user) =>
-                            $user->isJfPsu() || $user->isKabid() || $user->isKadis()
-                        ),
+                        ->visible(fn (User $user) => self::canDeleteAccess($user)),
                 ]),
             ]);
     }
-    
-    public static function getRelations(): array { return []; }
     
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListProposals::route('/'),
-            // 'create' => Pages\CreateProposal::route('/create'), // Tetap non-aktif
             'edit' => Pages\EditProposal::route('/{record}/edit'),
         ];
     }
-
+    
     public static function canCreate(): bool { return false; }
+
+    public static function canDelete(Model $record): bool
+    { return self::canDeleteAccess(Auth::user()); }
+    
+    public static function canDeleteAny(): bool
+    { return self::canDeleteAccess(Auth::user()); }
+    
+    // Nonaktifkan 'edit' untuk Staff
+    public static function canEdit(Model $record): bool
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        if ($user->isSuperAdmin()) return true;
+        if ($user->isStaff()) {
+            // Staff hanya bisa edit jika statusnya 'Diajukan' (untuk menolak)
+            return $record->status === Proposal::STATUS_DIAJUKAN;
+        }
+        // Role lain bisa edit
+        return $user->isJfPsu() || $user->isKabid() || $user->isKadis();
+    }
 }

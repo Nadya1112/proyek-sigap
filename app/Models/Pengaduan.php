@@ -3,14 +3,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo; // Import BelongsTo
+use Illuminate\Database\Eloquent\Relations\BelongsTo; // Import
 
 class Pengaduan extends Model
 {
     use HasFactory;
-
     protected $guarded = [];
 
+    // Konstanta status pengaduan baru (sesuai migrasi Tahap A)
     public const STATUS_DITERIMA = 'Diterima';
     public const STATUS_DIVERIFIKASI_JF = 'Diverifikasi JF';
     public const STATUS_DIPROSES = 'Diproses';

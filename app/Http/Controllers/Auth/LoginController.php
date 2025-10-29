@@ -38,7 +38,7 @@ class LoginController extends Controller
     /** POST /login */
    public function authenticate(Request $request)
     {
-        // ✅ Validasi form (tetap sama)
+        // Validasi form (tetap sama)
         $request->validate([
             'login'    => ['required', 'string'],
             'password' => ['required', 'string'],
@@ -77,12 +77,9 @@ class LoginController extends Controller
 
                 $user = Auth::user(); // Dapatkan user yang login
 
-                // ==========================================================
-                // === PERUBAHAN UTAMA ADA DI SINI ===
-                // ==========================================================
-                // Kita ganti pengecekan $user->role === 'admin'
-                // dengan fungsi helper isAdmin() dari Model User.
-                if ($user->isAdmin()) { // Mengecek (Staff, JF PSU, Kabid, Kadis)
+                // === PERBAIKAN LOGIKA REDIRECT ===
+                // Gunakan fungsi isAdmin() dari Model User
+                if ($user->isAdmin()) { // Mengecek (admin, Staff, JF PSU, Kabid, Kadis)
                     try {
                         return redirect()->route('filament.admin.pages.dashboard'); // Arahkan ke dashboard Filament
                     } catch (\Throwable $e) {
