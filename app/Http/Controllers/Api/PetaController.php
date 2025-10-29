@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api; // <-- Pastikan namespace benar
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Controller; // <-- Pastikan use statement benar
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB; // <-- Pastikan use statement benar
+use Illuminate\Support\Facades\Log; // Optional: Untuk logging error
 
 class PetaController extends Controller
 {
@@ -13,13 +14,14 @@ class PetaController extends Controller
      */
     public function kompleks(Request $request)
     {
-        // Kode ini mengambil data 'kompleks' dan sudah benar
-        $dataPerumahan = DB::table('kompleks')
+        // Mengambil data komplek & menggabungkannya (JOIN) dengan kelurahan dan kecamatan
+        $dataPerumahan = DB::table('kompleks') // Tabel 'kompleks'
             ->join('kelurahans', 'kompleks.kelurahan_id', '=', 'kelurahans.id')
             ->join('kecamatans', 'kelurahans.kecamatan_id', '=', 'kecamatans.id')
             ->select(
                 'kompleks.id',
                 'kompleks.nama_komplek',
+                'kompleks.pengembang', // Ambil kolom pengembang
                 'kompleks.latitude',
                 'kompleks.longitude',
                 'kelurahans.nama_kelurahan',
@@ -29,6 +31,7 @@ class PetaController extends Controller
             ->whereNotNull('kompleks.longitude')
             ->get();
 
+        // Mengubah data menjadi format GeoJSON
         $features = [];
         foreach ($dataPerumahan as $row) {
             $features[] = [
@@ -38,8 +41,10 @@ class PetaController extends Controller
                     'coordinates' => [(float)$row->longitude, (float)$row->latitude]
                 ],
                 'properties' => [
+                    // Data untuk popup Kompleks
                     'id' => $row->id,
-                    'nama' => $row->nama_komplek,
+                    'nama_perumahan' => $row->nama_komplek,
+                    'nama_pengembang' => $row->pengembang ?? 'Tidak Diketahui', // Tampilkan pengembang
                     'kelurahan' => $row->nama_kelurahan,
                     'kecamatan' => $row->nama_kecamatan,
                 ]
@@ -50,42 +55,90 @@ class PetaController extends Controller
 
     /**
      * API untuk data poligon kecamatan (Area)
-     * INI ADALAH FUNGSI YANG HARUS DIPERBAIKI
      */
     public function kecamatan(Request $request)
     {
-        // 1. Ambil SEMUA kecamatan yang memiliki data poligon
-        $dataKecamatan = DB::table('kecamatans') 
-                           ->whereNotNull('geojson_data')
-                           ->get(); 
+        // Mengambil data poligon dari tabel 'kecamatans'
+        $dataKecamatan = DB::table('kecamatans')
+                           ->whereNotNull('geojson_data') // Hanya ambil yg ada data poligonnya
+                           ->get();
 
-        $features = []; // Buat array kosong untuk "features"
-
-        // 2. Looping setiap kecamatan
+        $features = [];
         foreach ($dataKecamatan as $row) {
-            
+
             $geometry = null;
             try {
                 // Decode string JSON dari database menjadi objek
                 $geometry = json_decode(trim($row->geojson_data), false, 512, JSON_THROW_ON_ERROR);
             } catch (\JsonException $e) {
-                // Abaikan jika data JSON-nya rusak
+                Log::error("Gagal decode GeoJSON Kecamatan ID {$row->id}: " . $e->getMessage()); // Opsional
             }
 
-            // 3. Jika datanya valid, "bungkus" ke dalam format "Feature"
+            // Jika datanya valid, "bungkus" ke dalam format "Feature"
             if ($geometry) {
                 $features[] = [
-                    'type' => 'Feature', // <-- Ini adalah "Feature"
-                    'geometry' => $geometry, // <-- Ini data poligon Anda
-                    'properties' => [ // <-- Ini data pendukungnya
+                    'type' => 'Feature',
+                    'geometry' => $geometry,
+                    'properties' => [
                         'nama' => $row->nama_kecamatan,
                         'warna' => $row->warna
                     ]
                 ];
             }
         }
-        
-        // 4. "Bungkus" semua "Feature" ke dalam "FeatureCollection"
+        return response()->json(['type' => 'FeatureCollection', 'features' => $features]);
+    }
+
+    /**
+     * API untuk data poligon kelurahan (Area)
+     */
+    public function kelurahan(Request $request)
+    {
+        // Ambil data kelurahan, gabungkan dengan kecamatan
+        // Pastikan tabel kelurahans memiliki kolom sumber, shape_leng, shape_area
+        $dataKelurahan = DB::table('kelurahans')
+                           ->join('kecamatans', 'kelurahans.kecamatan_id', '=', 'kecamatans.id')
+                           ->select(
+                               'kelurahans.id',
+                               'kelurahans.nama_kelurahan',
+                               'kelurahans.geojson_data', // Data poligon
+                               'kecamatans.nama_kecamatan', // Nama kecamatan induk
+                               // Asumsi kolom ini ada di tabel kelurahans:
+                               DB::raw("'BANJARMASIN' as kabupaten"), // Jika selalu Banjarmasin
+                               'kelurahans.sumber',         // Sesuaikan nama kolom jika beda
+                               'kelurahans.shape_leng',     // Sesuaikan nama kolom jika beda
+                               'kelurahans.shape_area'      // Sesuaikan nama kolom jika beda
+                           )
+                           ->whereNotNull('kelurahans.geojson_data') // Hanya ambil yg ada poligonnya
+                           ->get();
+
+        $features = [];
+        foreach ($dataKelurahan as $row) {
+            $geometry = null;
+            try {
+                // Decode string JSON dari database
+                $geometry = json_decode(trim($row->geojson_data), false, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                Log::error("Gagal decode GeoJSON Kelurahan ID {$row->id}: " . $e->getMessage()); // Opsional
+            }
+
+            if ($geometry) {
+                $features[] = [
+                    'type' => 'Feature',
+                    'geometry' => $geometry,
+                    'properties' => [
+                        // Sesuaikan nama properti agar cocok dengan popup Anda
+                        'id' => $row->id,
+                        'kabupaten' => $row->kabupaten ?? 'BANJARMASIN',
+                        'kecamatan' => $row->nama_kecamatan,
+                        'desa' => $row->nama_kelurahan, // Menggunakan nama_kelurahan
+                        'sumber' => $row->sumber ?? 'N/A',
+                        'shape_leng' => round($row->shape_leng ?? 0, 8), // Format angka
+                        'shape_area' => round($row->shape_area ?? 0, 8)  // Format angka
+                    ]
+                ];
+            }
+        }
         return response()->json(['type' => 'FeatureCollection', 'features' => $features]);
     }
 }
