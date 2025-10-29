@@ -12,6 +12,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class KelurahanResource extends Resource
 {
@@ -77,4 +80,16 @@ class KelurahanResource extends Resource
             'edit' => Pages\EditKelurahan::route('/{record}/edit'),
         ];
     }
+
+    public static function canCreate(): bool
+{ return Auth::user()->isSuperAdmin(); }
+
+public static function canEdit(Model $record): bool
+{ return Auth::user()->isSuperAdmin(); }
+
+public static function canDelete(Model $record): bool
+{ return Auth::user()->isSuperAdmin(); }
+
+public static function canDeleteAny(): bool
+{ return Auth::user()->isSuperAdmin(); }
 }

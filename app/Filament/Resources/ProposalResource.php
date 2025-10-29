@@ -22,16 +22,16 @@ class ProposalResource extends Resource
     protected static ?int $navigationSort = 2;
 
     // Helper function untuk cek hak ubah status
-    private static function canUpdateStatus(User $user, ?string $currentStatus): bool
+private static function canUpdateStatus(User $user, ?string $currentStatus): bool
     {
-        if (!$currentStatus) return false; // Tidak bisa update jika status kosong
+        if (!$currentStatus) return false;
         if ($user->isSuperAdmin()) return true; // Super admin bisa kapan saja
 
         return match ($currentStatus) {
             Proposal::STATUS_DIAJUKAN => $user->isStaff() || $user->isJfPsu(),
             Proposal::STATUS_DIVERIFIKASI_JF => $user->isJfPsu() || $user->isKabid(),
             Proposal::STATUS_DISETUJUI_KABID => $user->isKabid() || $user->isKadis(),
-            default => false, // Status final (Ditolak, Disetujui Kadis)
+            default => false,
         };
     }
     
@@ -139,13 +139,15 @@ class ProposalResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                // PERUBAHAN: Tombol Delete hanya terlihat oleh Super Admin
                 Tables\Actions\DeleteAction::make()
-                    ->visible(fn (User $user) => self::canDeleteAccess($user)),
+                    ->visible(fn (User $user) => $user->isSuperAdmin()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    // PERUBAHAN: Tombol Bulk Delete hanya terlihat oleh Super Admin
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn (User $user) => self::canDeleteAccess($user)),
+                        ->visible(fn (User $user) => $user->isSuperAdmin()),
                 ]),
             ]);
     }
@@ -160,23 +162,18 @@ class ProposalResource extends Resource
     
     public static function canCreate(): bool { return false; }
 
+// PERUBAHAN: Hanya Super Admin yang bisa menghapus
     public static function canDelete(Model $record): bool
-    { return self::canDeleteAccess(Auth::user()); }
+    { return Auth::user()->isSuperAdmin(); }
     
     public static function canDeleteAny(): bool
-    { return self::canDeleteAccess(Auth::user()); }
+    { return Auth::user()->isSuperAdmin(); }
     
-    // Nonaktifkan 'edit' untuk Staff
+    // PERUBAHAN: Edit tetap bisa, sesuai logika status
     public static function canEdit(Model $record): bool
     {
         /** @var User $user */
         $user = Auth::user();
-        if ($user->isSuperAdmin()) return true;
-        if ($user->isStaff()) {
-            // Staff hanya bisa edit jika statusnya 'Diajukan' (untuk menolak)
-            return $record->status === Proposal::STATUS_DIAJUKAN;
-        }
-        // Role lain bisa edit
-        return $user->isJfPsu() || $user->isKabid() || $user->isKadis();
+        return self::canUpdateStatus($user, $record->status);
     }
 }

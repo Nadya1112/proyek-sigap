@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UserResource\RelationManagers;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class UserResource extends Resource
 {
@@ -95,4 +97,16 @@ class UserResource extends Resource
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
+
+    public static function canCreate(): bool
+{ return Auth::user()->isSuperAdmin(); }
+
+public static function canEdit(Model $record): bool
+{ return Auth::user()->isSuperAdmin(); }
+
+public static function canDelete(Model $record): bool
+{ return Auth::user()->isSuperAdmin(); }
+
+public static function canDeleteAny(): bool
+{ return Auth::user()->isSuperAdmin(); }
 }

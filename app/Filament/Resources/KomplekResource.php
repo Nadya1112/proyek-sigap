@@ -12,6 +12,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class KomplekResource extends Resource
 {
@@ -102,4 +105,16 @@ class KomplekResource extends Resource
             'edit' => Pages\EditKomplek::route('/{record}/edit'),
         ];
     }
+
+    public static function canCreate(): bool
+{ return Auth::user()->isSuperAdmin(); }
+
+public static function canEdit(Model $record): bool
+{ return Auth::user()->isSuperAdmin(); }
+
+public static function canDelete(Model $record): bool
+{ return Auth::user()->isSuperAdmin(); }
+
+public static function canDeleteAny(): bool
+{ return Auth::user()->isSuperAdmin(); }
 }

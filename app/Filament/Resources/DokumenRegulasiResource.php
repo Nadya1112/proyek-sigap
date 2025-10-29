@@ -3,12 +3,15 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DokumenRegulasiResource\Pages;
-use App\Models\Regulasi; // Gunakan model Regulasi dari database
+use App\Models\Regulasi;
+use App\Models\User; // Import User
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model; // Import Model
+use Illuminate\Support\Facades\Auth; // Import Auth
 use Illuminate\Support\Facades\Storage;
 
 class DokumenRegulasiResource extends Resource
@@ -23,29 +26,23 @@ class DokumenRegulasiResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('judul')
-                    ->required()
-                    ->maxLength(255)
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('tahun')
-                    ->numeric(),
+                Forms\Components\TextInput::make('judul')->required()->maxLength(255)->columnSpanFull(),
+                Forms\Components\TextInput::make('tahun')->numeric(),
                 Forms\Components\FileUpload::make('path')
                     ->label('File Dokumen')
                     ->required(fn (string $context): bool => $context === 'create')
-                    ->disk('public') // Simpan di disk 'public' (storage/app/public)
-                    ->directory('regulasi') // Simpan di dalam folder 'regulasi'
-                    ->storeFileNamesIn('nama_file_asli') // Simpan nama asli file
+                    ->disk('public')
+                    ->directory('regulasi')
+                    ->storeFileNamesIn('nama_file_asli')
                     ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
-                    ->maxSize(10240) // 10MB
-                    // Isi tipe dan ukuran file secara otomatis
+                    ->maxSize(10240)
                     ->afterStateUpdated(function ($state, callable $set) {
                         if ($state) {
                             $set('tipe_file', $state->getClientOriginalExtension());
-                            $set('ukuran_file', round($state->getSize() / 1024)); // Ukuran dalam KB
+                            $set('ukuran_file', round($state->getSize() / 1024));
                         }
                     })
                     ->columnSpanFull(),
-                
                 Forms\Components\Hidden::make('nama_file_asli'),
                 Forms\Components\Hidden::make('tipe_file'),
                 Forms\Components\Hidden::make('ukuran_file'),
@@ -60,20 +57,19 @@ class DokumenRegulasiResource extends Resource
                 Tables\Columns\TextColumn::make('tahun')->sortable(),
                 Tables\Columns\TextColumn::make('tipe_file')->label('Tipe')->badge(),
                 Tables\Columns\TextColumn::make('ukuran_file')->label('Ukuran (KB)')->numeric()->sortable(),
-                Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                // Tambahkan ViewAction untuk read-only
+                Tables\Actions\ViewAction::make(),
+                // Edit & Delete hanya untuk Super Admin
+                Tables\Actions\EditAction::make()
+                    ->visible(fn (User $user) => $user->isSuperAdmin()),
                 Tables\Actions\DeleteAction::make()
-                    ->after(function (Regulasi $record) {
-                        // Setelah record dihapus dari database, hapus juga filenya dari storage
-                        if ($record->path) {
-                            Storage::disk('public')->delete($record->path);
-                        }
-                    }),
+                    ->visible(fn (User $user) => $user->isSuperAdmin())
+                    ->after(function (Regulasi $record) { /* ... (logika hapus file) ... */ }),
                 Tables\Actions\Action::make('unduh')
                     ->label('Unduh')
                     ->icon('heroicon-o-arrow-down-tray')
@@ -81,18 +77,30 @@ class DokumenRegulasiResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->visible(fn (User $user) => $user->isSuperAdmin()),
                 ]),
             ]);
     }
     
-    public static function getPages(): array
+   public static function getPages(): array
     {
-        // Hubungkan ke halaman standar Filament
         return [
             'index' => Pages\ListDokumenRegulasis::route('/'),
             'create' => Pages\CreateDokumenRegulasi::route('/create'),
             'edit' => Pages\EditDokumenRegulasi::route('/{record}/edit'),
         ];
     }
+// --- PENERAPAN HAK AKSES READ-ONLY ---
+    public static function canCreate(): bool
+    { return Auth::user()->isSuperAdmin(); }
+
+    public static function canEdit(Model $record): bool
+    { return Auth::user()->isSuperAdmin(); }
+
+    public static function canDelete(Model $record): bool
+    { return Auth::user()->isSuperAdmin(); }
+
+    public static function canDeleteAny(): bool
+    { return Auth::user()->isSuperAdmin(); }
 }

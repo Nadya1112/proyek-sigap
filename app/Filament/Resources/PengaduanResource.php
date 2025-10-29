@@ -10,8 +10,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Model; // Import Model
-use Illuminate\Support\Facades\Auth; // Import Auth
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class PengaduanResource extends Resource
 {
@@ -29,7 +29,7 @@ class PengaduanResource extends Resource
             Pengaduan::STATUS_DITERIMA => $user->isStaff() || $user->isJfPsu(),
             Pengaduan::STATUS_DIVERIFIKASI_JF => $user->isJfPsu(),
             Pengaduan::STATUS_DIPROSES => $user->isJfPsu(),
-            default => false, // Status final (Selesai/Ditolak)
+            default => false,
         };
     }
     
@@ -124,15 +124,17 @@ class PengaduanResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->label('Tanggal Masuk'),
             ])
-            ->actions([
+           ->actions([
                 Tables\Actions\EditAction::make(),
+                // PERUBAHAN: Tombol Delete hanya terlihat oleh Super Admin
                 Tables\Actions\DeleteAction::make()
-                    ->visible(fn (User $user) => self::canDeleteAccess($user)),
+                    ->visible(fn (User $user) => $user->isSuperAdmin()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    // PERUBAHAN: Tombol Bulk Delete hanya terlihat oleh Super Admin
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn (User $user) => self::canDeleteAccess($user)),
+                        ->visible(fn (User $user) => $user->isSuperAdmin()),
                 ]),
             ]);
     }
@@ -147,21 +149,18 @@ class PengaduanResource extends Resource
     
     public static function canCreate(): bool { return false; }
     
+   // PERUBAHAN: Hanya Super Admin yang bisa menghapus
     public static function canDelete(Model $record): bool
-    { return self::canDeleteAccess(Auth::user()); }
+    { return Auth::user()->isSuperAdmin(); }
     
     public static function canDeleteAny(): bool
-    { return self::canDeleteAccess(Auth::user()); }
+    { return Auth::user()->isSuperAdmin(); }
     
-    // Nonaktifkan 'edit' untuk Staff
+    // PERUBAHAN: Edit tetap bisa, sesuai logika status
     public static function canEdit(Model $record): bool
     {
         /** @var User $user */
         $user = Auth::user();
-        if ($user->isSuperAdmin()) return true;
-        if ($user->isStaff()) {
-            return $record->status === Pengaduan::STATUS_DITERIMA;
-        }
-        return $user->isJfPsu();
+        return self::canUpdateStatus($user, $record->status);
     }
 }

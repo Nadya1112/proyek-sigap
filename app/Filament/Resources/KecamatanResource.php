@@ -10,6 +10,9 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class KecamatanResource extends Resource
 {
@@ -67,4 +70,17 @@ class KecamatanResource extends Resource
             'edit' => Pages\EditKecamatan::route('/{record}/edit'),
         ];
     }
+
+public static function canCreate(): bool
+{ return Auth::user()->isSuperAdmin(); }
+
+public static function canEdit(Model $record): bool
+{ return Auth::user()->isSuperAdmin(); }
+
+public static function canDelete(Model $record): bool
+{ return Auth::user()->isSuperAdmin(); }
+
+public static function canDeleteAny(): bool
+{ return Auth::user()->isSuperAdmin(); }
+
 }

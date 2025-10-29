@@ -13,14 +13,14 @@ class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable;
 
-    // Definisikan konstanta role baru Anda
-    public const ROLE_ADMIN = 'admin'; // Super Admin
+    // Definisikan semua konstanta role
+    public const ROLE_ADMIN = 'admin'; // Role Super Admin
     public const ROLE_STAFF = 'Staff';
     public const ROLE_JF_PSU = 'JF PSU';
     public const ROLE_KABID = 'Kabid';
     public const ROLE_KADIS = 'Kadis';
     public const ROLE_PENGGUNA = 'pengguna';
-
+    
     protected $fillable = [
         'name',
         'email',
@@ -30,7 +30,7 @@ class User extends Authenticatable implements FilamentUser
         'verification_code',
         'verification_expires_at',
         'email_verified_at',
-        'google_id', // Pastikan google_id ada di sini
+        'google_id',
     ];
 
     protected $hidden = [
@@ -72,7 +72,6 @@ class User extends Authenticatable implements FilamentUser
     public function isKabid(): bool { return $this->role === self::ROLE_KABID; }
     public function isKadis(): bool { return $this->role === self::ROLE_KADIS; }
     
-    // Fungsi umum untuk semua admin (termasuk super admin)
     public function isAdmin(): bool 
     {
         return $this->canAccessPanel(new Panel());
