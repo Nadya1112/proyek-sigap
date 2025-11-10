@@ -24,12 +24,12 @@ class ListKompleks extends ListRecords
                 ->uniqueField('nomor')
                 ->handleBlankRows(true) // lewati baris kosong
                 ->fields([
-                    ImportField::make('nomor')->label('Nomor')->required(),
+                    ImportField::make(name: 'kelurahan_id')->label('Kelurahan')->required(),
                     ImportField::make('nama_komplek')->label('Nama Komplek Perumahan')->required(),
-                    ImportField::make('kelurahan_nama')->label('Kelurahan')->required(),
-                    ImportField::make('kecamatan_nama')->label('Kecamatan')->required(),
-                    ImportField::make('status_aset')->label('Status Aset')->required(),
                     ImportField::make('jumlah_sertifikat')->label('Jumlah Sertifikat')->rules(['numeric','nullable']),
+                    ImportField::make('status_aset')->label('Status Aset')->required(),
+                    ImportField::make(name: 'latitude')->label(label: 'latitude')->required(),
+                    ImportField::make(name: 'longitude')->label(label: 'longitude')->required(),
                     // optional: ImportField::make('alamat'), ImportField::make('foto_komplek')
                 ])
                 ->mutateBeforeCreate(function(array $row){

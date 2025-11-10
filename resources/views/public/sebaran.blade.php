@@ -99,11 +99,12 @@
         const kompleksLayerGroup = L.layerGroup(); // Layer group untuk pin biru
         let allKelurahanLayer = null;
         let displayedKelurahanLayer = null;
+        
+        // HAPUS ATAU BIARKAN VARIABEL LAMA INI (tidak akan terpakai di 'handleKecamatanClick' lagi)
         const kelurahanStyle = { weight: 2, color: '#E6DB6A', dashArray: '', fillColor: '#E6DB6A', fillOpacity: 0.6 };
 
         // 3. Muat Data KECAMATAN (API + Popup Kustom + Klik)
         fetch('/api/kecamatan')
-            /* ... (kode fetch kecamatan sama seperti sebelumnya) ... */
             .then(response => response.json())
             .then(data => {
                 if (data && data.features) {
@@ -116,6 +117,7 @@
                                 const kecProps = feature.properties;
                                 const kecPopupContent = `<div style="font-family: sans-serif; min-width: 250px;"><div class="custom-popup-title">Layer Properties</div><div class="custom-popup-info"><strong>Kecamatan:</strong> ${kecProps.nama || 'Tidak Diketahui'}</div></div>`;
                                 layer.bindPopup(kecPopupContent);
+                                // Penting: 'layer' di sini adalah 'layerKecamatan' yang akan dikirim ke fungsi
                                 layer.on('click', function(e) { handleKecamatanClick(kecProps.nama, layer); });
                             }
                         }).addTo(layerGroup);
@@ -128,7 +130,6 @@
 
         // 4. Muat Data KELURAHAN (API + Popup Kustom)
         fetch('/api/kelurahan')
-             /* ... (kode fetch kelurahan sama seperti sebelumnya) ... */
              .then(response => response.json())
              .then(data => {
                  if (data && data.features) {
@@ -156,7 +157,7 @@
              .catch(error => console.error('Error fetching data kelurahan:', error));
 
 
-        // 5. Muat Data KOMPLEKS (API + Popup Kustom) - Tapi JANGAN langsung ditambahkan ke Peta
+        // 5. Muat Data KOMPLEKS (API + Popup Kustom)
         fetch('/api/kompleks')
             .then(response => response.json())
             .then(data => {
@@ -170,64 +171,92 @@
                                 layer.bindPopup(popupContent, { offset: [0, -10] });
                             }
                         }
-                    }).addTo(kompleksLayerGroup); // Penting: Hanya tambahkan ke group, BUKAN ke map
+                    }).addTo(kompleksLayerGroup);
                     console.log("Data Kompleks berhasil dimuat ke layer group.");
 
-                    // --- PENYESUAIAN ---
-                    // Pastikan layer tidak tampil jika checkbox tidak dicentang saat load
                     if (!document.getElementById('kompleks-checkbox').checked) {
                         if (map.hasLayer(kompleksLayerGroup)) {
                              map.removeLayer(kompleksLayerGroup);
                         }
                     }
-                    // --- AKHIR PENYESUAIAN ---
-
                 } else { console.error("Data kompleks tidak valid:", data); }
             })
             .catch(error => console.error('Error fetching data kompleks:', error));
 
-        // --- FUNGSI UNTUK MENANGANI KLIK KECAMATAN ---
+        
+        // --- (PERBAIKAN FINAL ADA DI FUNGSI INI) ---
+        // Fungsi 'handleKecamatanClick' yang sudah diperbarui
         function handleKecamatanClick(namaKecamatanDiKlik, layerKecamatan) {
-            /* ... (kode handleKecamatanClick sama seperti sebelumnya) ... */
-             if (displayedKelurahanLayer && map.hasLayer(displayedKelurahanLayer)) { map.removeLayer(displayedKelurahanLayer); }
+            // Sembunyikan layer kelurahan lama (jika ada)
+            if (displayedKelurahanLayer && map.hasLayer(displayedKelurahanLayer)) { map.removeLayer(displayedKelurahanLayer); }
+            
+            // Pastikan data kelurahan sudah dimuat
             if (!allKelurahanLayer) { alert("Data kelurahan belum siap."); return; }
 
+            // 1. Ambil 'warna' dari layer kecamatan yang baru saja Anda klik
+            //    Warna ini (misal: #016B61) didapat dari 'feature.properties.warna'
+            const kecamatanWarna = layerKecamatan.feature.properties.warna;
+
+            // 2. Buat sebuah style baru untuk kelurahan, berdasarkan warna kecamatan
+            //    Kita buat sedikit transparan (fillOpacity 0.4)
+            const styleKelurahanBaru = {
+                weight: 2,
+                color: kecamatanWarna,     // Gunakan warna dari kecamatan
+                dashArray: '5',            // Garis putus-putus
+                fillColor: kecamatanWarna, // Gunakan warna dari kecamatan
+                fillOpacity: 0.4         // Dibuat lebih transparan
+            };
+
+            // Buat layer group baru untuk menampung kelurahan
             displayedKelurahanLayer = L.layerGroup();
+            
+            // Loop semua kelurahan yang ada
             allKelurahanLayer.eachLayer(function(layer) {
+                // Jika nama kecamatan di kelurahan ini = nama kecamatan yang diklik
                 if (layer.feature.properties.kecamatan === namaKecamatanDiKlik) {
-                    let highlighted = L.geoJSON(layer.feature, { style: kelurahanStyle });
+                    
+                    // 3. Gunakan 'styleKelurahanBaru' (yang sudah ada warnanya)
+                    let highlighted = L.geoJSON(layer.feature, { style: styleKelurahanBaru }); 
+
+                    // Salin popup-nya
                     if (layer.getPopup()) {
                         highlighted.bindPopup(layer.getPopup().getContent());
                     }
+                    
+                    // Tambahkan ke layer group
                     highlighted.addTo(displayedKelurahanLayer);
                 }
             });
 
-            if (displayedKelurahanLayer.getLayers().length > 0) displayedKelurahanLayer.addTo(map);
-            else { console.log("Tidak ada kelurahan untuk:", namaKecamatanDiKlik); displayedKelurahanLayer = null; }
+            // Tampilkan layer group baru (yang berisi kelurahan berwarna) ke peta
+            if (displayedKelurahanLayer.getLayers().length > 0) {
+                displayedKelurahanLayer.addTo(map);
+            } else { 
+                console.log("Tidak ada kelurahan untuk:", namaKecamatanDiKlik); 
+                displayedKelurahanLayer = null; 
+            }
         }
-        // ----------------------------------------------
+        // --- (BATAS FUNGSI PERBAIKAN) ---
+
 
         // Sembunyikan kelurahan jika klik di luar fitur
          map.on('click', function(e){
-             /* ... (kode map.on('click') sama seperti sebelumnya) ... */
              if (displayedKelurahanLayer && map.hasLayer(displayedKelurahanLayer)) {
-                   let clickedOnFeature = false;
-                   displayedKelurahanLayer.eachLayer(layer => { if (e.originalEvent.target === layer._path) clickedOnFeature = true; });
-                   Object.values(kecamatanLayerGroups).forEach(group => { if(map.hasLayer(group)) { group.eachLayer(layer => { if (e.originalEvent.target === layer._path) clickedOnFeature = true; }); } });
-                   if (!clickedOnFeature) { map.removeLayer(displayedKelurahanLayer); displayedKelurahanLayer = null; }
-               }
-         });
+                 let clickedOnFeature = false;
+                 displayedKelurahanLayer.eachLayer(layer => { if (e.originalEvent.target === layer._path) clickedOnFeature = true; });
+                 Object.values(kecamatanLayerGroups).forEach(group => { if(map.hasLayer(group)) { group.eachLayer(layer => { if (e.originalEvent.target === layer._path) clickedOnFeature = true; }); } });
+                 if (!clickedOnFeature) { map.removeLayer(displayedKelurahanLayer); displayedKelurahanLayer = null; }
+             }
+        });
 
         // 6. Tombol Pengaturan & Fungsikan Panel
         L.Control.Settings = L.Control.extend({
-            /* ... (kode control settings sama seperti sebelumnya) ... */
              onAdd: (map) => {
-                const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-settings');
-                container.innerHTML = `<a href="#" title="Pengaturan Layer" role="button"><i class="fa-solid fa-layer-group"></i></a>`;
-                L.DomEvent.disableClickPropagation(container).on(container, 'click', () => { document.getElementById('pengaturan-panel').style.display = 'block'; });
-                return container;
-            }
+                 const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-settings');
+                 container.innerHTML = `<a href="#" title="Pengaturan Layer" role="button"><i class="fa-solid fa-layer-group"></i></a>`;
+                 L.DomEvent.disableClickPropagation(container).on(container, 'click', () => { document.getElementById('pengaturan-panel').style.display = 'block'; });
+                 return container;
+             }
         });
         new L.Control.Settings({ position: 'topright' }).addTo(map);
 
@@ -235,17 +264,16 @@
         document.getElementById('panel-close-btn').addEventListener('click', () => { panel.style.display = 'none'; });
 
         document.getElementById('kecamatan-filter-list').addEventListener('change', function(e) {
-             /* ... (kode event listener kecamatan sama seperti sebelumnya) ... */
-              if (e.target && e.target.matches('.kecamatan-checkbox')) {
-                const cb = e.target, name = cb.value, group = kecamatanLayerGroups[name];
-                if (group) {
-                    if (cb.checked) map.addLayer(group);
-                    else {
+             if (e.target && e.target.matches('.kecamatan-checkbox')) {
+                 const cb = e.target, name = cb.value, group = kecamatanLayerGroups[name];
+                 if (group) {
+                     if (cb.checked) map.addLayer(group);
+                     else {
                          map.removeLayer(group);
                          if (displayedKelurahanLayer && map.hasLayer(displayedKelurahanLayer)) { map.removeLayer(displayedKelurahanLayer); displayedKelurahanLayer = null; }
-                    }
-                }
-            }
+                     }
+                 }
+             }
         });
 
         // Event listener untuk checkbox kompleks (TETAP ADA)
