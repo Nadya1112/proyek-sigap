@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\HttpRequest;
+use Illuminate\Http\Request; // <-- PERBAIKAN: Seharusnya 'Http\Request'
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PetaController; // Pastikan ini ada
 
@@ -17,7 +17,7 @@ Route::get('/kompleks', [PetaController::class, 'kompleks']);
 Route::get('/kecamatan', [PetaController::class, 'kecamatan']);
 
 // Rute untuk mengambil data GeoJSON Kelurahan (Poligon)
-Route::get('/kelurahan', [PetaController::class, 'kelurahan']); // <-- TAMBAHKAN INI
+Route::get('/kelurahan', [PetaController::class, 'kelurahan']);
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

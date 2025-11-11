@@ -14,6 +14,11 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
+// Import komponen form yang baru
+use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\CodeEditor; // Lebih baik untuk JSON
+
 class KecamatanResource extends Resource
 {
     protected static ?string $model = Kecamatan::class;
@@ -29,7 +34,20 @@ class KecamatanResource extends Resource
                 Forms\Components\TextInput::make('nama_kecamatan')
                     ->label('Nama Kecamatan')
                     ->required()
-                    ->unique(ignoreRecord: true),
+                    ->unique(ignoreRecord: true)
+                    ->columnSpanFull(), // Buat field ini jadi lebar penuh
+                
+                // --- FIELD WARNA ---
+                ColorPicker::make('warna')
+                    ->label('Warna Wilayah')
+                    ->required(),
+
+                // --- FIELD GEOMETRI ---
+                CodeEditor::make('geometri')
+                    ->label('Data Geometri (GeoJSON)')
+                    ->json() // Memberi tahu editor ini adalah format JSON
+                    ->required()
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -40,6 +58,15 @@ class KecamatanResource extends Resource
                 Tables\Columns\TextColumn::make('nama_kecamatan')
                     ->label('Nama Kecamatan')
                     ->searchable(),
+                
+                // --- TAMPILKAN WARNA DI TABEL ---
+                Tables\Columns\ColorColumn::make('warna')
+                    ->label('Warna'),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
@@ -54,7 +81,6 @@ class KecamatanResource extends Resource
                 ]),
             ]);
     }
-
     public static function getRelations(): array
     {
         return [
@@ -71,16 +97,16 @@ class KecamatanResource extends Resource
         ];
     }
 
-public static function canCreate(): bool
-{ return Auth::user()->isSuperAdmin(); }
+    public static function canCreate(): bool
+    { return Auth::user()->isSuperAdmin(); }
 
-public static function canEdit(Model $record): bool
-{ return Auth::user()->isSuperAdmin(); }
+    public static function canEdit(Model $record): bool
+    { return Auth::user()->isSuperAdmin(); }
 
-public static function canDelete(Model $record): bool
-{ return Auth::user()->isSuperAdmin(); }
+    public static function canDelete(Model $record): bool
+    { return Auth::user()->isSuperAdmin(); }
 
-public static function canDeleteAny(): bool
-{ return Auth::user()->isSuperAdmin(); }
+    public static function canDeleteAny(): bool
+    { return Auth::user()->isSuperAdmin(); }
 
-}
+} // <-- Ini adalah kurung kurawal penutup untuk 'class KecamatanResource'

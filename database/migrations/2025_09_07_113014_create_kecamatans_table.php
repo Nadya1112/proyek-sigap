@@ -12,10 +12,10 @@ return new class extends Migration
             $table->id();
             $table->string('nama_kecamatan')->unique();
             $table->string('warna')->nullable();
+            $table->json('geometri'); // Kolom untuk menyimpan data GeoJSON polygon
             $table->timestamps();
         });
     }
-
     public function down(): void
     {
         Schema::dropIfExists('kecamatans');

@@ -1,17 +1,26 @@
 <?php
 
-namespace App\Http\Controllers\Api; // <-- Pastikan namespace benar
+namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller; // <-- Pastikan use statement benar
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // <-- Pastikan use statement benar
-use Illuminate\Support\Facades\Log; // Optional: Untuk logging error
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Models\Kecamatan; // <-- Pastikan Anda sudah punya model ini (jalankan `php artisan make:model Kecamatan` jika belum)
 
 class PetaController extends Controller
 {
     /**
+     * FUNGSI BARU: Untuk menampilkan halaman peta (peta.blade.php)
+     */
+    public function tampilkanPeta()
+    {
+        return view('peta');
+    }
+
+    /**
      * API untuk sebaran komplek perumahan (Titik/Point)
-     * PERBAIKAN: Menghapus 'kompleks.pengembang' dari query
+     * (Ini adalah kode Anda yang sudah ada, sudah bagus)
      */
     public function kompleks(Request $request)
     {
@@ -22,7 +31,6 @@ class PetaController extends Controller
                 ->select(
                     'kompleks.id',
                     'kompleks.nama_komplek',
-                    // 'kompleks.pengembang', // <-- DIHAPUS, ini yang menyebabkan error 500
                     'kompleks.latitude',
                     'kompleks.longitude',
                     'kelurahans.nama_kelurahan',
@@ -43,7 +51,7 @@ class PetaController extends Controller
                     'properties' => [
                         'id' => $row->id,
                         'nama_perumahan' => $row->nama_komplek,
-                        'nama_pengembang' => 'Tidak Diketahui', // <-- Di-hardcode karena kolom tidak ada
+                        'nama_pengembang' => 'Tidak Diketahui', // Hardcode
                         'kelurahan' => $row->nama_kelurahan,
                         'kecamatan' => $row->nama_kecamatan,
                     ]
@@ -59,23 +67,24 @@ class PetaController extends Controller
 
     /**
      * API untuk data poligon kecamatan (Area)
-     * PERBAIKAN: Mengganti 'geojson_data' menjadi 'polygon'.
+     * (Ini adalah kode Anda yang sudah ada, sudah bagus)
      */
     public function kecamatan(Request $request)
     {
         try {
+            // Pastikan nama kolom 'geometri' di tabel 'kecamatans' sudah benar
             $dataKecamatan = DB::table('kecamatans')
-                                ->whereNotNull('polygon') // <-- DIUBAH dari geojson_data
-                                ->get(); 
+                ->whereNotNull('geometri')
+                ->get();
 
             $features = [];
             foreach ($dataKecamatan as $row) {
                 $geometry = null;
                 try {
-                    $geometry = json_decode(trim($row->polygon), false, 512, JSON_THROW_ON_ERROR); // <-- DIUBAH dari geojson_data
+                    $geometry = json_decode(trim($row->geometri), false, 512, JSON_THROW_ON_ERROR);
                 } catch (\JsonException $e) {
-                    Log::error("Gagal decode GeoJSON Kecamatan ID {$row->id}: " . $e->getMessage()); 
-                    continue; // Lanjut ke data berikutnya jika 1 data rusak
+                    Log::error("Gagal decode GeoJSON Kecamatan ID {$row->id}: " . $e->getMessage());
+                    continue;
                 }
 
                 if ($geometry) {
@@ -84,7 +93,7 @@ class PetaController extends Controller
                         'geometry' => $geometry,
                         'properties' => [
                             'nama' => $row->nama_kecamatan,
-                            'warna' => $row->warna 
+                            'warna' => $row->warna
                         ]
                     ];
                 }
@@ -98,55 +107,65 @@ class PetaController extends Controller
     }
 
     /**
+     * FUNGSI LAMA (kelurahan) DIGANTI DENGAN YANG BARU INI:
+     *
      * API untuk data poligon kelurahan (Area)
-     * PERBAIKAN: Menghapus kolom 'sumber', 'shape_leng', 'shape_area'
+     * Versi baru ini mengambil data asli (geojson_data, shape_leng, dll)
+     * dan juga daftar kecamatan untuk filter.
      */
     public function kelurahan(Request $request)
     {
         try {
-            $dataKelurahan = DB::table('kelurahans')
-                                ->join('kecamatans', 'kelurahans.kecamatan_id', '=', 'kecamatans.id')
-                                ->select(
-                                    'kelurahans.id',
-                                    'kelurahans.nama_kelurahan',
-                                    'kelurahans.polygon', // <-- DIUBAH dari geojson_data
-                                    'kecamatans.nama_kecamatan', 
-                                    DB::raw("'BANJARMASIN' as kabupaten")
-                                    // Kolom-kolom ini dihapus untuk menghindari error
-                                    // 'kelurahans.sumber',
-                                    // 'kelurahans.shape_leng',
-                                    // 'kelurahans.shape_area'
-                                )
-                                ->whereNotNull('kelurahans.polygon') // <-- DIUBAH dari geojson_data
-                                ->get();
+            // 1. Ambil semua data kelurahan, JOIN dengan tabel kecamatans
+            $kelurahans = DB::table('kelurahans')
+                ->join('kecamatans', 'kelurahans.kecamatan_id', '=', 'kecamatans.id')
+                ->select(
+                    'kelurahans.*', // Ambil semua dari kelurahans
+                    'kecamatans.nama_kecamatan' // Ambil nama_kecamatan
+                )
+                ->whereNotNull('kelurahans.geojson_data') // <-- Menggunakan kolom baru kita
+                ->get();
 
-            $features = [];
-            foreach ($dataKelurahan as $row) {
-                $geometry = null;
+            // 2. Ambil juga daftar semua kecamatan (untuk filter di sidebar)
+            $kecamatans = DB::table('kecamatans')->select('id', 'nama_kecamatan')->get();
+
+            // 3. Ubah menjadi format GeoJSON FeatureCollection
+            $fitur = [];
+            foreach ($kelurahans as $data) {
+                $geometri = null;
                 try {
-                    $geometry = json_decode(trim($row->polygon), false, 512, JSON_THROW_ON_ERROR); // <-- DIUBAH dari geojson_data
+                    $geometri = json_decode(trim($data->geojson_data), false, 512, JSON_THROW_ON_ERROR); // <-- Menggunakan kolom baru kita
                 } catch (\JsonException $e) {
-                    Log::error("Gagal decode GeoJSON Kelurahan ID {$row->id}: " . $e->getMessage());
-                    continue; // Lanjut ke data berikutnya jika 1 data rusak
+                    Log::error("Gagal decode GeoJSON Kelurahan ID {$data->id}: " . $e->getMessage());
+                    continue;
                 }
 
-                if ($geometry) {
-                    $features[] = [
+                if ($geometri) {
+                    $fitur[] = [
                         'type' => 'Feature',
-                        'geometry' => $geometry,
+                        'geometry' => $geometri,
                         'properties' => [
-                            'id' => $row->id,
-                            'kabupaten' => $row->kabupaten ?? 'BANJARMASIN',
-                            'kecamatan' => $row->nama_kecamatan,
-                            'desa' => $row->nama_kelurahan,
-                            'sumber' => 'N/A', // <-- Dihardcode agar tidak error
-                            'shape_leng' => 0, // <-- Dihardcode agar tidak error
-                            'shape_area' => 0  // <-- Dihardcode agar tidak error
+                            'nama_kelurahan' => $data->nama_kelurahan,
+                            'sumber' => $data->sumber, // <-- Data asli
+                            'shape_leng' => $data->shape_leng, // <-- Data asli
+                            'shape_area' => $data->shape_area, // <-- Data asli
+                            'kecamatan_id' => $data->kecamatan_id, // <-- Penting untuk filter
+                            'nama_kecamatan' => $data->nama_kecamatan,
                         ]
                     ];
                 }
             }
-            return response()->json(['type' => 'FeatureCollection', 'features' => $features]);
+
+            $featureCollection = [
+                'type' => 'FeatureCollection',
+                'features' => $fitur
+            ];
+
+            // 4. Kembalikan data GeoJSON DAN daftar kecamatan
+            return response()->json([
+                'geojson' => $featureCollection,
+                'kecamatans' => $kecamatans
+            ]);
 
         } catch (\Exception $e) {
             Log::error("Error di API /api/kelurahan: " . $e->getMessage());

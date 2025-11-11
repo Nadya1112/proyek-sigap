@@ -128,33 +128,46 @@
             .catch(error => console.error('Error fetching data kecamatan:', error));
 
 
+        // ==================================================================
+        // ===            BLOK YANG DIPERBAIKI (START)                    ===
+        // ==================================================================
+        
         // 4. Muat Data KELURAHAN (API + Popup Kustom)
         fetch('/api/kelurahan')
              .then(response => response.json())
              .then(data => {
-                 if (data && data.features) {
-                     allKelurahanLayer = L.geoJSON(data, {
-                         onEachFeature: (feature, layer) => {
-                             const kelProps = feature.properties;
-                             const kelPopupContent = `
-                             <div style="font-family: sans-serif; min-width: 300px;">
-                                 <div class="custom-popup-title">Layer Properties</div>
-                                 <div class="custom-popup-info"><strong>kabupaten:</strong> ${kelProps.kabupaten || 'N/A'}</div>
-                                 <div class="custom-popup-info"><strong>kecamatan:</strong> ${kelProps.kecamatan || 'N/A'}</div>
-                                 <div class="custom-popup-info"><strong>desa:</strong> ${kelProps.desa || 'N/A'}</div>
-                                 <div class="custom-popup-info" style="line-height: 1.4;"><strong>sumber:</strong> ${kelProps.sumber || 'N/A'}</div>
-                                 <div class="custom-popup-button-div">
-                                     <button onclick="map.closePopup(); lihatDetailKelurahan(${kelProps.id})" class="custom-popup-button">Lihat Detail</button>
+                  // PERBAIKAN: Cek 'data.geojson' dan 'data.geojson.features'
+                  if (data && data.geojson && data.geojson.features) {
+                       
+                       // PERBAIKAN: Gunakan 'data.geojson' untuk membuat layer
+                       allKelurahanLayer = L.geoJSON(data.geojson, { 
+                            onEachFeature: (feature, layer) => {
+                                 const kelProps = feature.properties;
+                                 const kelPopupContent = `
+                                 <div style="font-family: sans-serif; min-width: 300px;">
+                                      <div class="custom-popup-title">Layer Properties</div>
+                                      <div class="custom-popup-info"><strong>kabupaten:</strong> ${kelProps.kabupaten || 'N/A'}</div>
+                                      <div class="custom-popup-info"><strong>kecamatan:</strong> ${kelProps.kecamatan || 'N/A'}</div>
+                                      <div class="custom-popup-info"><strong>desa:</strong> ${kelProps.desa || 'N/A'}</div>
+                                      <div class="custom-popup-info" style="line-height: 1.4;"><strong>sumber:</strong> ${kelProps.sumber || 'N/A'}</div>
+                                      <div class="custom-popup-button-div">
+                                           <button onclick="map.closePopup(); lihatDetailKelurahan(${kelProps.id})" class="custom-popup-button">Lihat Detail</button>
+                                      </div>
                                  </div>
-                             </div>
-                             `;
-                             layer.bindPopup(kelPopupContent);
-                         }
-                     });
-                     console.log("Data Kelurahan dari database berhasil dimuat.");
-                 } else { console.error("Data kelurahan dari API tidak valid."); }
+                                 `;
+                                 layer.bindPopup(kelPopupContent);
+                            }
+                       });
+                       console.log("Data Kelurahan dari database berhasil dimuat.");
+                  } else { 
+                       console.error("Data kelurahan dari API tidak valid.", data); // Tampilkan 'data' untuk debug
+                  }
              })
              .catch(error => console.error('Error fetching data kelurahan:', error));
+
+        // ==================================================================
+        // ===            BLOK YANG DIPERBAIKI (END)                      ===
+        // ==================================================================
 
 
         // 5. Muat Data KOMPLEKS (API + Popup Kustom)
@@ -176,7 +189,7 @@
 
                     if (!document.getElementById('kompleks-checkbox').checked) {
                         if (map.hasLayer(kompleksLayerGroup)) {
-                             map.removeLayer(kompleksLayerGroup);
+                            map.removeLayer(kompleksLayerGroup);
                         }
                     }
                 } else { console.error("Data kompleks tidak valid:", data); }
@@ -204,7 +217,7 @@
                 color: kecamatanWarna,     // Gunakan warna dari kecamatan
                 dashArray: '5',            // Garis putus-putus
                 fillColor: kecamatanWarna, // Gunakan warna dari kecamatan
-                fillOpacity: 0.4         // Dibuat lebih transparan
+                fillOpacity: 0.4           // Dibuat lebih transparan
             };
 
             // Buat layer group baru untuk menampung kelurahan
@@ -241,13 +254,13 @@
 
         // Sembunyikan kelurahan jika klik di luar fitur
          map.on('click', function(e){
-             if (displayedKelurahanLayer && map.hasLayer(displayedKelurahanLayer)) {
-                 let clickedOnFeature = false;
-                 displayedKelurahanLayer.eachLayer(layer => { if (e.originalEvent.target === layer._path) clickedOnFeature = true; });
-                 Object.values(kecamatanLayerGroups).forEach(group => { if(map.hasLayer(group)) { group.eachLayer(layer => { if (e.originalEvent.target === layer._path) clickedOnFeature = true; }); } });
-                 if (!clickedOnFeature) { map.removeLayer(displayedKelurahanLayer); displayedKelurahanLayer = null; }
-             }
-        });
+              if (displayedKelurahanLayer && map.hasLayer(displayedKelurahanLayer)) {
+                   let clickedOnFeature = false;
+                   displayedKelurahanLayer.eachLayer(layer => { if (e.originalEvent.target === layer._path) clickedOnFeature = true; });
+                   Object.values(kecamatanLayerGroups).forEach(group => { if(map.hasLayer(group)) { group.eachLayer(layer => { if (e.originalEvent.target === layer._path) clickedOnFeature = true; }); } });
+                   if (!clickedOnFeature) { map.removeLayer(displayedKelurahanLayer); displayedKelurahanLayer = null; }
+              }
+         });
 
         // 6. Tombol Pengaturan & Fungsikan Panel
         L.Control.Settings = L.Control.extend({
@@ -294,7 +307,7 @@
         
         // --- Fungsi untuk tombol "Lihat Detail" Kelurahan ---
         function lihatDetailKelurahan(idKelurahan) {
-            console.log("Lihat detail Kelurahan ID:", idKelurahan + " diklik.");
+            console.log("Liah detail Kelurahan ID:", idKelurahan + " diklik.");
             // window.location.href = '/detail-kelurahan/' + idKelurahan;
         }
 
