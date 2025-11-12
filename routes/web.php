@@ -16,6 +16,12 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegulasiController;
 use App\Http\Controllers\UserDashboardController;
 
+// --- PENAMBAHAN 1: IMPORT UNTUK SCRIPT ---
+// Ini diperlukan agar skrip impor di bawah bisa berjalan
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+// --- BATAS PENAMBAHAN 1 ---
+
 /*
 |--------------------------------------------------------------------------
 | Redirect root
@@ -126,5 +132,3 @@ Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])->
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->middleware('guest')->name('password.email');
 Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->middleware('guest')->name('password.reset');
 Route::post('/reset-password', [NewPasswordController::class, 'store'])->middleware('guest')->name('password.store');
-
-// PERBAIKAN: Hapus kurung kurawal ekstra di sini

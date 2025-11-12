@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\Kecamatan; // <-- Pastikan Anda sudah punya model ini (jalankan `php artisan make:model Kecamatan` jika belum)
+use App\Models\Kecamatan; 
 
 class PetaController extends Controller
 {
@@ -20,7 +20,7 @@ class PetaController extends Controller
 
     /**
      * API untuk sebaran komplek perumahan (Titik/Point)
-     * (Ini adalah kode Anda yang sudah ada, sudah bagus)
+     * PERBAIKAN FINAL: Menggunakan pembagi yang berbeda untuk Lat (10^9) dan Lng (10^7).
      */
     public function kompleks(Request $request)
     {
@@ -42,16 +42,24 @@ class PetaController extends Controller
 
             $features = [];
             foreach ($dataPerumahan as $row) {
+                // === PERBAIKAN KOORDINAT FINAL DIMULAI DI SINI ===
+                // Longitude (sekitar 114.xxx): Dibagi 10^7
+                $longitude = (float)$row->longitude / 10000000; 
+                // Latitude (sekitar -3.xxx): Dibagi 10^9
+                $latitude = (float)$row->latitude / 1000000000; 
+                // === PERBAIKAN KOORDINAT FINAL SELESAI DI SINI ===
+                
                 $features[] = [
                     'type' => 'Feature',
                     'geometry' => [
                         'type' => 'Point',
-                        'coordinates' => [(float)$row->longitude, (float)$row->latitude]
+                        // Urutan GeoJSON: [Longitude, Latitude]
+                        'coordinates' => [$longitude, $latitude] 
                     ],
                     'properties' => [
                         'id' => $row->id,
                         'nama_perumahan' => $row->nama_komplek,
-                        'nama_pengembang' => 'Tidak Diketahui', // Hardcode
+                        'nama_pengembang' => 'Tidak Diketahui', 
                         'kelurahan' => $row->nama_kelurahan,
                         'kecamatan' => $row->nama_kecamatan,
                     ]
@@ -67,12 +75,10 @@ class PetaController extends Controller
 
     /**
      * API untuk data poligon kecamatan (Area)
-     * (Ini adalah kode Anda yang sudah ada, sudah bagus)
      */
     public function kecamatan(Request $request)
     {
         try {
-            // Pastikan nama kolom 'geometri' di tabel 'kecamatans' sudah benar
             $dataKecamatan = DB::table('kecamatans')
                 ->whereNotNull('geometri')
                 ->get();
@@ -107,34 +113,27 @@ class PetaController extends Controller
     }
 
     /**
-     * FUNGSI LAMA (kelurahan) DIGANTI DENGAN YANG BARU INI:
-     *
      * API untuk data poligon kelurahan (Area)
-     * Versi baru ini mengambil data asli (geojson_data, shape_leng, dll)
-     * dan juga daftar kecamatan untuk filter.
      */
     public function kelurahan(Request $request)
     {
         try {
-            // 1. Ambil semua data kelurahan, JOIN dengan tabel kecamatans
             $kelurahans = DB::table('kelurahans')
                 ->join('kecamatans', 'kelurahans.kecamatan_id', '=', 'kecamatans.id')
                 ->select(
-                    'kelurahans.*', // Ambil semua dari kelurahans
-                    'kecamatans.nama_kecamatan' // Ambil nama_kecamatan
+                    'kelurahans.*', 
+                    'kecamatans.nama_kecamatan' 
                 )
-                ->whereNotNull('kelurahans.geojson_data') // <-- Menggunakan kolom baru kita
+                ->whereNotNull('kelurahans.geometri') 
                 ->get();
 
-            // 2. Ambil juga daftar semua kecamatan (untuk filter di sidebar)
             $kecamatans = DB::table('kecamatans')->select('id', 'nama_kecamatan')->get();
 
-            // 3. Ubah menjadi format GeoJSON FeatureCollection
             $fitur = [];
             foreach ($kelurahans as $data) {
                 $geometri = null;
                 try {
-                    $geometri = json_decode(trim($data->geojson_data), false, 512, JSON_THROW_ON_ERROR); // <-- Menggunakan kolom baru kita
+                    $geometri = json_decode(trim($data->geometri), false, 512, JSON_THROW_ON_ERROR); 
                 } catch (\JsonException $e) {
                     Log::error("Gagal decode GeoJSON Kelurahan ID {$data->id}: " . $e->getMessage());
                     continue;
@@ -145,11 +144,12 @@ class PetaController extends Controller
                         'type' => 'Feature',
                         'geometry' => $geometri,
                         'properties' => [
+                            'id' => $data->id, 
                             'nama_kelurahan' => $data->nama_kelurahan,
-                            'sumber' => $data->sumber, // <-- Data asli
-                            'shape_leng' => $data->shape_leng, // <-- Data asli
-                            'shape_area' => $data->shape_area, // <-- Data asli
-                            'kecamatan_id' => $data->kecamatan_id, // <-- Penting untuk filter
+                            'sumber' => $data->sumber, 
+                            'shape_leng' => $data->shape_leng, 
+                            'shape_area' => $data->shape_area, 
+                            'kecamatan_id' => $data->kecamatan_id, 
                             'nama_kecamatan' => $data->nama_kecamatan,
                         ]
                     ];
@@ -161,7 +161,6 @@ class PetaController extends Controller
                 'features' => $fitur
             ];
 
-            // 4. Kembalikan data GeoJSON DAN daftar kecamatan
             return response()->json([
                 'geojson' => $featureCollection,
                 'kecamatans' => $kecamatans
