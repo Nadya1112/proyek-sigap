@@ -33,8 +33,38 @@
             font-size: 1.4em; color: #333; width: 34px; height: 34px; line-height: 34px; text-align: center; background: #fff;
             border-radius: 4px; box-shadow: 0 1px 5px rgba(0,0,0,0.65); cursor: pointer;
         }
-        .leaflet-top.leaflet-left { top: 80px; }
-        .leaflet-control-zoom a { width: 28px; height: 28px; line-height: 28px; font-size: 18px; }
+        
+        /* Posisi kontrol Leaflet (zoom, dll) di bawah card kustom */
+        .leaflet-top.leaflet-left { top: 80px; } 
+        
+        /* === PERUBAHAN: MEMPERKECIL TOMBOL ZOOM === */
+        .leaflet-control-zoom a { 
+            width: 25px !important;       /* Diperkecil */
+            height: 25px !important;      /* Diperkecil */
+            line-height: 25px !important; /* Pusatkan ikon */
+            font-size: 16px !important;   /* Ukuran ikon +/- */
+        }
+        
+        /* === CSS BARU UNTUK CARD PETA - SEBARAN (GRADASI) === */
+        #map-header-card {
+            position: absolute;
+            top: 20px; 
+            left: 20px; 
+            z-index: 1001; /* Tampilkan di atas peta */
+            
+            /* Gradasi Oranye ke Kuning */
+            background: linear-gradient(to right, #f9a825, #fdd835); /* Gradasi oranye/kuning */
+            
+            color: #333; /* Warna teks gelap agar kontras */
+            padding: 8px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+            font-weight: bold;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            pointer-events: none; /* Agar klik bisa tembus ke peta di bawahnya */
+        }
+
         .leaflet-popup-content-wrapper { background: #fff; color: #333; border-radius: 8px; box-shadow: 0 1px 5px rgba(0,0,0,0.4); }
         .leaflet-popup-tip-container .leaflet-popup-tip { background: #fff; }
         .leaflet-popup-content { margin: 0 !important; padding: 0; width: auto !important; font-size: 14px; line-height: 1.6; }
@@ -49,6 +79,10 @@
     </style>
 </head>
 <body>
+
+    <div id="map-header-card">
+        PETA - SEBARAN
+    </div>
 
     <div class="pengaturan-panel" id="pengaturan-panel">
         <button class="panel-close-btn" id="panel-close-btn">&times;</button>
@@ -340,5 +374,5 @@
         // ==========================================================
 
     </script>
-</body>
+</body> 
 </html>
