@@ -1330,14 +1330,24 @@
             if (!kecamatanId) return;
 
             try {
-                // Contoh pembuatan URL dinamis dari route()
+                const url = `{{ route('get.kelurahan', ['kecamatanId' => ':kecamatanId']) }}`.replace(':kecamatanId', kecamatanId);
+                console.log('Fetching kelurahan from:', url); // Debug: Log URL
+
                 const res = await fetch(url, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 });
-                if (!res.ok) throw new Error('Gagal memuat data kelurahan');
-                const data = await res.json();
+
+                const responseText = await res.text();
+                console.log('Server response:', responseText); // Debug: Log raw response
+
+                if (!res.ok) {
+                    throw new Error(`Gagal memuat data kelurahan. Status: ${res.status}`);
+                }
+
+                const data = JSON.parse(responseText);
+                console.log('Parsed data:', data); // Debug: Log parsed data
 
                 // Populate opsi kelurahan
                 data.forEach(k => {
@@ -1349,7 +1359,7 @@
 
                 kelurahanSelect.disabled = false;
             } catch (e) {
-                console.error(e);
+                console.error('Error fetching kelurahan:', e); // Debug: Log error
                 alert('Tidak bisa memuat daftar kelurahan. Coba lagi.');
             }
         });

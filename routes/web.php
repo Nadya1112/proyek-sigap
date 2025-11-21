@@ -63,6 +63,18 @@ Route::post('/pengaduan-masyarakat', [PengaduanController::class, 'storePengadua
 
 /*
 |--------------------------------------------------------------------------
+| AJAX Data Endpoints (Public)
+|--------------------------------------------------------------------------
+*/
+Route::get('/get-kelurahan/{kecamatanId}', [EproposalController::class, 'getKelurahan'])
+    ->where('kecamatanId', '[0-9]+')
+    ->name('get.kelurahan');
+Route::get('/get-kompleks-by-kelurahan/{kelurahanId}', [EproposalController::class, 'getKompleksByKelurahan'])
+    ->where('kelurahanId', '[0-9]+')
+    ->name('get.kompleks.by.kelurahan');
+
+/*
+|--------------------------------------------------------------------------
 | Authentication Routes
 |--------------------------------------------------------------------------
 */
@@ -106,12 +118,6 @@ Route::middleware(['auth', 'nocache'])->group(function () { // PERBAIKAN: Indent
     Route::delete('/profil/hapus', [ProfileController::class, 'destroy'])->name('profil.destroy');
 
     // E-Proposal Dropdown Data
-    Route::get('/get-kelurahan/{kecamatanId}', [EproposalController::class, 'getKelurahan'])
-         ->where('kecamatanId', '[0-9]+')
-         ->name('get.kelurahan');
-    Route::get('/get-kompleks-by-kelurahan/{kelurahanId}', [EproposalController::class, 'getKompleksByKelurahan'])
-         ->where('kelurahanId', '[0-9]+')
-         ->name('get.kompleks.by.kelurahan');
 
 }); // Akhir grup middleware auth
 
