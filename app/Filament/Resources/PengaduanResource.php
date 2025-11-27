@@ -56,7 +56,7 @@ class PengaduanResource extends Resource
                 Forms\Components\Section::make('Detail Pengaduan')
                     ->schema([
                         Forms\Components\Textarea::make('isi_pengaduan')->disabled()->columnSpanFull(),
-                        Forms\Components\Image::make('bukti_foto')->disabled()->label('Bukti Foto')->disk('public'),
+                        Forms\Components\FileUpload::make('bukti_foto')->image()->disabled()->label('Bukti Foto')->disk('public'),
                     ]),
 
                 Forms\Components\Section::make('Tindak Lanjut Admin')
