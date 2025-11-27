@@ -22,128 +22,241 @@
 <body class="bg-gray-50">
 
     <!-- 🔹 NAVBAR -->
-    <nav class="navbar-blur shadow-lg sticky top-0 z-50 transition-all duration-300">
-        <div class="container mx-auto px-6 flex items-center justify-between py-4">
+    <nav class="navbar-blur shadow-lg sticky top-0 z-50 transition-all duration-300" x-data="{ mobileMenuOpen: false }">
+        <div class="container mx-auto px-4 md:px-6">
+            <div class="flex items-center justify-between py-4">
 
-            <!-- Logo Dinas -->
-            <div class="flex items-center gap-3 animate-fade-in">
-                <div class="relative">
-                    <img src="{{ asset('img/logo-pemkot.png') }}" alt="logo pemkot"
-                        class="w-10 h-auto object-contain transition-transform duration-300 hover:scale-110">
-                    <div
-                        class="absolute -inset-1 bg-gradient-to-r from-sigap-yellow to-orange-500 rounded-full opacity-0 hover:opacity-20 transition-opacity duration-300">
-                    </div>
-                </div>
-                <span
-                    class="font-semibold text-sm leading-tight text-gray-800 hover:text-sigap-yellow transition-colors duration-300">
-                    Dinas Perumahan Rakyat dan Kawasan Permukiman Kota Banjarmasin
-                </span>
-            </div>
-
-            <!-- Menu Desktop -->
-            <div class="hidden md:flex gap-8 text-gray-600 font-medium">
-                <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
-                    Beranda
-                </a>
-                <a href="{{ route('home') }}#fitur" class="nav-link">
-                    Fitur
-                </a>
-                <a href="{{ route('sebaran') }}" class="nav-link {{ request()->routeIs('sebaran') ? 'active' : '' }}">
-                    Sebaran Komplek
-                </a>
-                <a href="{{ route('regulasi') }}" class="nav-link {{ request()->routeIs('regulasi*') ? 'active' : '' }}">
-                    Regulasi
-                </a>
-                <a href="{{ route('home') }}#kontak" class="nav-link {{ request()->routeIs('kontak') ? 'active' : '' }}">
-                    Kontak
-                </a>
-            </div>
-
-            <!-- Login Button / User Dropdown Desktop -->
-            <div class="hidden md:flex items-center gap-4">
-                @auth
-                    <!-- User Dropdown -->
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open"
-                            class="flex items-center gap-3 text-gray-700 hover:text-sigap-yellow transition-colors duration-300 focus:outline-none">
-                            <div
-                                class="w-10 h-10 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center transform transition-transform duration-300 hover:scale-110">
-                                <span class="text-white font-bold text-base">
-                                    {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
-                                </span>
-                            </div>
-                            <span class="font-semibold">{{ auth()->user()->name }}</span>
-                            <svg class="w-5 h-5 transition-transform duration-300" :class="{ 'rotate-180': open }"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-
-                        <!-- Dropdown Menu -->
-                        <div x-show="open" @click.away="open = false"
-                            x-transition:enter="transition ease-out duration-200"
-                            x-transition:enter-start="opacity-0 transform scale-95"
-                            x-transition:enter-end="opacity-100 transform scale-100"
-                            x-transition:leave="transition ease-in duration-150"
-                            x-transition:leave-start="opacity-100 transform scale-100"
-                            x-transition:leave-end="opacity-0 transform scale-95"
-                            class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-lg border border-gray-100 z-50">
-
-                            <!-- User Info -->
-                            <div class="px-4 py-3 border-b border-gray-100">
-                                <div class="flex items-center gap-4">
-                                    <div
-                                        class="w-14 h-14 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center">
-                                        <span class="text-white font-bold text-xl">
-                                            {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-gray-800 text-lg">{{ auth()->user()->name }}</p>
-                                        <p class="text-sm text-gray-500">{{ auth()->user()->email }}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="space-y-1 p-2">
-                                <a href="{{ route('user.dashboard') }}"
-                                    class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:text-sigap-yellow {{ request()->routeIs('user.dashboard') ? 'bg-gray-100 text-sigap-yellow' : 'hover:bg-gray-50' }}">
-                                    <i data-feather="grid" class="w-5 h-5"></i>
-                                    <span>Dashboard</span>
-                                </a>
-                                <a href="{{ route('profil.index') }}#profil" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-sigap-yellow">
-                                    <i data-feather="user" class="w-5 h-5"></i>
-                                    <span>Profil Saya</span>
-                                </a>
-                                <a href="{{ route('user.dashboard') }}#daftar-proposal" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-orange-500">
-                                    <i data-feather="file-text" class="w-5 h-5"></i>
-                                    <span>Proposal Saya</span>
-                                </a>
-                                <a href="{{ route('user.dashboard') }}#daftar-pengaduan" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-orange-500">
-                                    <i data-feather="message-square" class="w-5 h-5"></i>
-                                    <span>Pengaduan Saya</span>
-                                </a>
-
-                                <div class="my-1 h-px bg-gray-200"></div>
-
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50">
-                                        <i data-feather="log-out" class="w-5 h-5"></i>
-                                        <span>Keluar</span>
-                                    </button>
-                                </form>
-                            </div>
+                <!-- Logo Dinas -->
+                <div class="flex items-center gap-2 md:gap-3 animate-fade-in flex-1 md:flex-initial">
+                    <div class="relative flex-shrink-0">
+                        <img src="{{ asset('img/logo-pemkot.png') }}" alt="logo pemkot"
+                            class="w-8 md:w-10 h-auto object-contain transition-transform duration-300 hover:scale-110">
+                        <div
+                            class="absolute -inset-1 bg-gradient-to-r from-sigap-yellow to-orange-500 rounded-full opacity-0 hover:opacity-20 transition-opacity duration-300">
                         </div>
                     </div>
-                @else
-                    <!-- Login Button -->
-                    <div class="flex items-center gap-3">
-                        <a href="{{ route('login') }}" class="btn-gradient">
+                    <span
+                        class="font-semibold text-xs md:text-sm leading-tight text-gray-800 hover:text-sigap-yellow transition-colors duration-300 line-clamp-2">
+                        Dinas Perumahan Rakyat dan Kawasan Permukiman Kota Banjarmasin
+                    </span>
+                </div>
+
+                <!-- Menu Desktop -->
+                <div id="desktop-menu" style="display: none;">
+                    <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
+                        Beranda
+                    </a>
+                    <a href="{{ route('home') }}#fitur" class="nav-link">
+                        Fitur
+                    </a>
+                    <a href="{{ route('sebaran') }}" class="nav-link {{ request()->routeIs('sebaran') ? 'active' : '' }}">
+                        Sebaran Komplek
+                    </a>
+                    <a href="{{ route('regulasi') }}" class="nav-link {{ request()->routeIs('regulasi*') ? 'active' : '' }}">
+                        Regulasi
+                    </a>
+                    <a href="{{ route('home') }}#kontak" class="nav-link {{ request()->routeIs('kontak') ? 'active' : '' }}">
+                        Kontak
+                    </a>
+                </div>
+
+                <!-- Login Button / User Dropdown Desktop -->
+                <div id="desktop-user-section" style="display: none;">
+                    @auth
+                        <!-- User Dropdown -->
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open"
+                                class="flex items-center gap-3 text-gray-700 hover:text-sigap-yellow transition-colors duration-300 focus:outline-none">
+                                <div
+                                    class="w-10 h-10 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center transform transition-transform duration-300 hover:scale-110">
+                                    <span class="text-white font-bold text-base">
+                                        {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                    </span>
+                                </div>
+                                <span class="font-semibold">{{ auth()->user()->name }}</span>
+                                <svg class="w-5 h-5 transition-transform duration-300" :class="{ 'rotate-180': open }"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="open" @click.away="open = false"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 transform scale-95"
+                                x-transition:enter-end="opacity-100 transform scale-100"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100 transform scale-100"
+                                x-transition:leave-end="opacity-0 transform scale-95"
+                                class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-lg border border-gray-100 z-50">
+
+                                <!-- User Info -->
+                                <div class="px-4 py-3 border-b border-gray-100">
+                                    <div class="flex items-center gap-4">
+                                        <div
+                                            class="w-14 h-14 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center">
+                                            <span class="text-white font-bold text-xl">
+                                                {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-gray-800 text-lg">{{ auth()->user()->name }}</p>
+                                            <p class="text-sm text-gray-500">{{ auth()->user()->email }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-1 p-2">
+                                    <a href="{{ route('user.dashboard') }}"
+                                        class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:text-sigap-yellow {{ request()->routeIs('user.dashboard') ? 'bg-gray-100 text-sigap-yellow' : 'hover:bg-gray-50' }}">
+                                        <i data-feather="grid" class="w-5 h-5"></i>
+                                        <span>Dashboard</span>
+                                    </a>
+                                    <a href="{{ route('profil.index') }}#profil" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-sigap-yellow">
+                                        <i data-feather="user" class="w-5 h-5"></i>
+                                        <span>Profil Saya</span>
+                                    </a>
+                                    <a href="{{ route('user.dashboard') }}#daftar-proposal" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-orange-500">
+                                        <i data-feather="file-text" class="w-5 h-5"></i>
+                                        <span>Proposal Saya</span>
+                                    </a>
+                                    <a href="{{ route('user.dashboard') }}#daftar-pengaduan" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-orange-500">
+                                        <i data-feather="message-square" class="w-5 h-5"></i>
+                                        <span>Pengaduan Saya</span>
+                                    </a>
+
+                                    <div class="my-1 h-px bg-gray-200"></div>
+
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50">
+                                            <i data-feather="log-out" class="w-5 h-5"></i>
+                                            <span>Keluar</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <!-- Login Button -->
+                        <div class="flex items-center gap-3">
+                            <a href="{{ route('login') }}" class="btn-gradient">
+                                <span class="relative z-10">Masuk</span>
+                            </a>
+                        </div>
+                    @endauth
+                </div>
+
+                <!-- Mobile Menu Button & User Icon -->
+                <div id="mobile-controls" style="display: none;">
+                    @auth
+                        <!-- Mobile User Button -->
+                        <a href="{{ route('user.dashboard') }}"
+                            class="w-9 h-9 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center transform transition-transform duration-300 hover:scale-110">
+                            <span class="text-white font-bold text-sm">
+                                {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                            </span>
+                        </a>
+                    @else
+                        <!-- Mobile Login Button -->
+                        <a href="{{ route('login') }}" class="btn-gradient text-sm px-4 py-2">
                             <span class="relative z-10">Masuk</span>
                         </a>
-                    </div>
-                @endauth
+                    @endauth
+
+                    <!-- Hamburger Button -->
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" 
+                        class="text-gray-600 hover:text-sigap-yellow focus:outline-none transition-colors duration-300">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                            <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div x-show="mobileMenuOpen" 
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 transform -translate-y-4"
+                x-transition:enter-end="opacity-100 transform translate-y-0"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 transform translate-y-0"
+                x-transition:leave-end="opacity-0 transform -translate-y-4"
+                id="mobile-menu-container"
+                style="display: none;">
+                <div class="flex flex-col space-y-2 pt-4 pb-4 border-t border-gray-200 mt-4">
+                    <a href="{{ route('home') }}" 
+                        class="mobile-nav-link {{ request()->routeIs('home') ? 'active' : '' }}"
+                        @click="mobileMenuOpen = false">
+                        <i data-feather="home" class="w-5 h-5"></i>
+                        <span>Beranda</span>
+                    </a>
+                    <a href="{{ route('home') }}#fitur" 
+                        class="mobile-nav-link"
+                        @click="mobileMenuOpen = false">
+                        <i data-feather="grid" class="w-5 h-5"></i>
+                        <span>Fitur</span>
+                    </a>
+                    <a href="{{ route('sebaran') }}" 
+                        class="mobile-nav-link {{ request()->routeIs('sebaran') ? 'active' : '' }}"
+                        @click="mobileMenuOpen = false">
+                        <i data-feather="map-pin" class="w-5 h-5"></i>
+                        <span>Sebaran Komplek</span>
+                    </a>
+                    <a href="{{ route('regulasi') }}" 
+                        class="mobile-nav-link {{ request()->routeIs('regulasi*') ? 'active' : '' }}"
+                        @click="mobileMenuOpen = false">
+                        <i data-feather="book" class="w-5 h-5"></i>
+                        <span>Regulasi</span>
+                    </a>
+                    <a href="{{ route('home') }}#kontak" 
+                        class="mobile-nav-link"
+                        @click="mobileMenuOpen = false">
+                        <i data-feather="phone" class="w-5 h-5"></i>
+                        <span>Kontak</span>
+                    </a>
+
+                    @auth
+                        <div class="border-t border-gray-200 pt-3 mt-2">
+                            <div class="px-4 py-2 mb-2">
+                                <p class="font-semibold text-gray-800 text-sm">{{ auth()->user()->name }}</p>
+                                <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
+                            </div>
+                            <a href="{{ route('user.dashboard') }}" 
+                                class="mobile-nav-link"
+                                @click="mobileMenuOpen = false">
+                                <i data-feather="grid" class="w-5 h-5"></i>
+                                <span>Dashboard</span>
+                            </a>
+                            <a href="{{ route('profil.index') }}#profil" 
+                                class="mobile-nav-link"
+                                @click="mobileMenuOpen = false">
+                                <i data-feather="user" class="w-5 h-5"></i>
+                                <span>Profil Saya</span>
+                            </a>
+                            <a href="{{ route('user.dashboard') }}#daftar-proposal" 
+                                class="mobile-nav-link"
+                                @click="mobileMenuOpen = false">
+                                <i data-feather="file-text" class="w-5 h-5"></i>
+                                <span>Proposal Saya</span>
+                            </a>
+                            <a href="{{ route('user.dashboard') }}#daftar-pengaduan" 
+                                class="mobile-nav-link"
+                                @click="mobileMenuOpen = false">
+                                <i data-feather="message-square" class="w-5 h-5"></i>
+                                <span>Pengaduan Saya</span>
+                            </a>
+                            <form method="POST" action="{{ route('logout') }}" class="mt-2">
+                                @csrf
+                                <button type="submit" class="mobile-nav-link w-full text-left text-red-600 hover:bg-red-50">
+                                    <i data-feather="log-out" class="w-5 h-5"></i>
+                                    <span>Keluar</span>
+                                </button>
+                            </form>
+                        </div>
+                    @endauth
+                </div>
             </div>
         </div>
     </nav>
@@ -206,11 +319,11 @@
                 <div>
                     <h4 class="text-lg font-bold mb-6">Quick Links</h4>
                     <ul class="space-y-3">
-                        <li><a href="{{ route('home') }}">Beranda</a></li>
-                        <li><a href="{{ route('informasi-fasum') }}">Informasi FASUM</a></li>
-                        <li><a href="{{ route('eproposal') }}">E-Proposal PSU</a></li>
-                        <li><a href="{{ route('pengaduan') }}">Pengaduan</a></li>
-                        <li><a href="{{ route('regulasi') }}">Regulasi</a></li>
+                        <li><a href="{{ route('home') }}" class="footer-link">Beranda</a></li>
+                        <li><a href="{{ route('informasi-fasum') }}" class="footer-link">Informasi FASUM</a></li>
+                        <li><a href="{{ route('eproposal') }}" class="footer-link">E-Proposal PSU</a></li>
+                        <li><a href="{{ route('pengaduan') }}" class="footer-link">Pengaduan</a></li>
+                        <li><a href="{{ route('regulasi') }}" class="footer-link">Regulasi</a></li>
                     </ul>
                 </div>
 
@@ -283,6 +396,34 @@
 
     <script>
         feather.replace()
+        
+        // Responsive Navbar Handler
+        function handleNavbarResponsive() {
+            const desktopMenu = document.getElementById('desktop-menu');
+            const desktopUserSection = document.getElementById('desktop-user-section');
+            const mobileControls = document.getElementById('mobile-controls');
+            const mobileMenuContainer = document.getElementById('mobile-menu-container');
+            
+            if (window.innerWidth >= 1024) {
+                // Desktop view
+                if (desktopMenu) desktopMenu.style.display = 'flex';
+                if (desktopUserSection) desktopUserSection.style.display = 'flex';
+                if (mobileControls) mobileControls.style.display = 'none';
+                if (mobileMenuContainer) mobileMenuContainer.style.display = 'none';
+            } else {
+                // Mobile/Tablet view
+                if (desktopMenu) desktopMenu.style.display = 'none';
+                if (desktopUserSection) desktopUserSection.style.display = 'none';
+                if (mobileControls) mobileControls.style.display = 'flex';
+                // Mobile menu container akan di-handle oleh Alpine.js x-show
+            }
+        }
+        
+        // Run on load
+        handleNavbarResponsive();
+        
+        // Run on resize
+        window.addEventListener('resize', handleNavbarResponsive);
     </script>
 </body>
 

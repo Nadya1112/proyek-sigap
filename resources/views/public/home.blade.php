@@ -516,7 +516,10 @@
                             </h3>
 
                             <p class="benefit-desc">
-                                Siap membantu Anda setiap hari di jam kerja (08.00 - 16.30) dengan respon time yang cepat.
+                                Siap membantu Anda pada jam kerja.
+                            </p>
+                            <p class="benefit-desc">
+                                Senin - Kamis (08.00 - 16.30) & Jumat (08.00 - 11.00)
                             </p>
                         </div>
                     </div>
