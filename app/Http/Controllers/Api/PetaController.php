@@ -9,11 +9,15 @@ use Illuminate\Support\Facades\Log;
 
 class PetaController extends Controller
 {
+    public function tampilkanPeta()
+    {
+        return view('peta');
+    }
+
     // 1. API KOMPLEKS (TITIK)
     public function kompleks(Request $request)
     {
         try {
-            // Mengambil data dari tabel 'kompleks'
             $dataPerumahan = DB::table('kompleks')
                 ->join('kelurahans', 'kompleks.kelurahan_id', '=', 'kelurahans.id')
                 ->join('kecamatans', 'kelurahans.kecamatan_id', '=', 'kecamatans.id')
@@ -21,8 +25,7 @@ class PetaController extends Controller
                     'kompleks.id',
                     'kompleks.nama_komplek',
                     'kompleks.nama_pengembang',
-                    // [PERBAIKAN UTAMA DISINI]
-                    'kompleks.alamat_komplek as alamat', // Mengambil 'alamat_komplek' jadi 'alamat'
+                    'kompleks.alamat_komplek as alamat',
                     'kompleks.latitude',
                     'kompleks.longitude',
                     'kompleks.jumlah_sertifikat',
@@ -44,7 +47,6 @@ class PetaController extends Controller
                 $longitude = (float)$row->longitude;
                 $latitude = (float)$row->latitude;
 
-                // Validasi koordinat
                 if ($longitude == 0 || $latitude == 0) continue;
 
                 $features[] = [
@@ -60,8 +62,6 @@ class PetaController extends Controller
                         'alamat' => $row->alamat ?? '-', 
                         'kelurahan' => $row->nama_kelurahan,
                         'kecamatan' => $row->nama_kecamatan,
-                        
-                        // Data Detail Lainnya
                         'jumlah_sertifikat' => $row->jumlah_sertifikat ?? 0,
                         'jumlah_unit' => $row->jumlah_unit ?? 0,
                         'status_aset' => $row->status_aset ?? '-',
@@ -88,38 +88,91 @@ class PetaController extends Controller
             $features = [];
             foreach ($data as $row) {
                 if (empty($row->geometri)) continue;
-                $geom = json_decode($row->geometri);
-                if (json_last_error() !== JSON_ERROR_NONE) continue;
-                $features[] = [
-                    'type' => 'Feature', 
-                    'geometry' => $geom, 
-                    'properties' => ['nama' => $row->nama_kecamatan, 'warna' => $row->warna]
-                ];
+                
+                try {
+                    // Bersihkan format JSON jika perlu
+                    $cleanGeom = trim($row->geometri);
+                    if (str_starts_with($cleanGeom, '"') && str_ends_with($cleanGeom, '"')) {
+                        $cleanGeom = json_decode($cleanGeom); // Decode string ganda
+                    }
+                    
+                    $geometry = json_decode($cleanGeom);
+                    if (json_last_error() !== JSON_ERROR_NONE) continue;
+                    
+                    $features[] = [
+                        'type' => 'Feature', 
+                        'geometry' => $geometry, 
+                        'properties' => ['nama' => $row->nama_kecamatan, 'warna' => $row->warna]
+                    ];
+                } catch (\Exception $e) { continue; }
             }
             return response()->json(['type' => 'FeatureCollection', 'features' => $features]);
         } catch (\Exception $e) { return response()->json(['error' => 'Gagal'], 500); }
     }
 
-    // 3. API KELURAHAN (POLIGON)
+    // 3. API KELURAHAN (POLIGON) - [DIPERBAIKI LOGIKA DECODE-NYA]
     public function kelurahan(Request $request)
     {
         try {
+            // Ambil SEMUA data
             $data = DB::table('kelurahans')
                 ->join('kecamatans', 'kelurahans.kecamatan_id', '=', 'kecamatans.id')
-                ->select('kelurahans.id', 'kelurahans.nama_kelurahan', 'kelurahans.geometri', 'kecamatans.nama_kecamatan')
-                ->get();
+                ->select(
+                    'kelurahans.id', 
+                    'kelurahans.nama_kelurahan', 
+                    'kelurahans.geometri',
+                    'kelurahans.sumber',
+                    'kecamatans.nama_kecamatan'
+                )
+                ->whereNotNull('kelurahans.geometri')
+                ->get(); 
+            
             $features = [];
             foreach ($data as $row) {
                 if (empty($row->geometri)) continue;
-                $geom = json_decode($row->geometri);
-                if (json_last_error() !== JSON_ERROR_NONE) continue;
-                $features[] = [
-                    'type' => 'Feature', 
-                    'geometry' => $geom, 
-                    'properties' => ['id' => $row->id, 'nama_kelurahan' => $row->nama_kelurahan]
-                ];
+
+                try {
+                    // [KUNCI PERBAIKAN]
+                    // 1. Ambil string mentah
+                    $rawGeom = $row->geometri;
+
+                    // 2. Jika string diawali tanda petik ("), berarti ter-encode ganda, kita decode sekali agar jadi JSON murni
+                    if (substr($rawGeom, 0, 1) === '"') {
+                        $rawGeom = json_decode($rawGeom);
+                    }
+
+                    // 3. Bersihkan Backslash (Escape Character) yang mengganggu
+                    $rawGeom = stripslashes($rawGeom);
+
+                    // 4. Baru di-decode menjadi Objek
+                    $geom = json_decode($rawGeom);
+                    
+                    // 5. Jika masih gagal, coba decode tanpa stripslashes (fallback)
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                         $geom = json_decode($row->geometri);
+                    }
+
+                    // Jika sukses, masukkan ke fitur
+                    if (json_last_error() === JSON_ERROR_NONE && $geom) {
+                        $features[] = [
+                            'type' => 'Feature', 
+                            'geometry' => $geom, 
+                            'properties' => [
+                                'id' => $row->id, 
+                                'nama_kelurahan' => $row->nama_kelurahan,
+                                'nama_kecamatan' => $row->nama_kecamatan,
+                                'sumber' => $row->sumber
+                            ]
+                        ];
+                    }
+                } catch (\Exception $e) { 
+                    continue; 
+                }
             }
             return response()->json(['geojson' => ['type' => 'FeatureCollection', 'features' => $features]]);
-        } catch (\Exception $e) { return response()->json(['error' => 'Gagal'], 500); }
+        } catch (\Exception $e) { 
+            Log::error("Error API Kelurahan: " . $e->getMessage());
+            return response()->json(['error' => 'Gagal'], 500); 
+        }
     }
 }
