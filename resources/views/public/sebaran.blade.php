@@ -7,321 +7,324 @@
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
     <style>
-        /* ... CSS Anda (sama seperti sebelumnya) ... */
         body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
         #map { height: 100vh; width: 100%; }
         ul { list-style: none; padding: 0; margin: 0; }
+        
+        /* Panel Pengaturan */
         .pengaturan-panel {
             position: absolute; top: 80px; right: 20px; z-index: 1000;
-            width: 280px; background: rgba(40, 40, 40, 0.9);
-            color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            width: 280px; background: rgba(255, 255, 255, 0.95); /* Ganti putih biar pastel lebih keluar */
+            color: #333; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             padding: 15px; display: none;
         }
-        .pengaturan-panel h4 { margin-top: 0; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #666; font-size: 1.1em; }
-        .pengaturan-panel h5 { margin-top: 15px; margin-bottom: 10px; color: #ddd; font-size: 0.9em; text-transform: uppercase; }
+        .pengaturan-panel h4 { margin-top: 0; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; font-size: 1.1em; font-weight: 700; }
+        .pengaturan-panel h5 { margin-top: 15px; margin-bottom: 10px; color: #555; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; }
         .pengaturan-panel li { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.95em; }
-        .pengaturan-panel input[type="checkbox"] { margin-right: 10px; }
+        .pengaturan-panel input[type="checkbox"] { margin-right: 10px; cursor: pointer; accent-color: #05c205; }
         .pengaturan-panel label { flex-grow: 1; cursor: pointer; }
-        .legend-color { display: inline-block; width: 20px; height: 20px; border: 1px solid #777; margin-left: 10px; }
-        .panel-close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; color: #aaa; font-size: 24px; cursor: pointer; }
-        .panel-close-btn:hover { color: #fff; }
+        .legend-color { display: inline-block; width: 20px; height: 20px; border-radius: 5px; margin-left: 10px; border: 1px solid #ddd; }
+        .panel-close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; color: #999; font-size: 24px; cursor: pointer; }
+        .panel-close-btn:hover { color: #333; }
+        
         .leaflet-control-settings a {
             font-size: 1.4em; color: #333; width: 34px; height: 34px; line-height: 34px; text-align: center; background: #fff;
             border-radius: 4px; box-shadow: 0 1px 5px rgba(0,0,0,0.65); cursor: pointer;
         }
-        
-        /* Posisi kontrol Leaflet (zoom, dll) di bawah card kustom */
         .leaflet-top.leaflet-left { top: 80px; } 
+        .leaflet-control-zoom a { width: 25px !important; height: 25px !important; line-height: 25px !important; font-size: 16px !important; }
         
-        /* === PERUBAHAN: MEMPERKECIL TOMBOL ZOOM === */
-        .leaflet-control-zoom a { 
-            width: 25px !important;       /* Diperkecil */
-            height: 25px !important;      /* Diperkecil */
-            line-height: 25px !important; /* Pusatkan ikon */
-            font-size: 16px !important;   /* Ukuran ikon +/- */
-        }
-        
-        /* === CSS BARU UNTUK CARD PETA - SEBARAN (GRADASI) === */
         #map-header-card {
-            position: absolute;
-            top: 20px; 
-            left: 20px; 
-            z-index: 1001; /* Tampilkan di atas peta */
-            
-            /* Gradasi Oranye ke Kuning */
-            background: linear-gradient(to right, #f9a825, #fdd835); /* Gradasi oranye/kuning */
-            
-            color: #333; /* Warna teks gelap agar kontras */
-            padding: 8px 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
-            font-weight: bold;
-            font-size: 1.1em;
-            text-transform: uppercase;
-            pointer-events: none; /* Agar klik bisa tembus ke peta di bawahnya */
+            position: absolute; top: 20px; left: 20px; z-index: 1001;
+            background: white;
+            color: #333; padding: 10px 20px; border-radius: 50px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            font-weight: bold; font-size: 1.1em; text-transform: uppercase;
+            pointer-events: none; border: 2px solid #05c205;
         }
 
-        .leaflet-popup-content-wrapper { background: #fff; color: #333; border-radius: 8px; box-shadow: 0 1px 5px rgba(0,0,0,0.4); }
+        /* Popup Styles */
+        .leaflet-popup-content-wrapper { background: #fff; color: #333; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
         .leaflet-popup-tip-container .leaflet-popup-tip { background: #fff; }
         .leaflet-popup-content { margin: 0 !important; padding: 0; width: auto !important; font-size: 14px; line-height: 1.6; }
-        .custom-popup-title { padding: 10px 15px; font-weight: bold; font-size: 15px; border-bottom: 1px solid #eee; position: relative; }
-        .leaflet-popup-close-button { position: absolute; top: 5px; right: 10px; padding: 5px; border: none; background: none; font-size: 20px; color: #888; }
-        .leaflet-popup-close-button:hover { color: #333; background: none; }
-        .custom-popup-info { padding: 10px 15px; border-bottom: 1px solid #eee; }
-        .custom-popup-info strong { margin-right: 5px; }
-        .custom-popup-button-div { padding: 15px; }
-        .custom-popup-button { background-color: #0d6efd; color: white; border: none; padding: 10px 15px; border-radius: 5px; width: 100%; cursor: pointer; font-size: 14px; text-align: center; }
-        .custom-popup-last-div { padding: 10px 15px; }
+        .custom-popup-title { padding: 12px 15px; font-weight: bold; font-size: 15px; border-bottom: 1px solid #f0f0f0; color: #05c205; }
+        .leaflet-popup-close-button { position: absolute; top: 8px; right: 10px; padding: 5px; border: none; background: none; font-size: 20px; color: #aaa; }
+        .custom-popup-info { padding: 10px 15px; border-bottom: 1px solid #f0f0f0; }
+        .custom-popup-button-div { padding: 15px; text-align: center; }
+        .custom-popup-button { background-color: #0d6efd; color: white; border: none; padding: 8px 20px; border-radius: 20px; width: 100%; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; }
+        .custom-popup-button:hover { background-color: #0b5ed7; transform: scale(1.02); }
+
+        /* Modal Detail */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); z-index: 2000;
+            display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: #fff; width: 90%; max-width: 550px;
+            border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            overflow: hidden; animation: slideUp 0.3s ease-out; display: flex; flex-direction: column;
+        }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal-header {
+            background: #05c205; color: white; padding: 15px 25px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-header h3 { margin: 0; font-size: 1.3rem; font-weight: 700; }
+        .close-modal { background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
+        .modal-body { padding: 0; max-height: 70vh; overflow-y: auto; }
+        
+        .detail-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        .detail-table tr:nth-child(even) { background-color: #f8f9fa; }
+        .detail-table th { text-align: left; padding: 12px 20px; width: 35%; color: #666; font-weight: 600; border-bottom: 1px solid #eee; }
+        .detail-table td { padding: 12px 20px; color: #333; border-bottom: 1px solid #eee; }
+        .divider-row td { background-color: #f0f0f0; height: 8px; padding: 0; border: none; }
+        .modal-footer { padding: 15px 25px; text-align: right; border-top: 1px solid #eee; background: #fff; }
+        .btn-tutup { background: #6c757d; color: white; border: none; padding: 8px 25px; border-radius: 50px; cursor: pointer; font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <div id="map-header-card">
-        PETA - SEBARAN
-    </div>
+    <div id="map-header-card">PETA - SEBARAN</div>
 
     <div class="pengaturan-panel" id="pengaturan-panel">
         <button class="panel-close-btn" id="panel-close-btn">&times;</button>
         <h4>Pengaturan Layer</h4>
-
         <h5>Kecamatan</h5>
         <ul id="kecamatan-filter-list">
             @if(isset($kecamatans) && !$kecamatans->isEmpty())
                 @foreach ($kecamatans as $kecamatan)
                     <li>
-                        <input type="checkbox" class="kecamatan-checkbox" value="{{ $kecamatan->nama_kecamatan }}">
+                        <input type="checkbox" class="kecamatan-checkbox" value="{{ $kecamatan->nama_kecamatan }}" checked>
                         <label>{{ $kecamatan->nama_kecamatan }}</label>
-                        <span class="legend-color" style="background-color: {{ $kecamatan->warna }};"></span>
+                        <span class="legend-color" data-kecamatan="{{ $kecamatan->nama_kecamatan }}"></span>
                     </li>
                 @endforeach
             @else <li>Data kecamatan tidak ditemukan.</li> @endif
         </ul>
-
         <h5>Sebaran Komplek</h5>
         <ul id="kompleks-filter-list">
             <li>
-                <input type="checkbox" id="kompleks-checkbox" value="kompleks">
+                <input type="checkbox" id="kompleks-checkbox" value="kompleks" checked>
                 <label for="kompleks-checkbox">Sebaran Komplek</label>
-                <span class="legend-color" style="background-color: #05c205;"></span>
+                <span class="legend-color" style="background-color: #05c205; border: 2px solid white; box-shadow: 0 0 2px #999;"></span>
             </li>
         </ul>
-
     </div>
 
     <div id="map"></div>
 
-    <script>
-        // 1. Inisialisasi Peta
-        const map = L.map('map').setView([-3.32, 114.59], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map);
+    <div id="modal-detail" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Detail Komplek</h3>
+                <button class="close-modal" onclick="tutupModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <table class="detail-table">
+                    <tr><th>Pengembang</th><td id="d-pengembang">-</td></tr>
+                    <tr><th>Alamat</th><td id="d-alamat">-</td></tr>
+                    <tr><th>Kelurahan</th><td id="d-kelurahan">-</td></tr>
+                    <tr><th>Kecamatan</th><td id="d-kecamatan">-</td></tr>
+                    
+                    <tr class="divider-row"><td colspan="2"></td></tr>
+                    
+                    <tr><th>Jumlah Sertifikat</th><td id="d-sertifikat">0</td></tr>
+                    <tr><th>Jumlah Unit</th><td id="d-unit">0</td></tr>
+                    <tr><th>Status Aset</th><td id="d-status">-</td></tr>
+                    
+                    <tr class="divider-row"><td colspan="2"></td></tr>
+                    
+                    <tr><th>Fasilitas Ibadah</th><td id="d-ibadah">-</td></tr>
+                    <tr><th>Fasilitas Umum</th><td id="d-umum">-</td></tr>
+                    <tr><th>Fasilitas Pendidikan</th><td id="d-pendidikan">-</td></tr>
+                    <tr><th>Fasilitas Kesehatan</th><td id="d-kesehatan">-</td></tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-tutup" onclick="tutupModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
 
-        // 2. Siapkan Wadah Layer
+    <script>
+        // --- 1. Inisialisasi Peta ---
+        const map = L.map('map').setView([-3.32, 114.59], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' 
+        }).addTo(map);
+
+        // --- 2. Variabel & Layer Group ---
         const kecamatanLayerGroups = {};
-        const kompleksLayerGroup = L.layerGroup();
+        const kompleksLayerGroup = L.layerGroup().addTo(map); 
         let allKelurahanLayer = null;
         let displayedKelurahanLayer = null;
+        let kompleksDataStore = {};
 
-        // ==========================================================
-        // ===            [DEFINISI ICON KOMPLEKS]                  ===
-        // ==========================================================
-        const KompleksIcon = L.divIcon({
-            className: 'custom-kompleks-icon',
-            html: '<i class="fa-solid fa-house" style="color: #05c205; font-size: 18px;"></i>',
-            iconSize: [25, 25],
-            iconAnchor: [12, 18], 
-            popupAnchor: [0, -18]
+        // =====================================================================
+        // [KONFIGURASI] WARNA PASTEL KECAMATAN
+        // =====================================================================
+        const warnaPastelKecamatan = {
+            "Banjarmasin Barat":   "#FFB7B2", // Pastel Pink Salmon
+            "Banjarmasin Selatan": "#FFDAC1", // Pastel Peach/Oranye Lembut
+            "Banjarmasin Tengah":  "#FFFFB5", // Pastel Kuning
+            "Banjarmasin Timur":   "#B5EAD7", // Pastel Mint Hijau
+            "Banjarmasin Utara":   "#C7CEEA"  // Pastel Ungu/Biru Muda
+        };
+        // =====================================================================
+
+        // Icon Rumah Hijau Custom
+        const GreenHouseIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: `<div style="
+                background-color: white;
+                border: 2px solid #05c205;
+                width: 32px; height: 32px;
+                border-radius: 50%;
+                display: flex; justify-content: center; align-items: center;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+                <i class="fa-solid fa-house" style="color: #05c205; font-size: 16px;"></i>
+            </div>`,
+            iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -18]
         });
-        // ==========================================================
 
-
-        // 3. Muat Data KECAMATAN
+        // --- 3. Muat Data KECAMATAN (Dengan Warna Pastel) ---
         fetch('/api/kecamatan')
             .then(response => response.json())
             .then(data => {
                 if (data && data.features) {
                     data.features.forEach(feature => {
                         const namaKecamatan = feature.properties.nama;
+                        
+                        // [LOGIKA] Ambil warna pastel, jika tidak ada pakai default
+                        const warnaFinal = warnaPastelKecamatan[namaKecamatan] || feature.properties.warna || '#ccc';
+                        
+                        // [LOGIKA] Update warna kotak legend di sidebar agar sinkron
+                        const legendSpan = document.querySelector(`.legend-color[data-kecamatan="${namaKecamatan}"]`);
+                        if(legendSpan) {
+                            legendSpan.style.backgroundColor = warnaFinal;
+                        }
+
                         const layerGroup = L.layerGroup();
                         L.geoJSON(feature, {
-                            style: { color: "#000", weight: 1, fillColor: feature.properties.warna, fillOpacity: 0.9 },
-                            onEachFeature: (feature, layer) => {
-                                const kecProps = feature.properties;
-                                const kecPopupContent = `<div style="font-family: sans-serif; min-width: 250px;"><div class="custom-popup-title">Layer Properties</div><div class="custom-popup-info"><strong>Kecamatan:</strong> ${kecProps.nama || 'Tidak Diketahui'}</div></div>`;
-                                layer.bindPopup(kecPopupContent);
-                                layer.on('click', function(e) { handleKecamatanClick(kecProps.nama, layer); });
+                            style: { 
+                                color: "#666",        // Garis tepi abu tua (supaya rapi)
+                                weight: 1.5,          // Tebal garis
+                                fillColor: warnaFinal, // Warna Pastel dari variabel
+                                fillOpacity: 0.7       // Transparansi enak dilihat
+                            },
+                            onEachFeature: (f, l) => {
+                                l.bindPopup(`
+                                    <div style="text-align:center; font-weight:bold; color:#555;">
+                                        Kecamatan<br>
+                                        <span style="color:#000; font-size:14px;">${f.properties.nama}</span>
+                                    </div>
+                                `);
+                                l.on('click', function() { handleKecamatanClick(f.properties.nama); });
                             }
                         }).addTo(layerGroup);
                         kecamatanLayerGroups[namaKecamatan] = layerGroup;
+                        layerGroup.addTo(map);
                     });
-                } else { console.error("Data kecamatan API tidak valid:", data); }
-            })
-            .catch(error => console.error('Error fetching data kecamatan:', error));
+                }
+            });
 
-
-        // 4. Muat Data KELURAHAN
+        // --- 4. Muat Data KELURAHAN ---
         fetch('/api/kelurahan')
             .then(response => response.json())
             .then(data => {
-                if (data && data.geojson && data.geojson.features) {
-                        allKelurahanLayer = L.geoJSON(data.geojson, { 
-                            style: {
-                                color: "#666",
-                                weight: 1,
-                                fillColor: "#ccc",
-                                fillOpacity: 0.1
-                            },
-                            onEachFeature: (feature, layer) => {
-                                 const kelProps = feature.properties;
-                                 const kelPopupContent = `
-                                 <div style="font-family: sans-serif; min-width: 300px;">
-                                     <div class="custom-popup-title">Layer Properties</div>
-                                     <div class="custom-popup-info"><strong>kota:</strong> BANJARMASIN</div>
-                                     <div class="custom-popup-info"><strong>kecamatan:</strong> ${kelProps.nama_kecamatan || 'N/A'}</div>
-                                     <div class="custom-popup-info"><strong>kelurahan:</strong> ${kelProps.nama_kelurahan || 'N/A'}</div>
-                                     <div class="custom-popup-info" style="line-height: 1.4;"><strong>sumber:</strong> ${kelProps.sumber || 'N/A'}</div>
-                                     <div class="custom-popup-button-div">
-                                          <button onclick="map.closePopup(); lihatDetailKelurahan(${kelProps.id})" class="custom-popup-button">Lihat Detail</button>
-                                     </div>
-                                 </div>
-                                 `;
-                                 layer.bindPopup(kelPopupContent);
-                            }
-                        });
-                        console.log("Data Kelurahan dari database berhasil dimuat.");
-                } else { 
-                        console.error("Data kelurahan dari API tidak valid..."); 
+                if (data && data.geojson) {
+                    allKelurahanLayer = L.geoJSON(data.geojson, { 
+                        style: { color: "#555", weight: 1, fillColor: "#fff", fillOpacity: 0.1, dashArray: '4, 4' },
+                        onEachFeature: (f, l) => {
+                             l.bindPopup(`<strong>Kelurahan:</strong> ${f.properties.nama_kelurahan}`);
+                        }
+                    });
+                    allKelurahanLayer.addTo(map);
                 }
-            })
-            .catch(error => console.error('Error fetching data kelurahan:', error));
+            });
 
-
-        // 5. Muat Data KOMPLEKS (Diperbarui menggunakan L.marker dengan Ikon Kustom)
+        // --- 5. Muat Data KOMPLEKS ---
         fetch('/api/kompleks')
             .then(response => response.json())
             .then(data => {
                 if (data && data.features) {
                     L.geoJSON(data, {
                         pointToLayer: (feature, latlng) => {
-                            // Gunakan L.marker dengan Ikon Kustom
-                            return L.marker(latlng, { icon: KompleksIcon }); 
+                            return L.marker(latlng, { icon: GreenHouseIcon }); 
                         },
                         onEachFeature: function(feature, layer) {
                             const props = feature.properties;
+                            kompleksDataStore[props.id] = props;
+
                             if (props) {
-                                // === PERBAIKAN POPUP DISINI (Nama Komplek dan Nama Pengembang '-') ===
-                                const popupContent = `<div style="font-family: sans-serif; min-width: 280px; padding: 0;">
-                                    <div class="custom-popup-title">Layer Properties</div>
-                                    <div class="custom-popup-info"><strong>Nama Komplek:</strong> ${props.nama_perumahan || 'Tidak Diketahui'}</div>
-                                    <div class="custom-popup-info"><strong>Pengembang:</strong> -</div>
-                                    <div class="custom-popup-button-div"><button onclick="map.closePopup(); lihatDetail(${props.id})" class="custom-popup-button">Lihat Detail</button></div>
+                                const popupContent = `
+                                <div style="font-family: sans-serif; min-width: 220px; text-align: center;">
+                                    <h4 style="margin:0 0 5px 0; color:#05c205; font-size:14px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                                        ${props.nama_perumahan}
+                                    </h4>
+                                    <div style="font-size:11px; color:#666; margin-bottom:10px;">
+                                        <i class="fa-solid fa-building"></i> ${props.nama_pengembang}
+                                    </div>
+                                    <button onclick="lihatDetail(${props.id})" class="custom-popup-button">
+                                        Lihat Detail
+                                    </button>
                                 </div>`;
-                                // === BATAS PERBAIKAN POPUP ===
-                                layer.bindPopup(popupContent, { offset: [0, -18] }); 
+                                layer.bindPopup(popupContent, { offset: [0, -15] }); 
                             }
                         }
                     }).addTo(kompleksLayerGroup);
-                    console.log("Data Kompleks berhasil dimuat ke layer group.");
-                    
-                    if (!document.getElementById('kompleks-checkbox').checked) {
-                        if (map.hasLayer(kompleksLayerGroup)) {
-                            map.removeLayer(kompleksLayerGroup);
-                        }
-                    }
-                } else { console.error("Data kompleks tidak valid:", data); }
+                }
             })
             .catch(error => console.error('Error fetching data kompleks:', error));
 
-        
-        // ==========================================================
-        // ===       FUNGSI HANDLEKLIK UNTUK KECAMATAN (START)      ===
-        // ==========================================================
-        function handleKecamatanClick(namaKecamatanDiKlik, layerKecamatan) {
-            
-            // Hapus kelurahan lama jika ada
+
+        // --- 6. Logika Peta Lainnya ---
+        function handleKecamatanClick(namaKecamatanDiKlik) {
             if (displayedKelurahanLayer && map.hasLayer(displayedKelurahanLayer)) {
                 map.removeLayer(displayedKelurahanLayer);
             }
-            
-            if (!allKelurahanLayer) {
-                alert("Data kelurahan belum siap. Cek Console F12.");
-                return;
-            }
+            if (!allKelurahanLayer) return;
 
-            // --- STYLE HIGHLIGHT KELURAHAN (WARNA PASTEL) ---
-            const styleKelurahanBaru = {
-                weight: 2,
-                color: '#F98888',     // Pastel Salmon (Garis Batas)
-                dashArray: '5',
-                fillColor: '#FFFFAA', // Pastel Kuning Lemon (Isi Poligon)
-                fillOpacity: 0.7      // Tingkatkan opacity agar lebih jelas
-            };
-            // --- BATAS STYLE HIGHLIGHT ---
-
+            // Style highlight kelurahan (Pastel Merah)
+            const styleKelurahanBaru = { weight: 2, color: '#FF6961', dashArray: '0', fillColor: '#fff', fillOpacity: 0.1 };
             displayedKelurahanLayer = L.layerGroup();
             let ditemukan = 0;
 
-            // Loop semua kelurahan dan saring berdasarkan kecamatan
             allKelurahanLayer.eachLayer(function(layer) {
                 let namaKelurahanKecamatan = layer.feature.properties.nama_kecamatan;
-
-                if (namaKelurahanKecamatan && namaKecamatanDiKlik) {
-                    
-                    let cleanNamaKelurahan = namaKelurahanKecamatan.trim().toLowerCase();
-                    let cleanNamaDiklik = namaKecamatanDiKlik.trim().toLowerCase();
-
-                    if (cleanNamaKelurahan === cleanNamaDiklik) {
-                        ditemukan++;
-                        let highlighted = L.geoJSON(layer.feature, { 
-                             style: styleKelurahanBaru,
-                             onEachFeature: function(feature, highlightedLayer) {
-                                 highlightedLayer.bindPopup(layer.getPopup().getContent());
-                             }
-                        }); 
-                        highlighted.addTo(displayedKelurahanLayer);
-                    }
+                if (namaKelurahanKecamatan && namaKecamatanDiKlik && 
+                    namaKelurahanKecamatan.trim().toLowerCase() === namaKecamatanDiKlik.trim().toLowerCase()) {
+                    ditemukan++;
+                    let highlighted = L.geoJSON(layer.feature, { 
+                         style: styleKelurahanBaru,
+                         onEachFeature: (f, l) => l.bindPopup(layer.getPopup().getContent())
+                    }); 
+                    highlighted.addTo(displayedKelurahanLayer);
                 }
             });
 
-            // Tampilkan layer kelurahan ke peta
             if (ditemukan > 0) {
                 displayedKelurahanLayer.addTo(map);
                 displayedKelurahanLayer.bringToFront(); 
-
-            } else {
-                console.log("Tidak ada kelurahan yang cocok untuk nama '" + namaKecamatanDiKlik + "'");
             }
         }
-        // ==========================================================
-        // ===       FUNGSI HANDLEKLIK UNTUK KECAMATAN (END)        ===
-        // ==========================================================
-
-
-        // Sembunyikan kelurahan jika klik di luar fitur (Logic yang Diperbaiki)
-        map.on('click', function(e){
+        
+        map.on('click', function(e) {
              if (displayedKelurahanLayer && map.hasLayer(displayedKelurahanLayer)) {
-                 
-                 let clickedOnFeature = false;
-                 
-                 displayedKelurahanLayer.eachLayer(layerGroup => {
-                     layerGroup.eachLayer(layer => {
-                         if (layer.contains(e.latlng)) { 
-                             clickedOnFeature = true;
-                         }
-                     });
-                 });
-                 
-                 if (!clickedOnFeature && !e.originalEvent.target.closest('.leaflet-popup-content-wrapper')) { 
-                     map.removeLayer(displayedKelurahanLayer); 
-                     displayedKelurahanLayer = null; 
+                 if (!e.originalEvent.target.closest('.leaflet-popup-content-wrapper')) {
+                     map.removeLayer(displayedKelurahanLayer);
+                     displayedKelurahanLayer = null;
                  }
              }
         });
 
-        // 6. Tombol Pengaturan & Fungsikan Panel
+        // --- 7. Panel Pengaturan ---
         L.Control.Settings = L.Control.extend({
               onAdd: (map) => {
                   const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-settings');
@@ -332,46 +335,45 @@
         });
         new L.Control.Settings({ position: 'topright' }).addTo(map);
 
-        const panel = document.getElementById('pengaturan-panel');
-        document.getElementById('panel-close-btn').addEventListener('click', () => { panel.style.display = 'none'; });
+        document.getElementById('panel-close-btn').addEventListener('click', () => { document.getElementById('pengaturan-panel').style.display = 'none'; });
 
         document.getElementById('kecamatan-filter-list').addEventListener('change', function(e) {
               if (e.target && e.target.matches('.kecamatan-checkbox')) {
-                  const cb = e.target, name = cb.value, group = kecamatanLayerGroups[name];
-                  if (group) {
-                      if (cb.checked) map.addLayer(group);
-                      else {
-                          map.removeLayer(group);
-                          if (displayedKelurahanLayer && map.hasLayer(displayedKelurahanLayer)) { map.removeLayer(displayedKelurahanLayer); displayedKelurahanLayer = null; }
-                      }
-                  }
+                  const group = kecamatanLayerGroups[e.target.value];
+                  if (group) { e.target.checked ? map.addLayer(group) : map.removeLayer(group); }
               }
         });
 
-        // Event listener untuk checkbox kompleks
         document.getElementById('kompleks-checkbox').addEventListener('change', function(e) {
-            if (e.target.checked) {
-                map.addLayer(kompleksLayerGroup);
-            } else {
-                map.removeLayer(kompleksLayerGroup);
-            }
+            e.target.checked ? map.addLayer(kompleksLayerGroup) : map.removeLayer(kompleksLayerGroup);
         });
-        
-        // ==========================================================
-        // ===            [FUNGSI lihatDetail]                      ===
-        // ==========================================================
-        // Fungsi ini dikosongkan agar tidak ada alert saat diklik.
-        function lihatDetail(idKompleks) {
-            console.log("Tombol Lihat Detail Kompleks ID:", idKompleks + " diklik.");
-            // Tambahkan di sini logika untuk pindah ke halaman detail yang sebenarnya
+
+        // --- FUNGSI MODAL ---
+        function lihatDetail(id) {
+            const data = kompleksDataStore[id];
+            if (!data) { alert("Data detail belum termuat."); return; }
+
+            document.getElementById('modal-title').innerText = data.nama_perumahan;
+            document.getElementById('d-pengembang').innerText = data.nama_pengembang;
+            document.getElementById('d-alamat').innerText = data.alamat || '-';
+            document.getElementById('d-kelurahan').innerText = data.kelurahan;
+            document.getElementById('d-kecamatan').innerText = data.kecamatan;
+            
+            document.getElementById('d-sertifikat').innerText = data.jumlah_sertifikat;
+            document.getElementById('d-unit').innerText = data.jumlah_unit;
+            document.getElementById('d-status').innerText = data.status_aset;
+            
+            document.getElementById('d-ibadah').innerText = data.fasilitas_ibadah;
+            document.getElementById('d-umum').innerText = data.fasilitas_umum;
+            document.getElementById('d-pendidikan').innerText = data.fasilitas_pendidikan;
+            document.getElementById('d-kesehatan').innerText = data.fasilitas_kesehatan;
+
+            map.closePopup(); 
+            document.getElementById('modal-detail').style.display = 'flex';
         }
-        
-        function lihatDetailKelurahan(idKelurahan) {
-            console.log("Tombol Lihat Detail Kelurahan ID:", idKelurahan + " diklik.");
-            // Tombol di popup kelurahan sudah ditambahkan map.closePopup() di inline HTML
-            // Tambahkan di sini logika untuk pindah ke halaman detail kelurahan
-        }
-        // ==========================================================
+
+        function tutupModal() { document.getElementById('modal-detail').style.display = 'none'; }
+        document.getElementById('modal-detail').addEventListener('click', function(e) { if (e.target === this) tutupModal(); });
 
     </script>
 </body> 

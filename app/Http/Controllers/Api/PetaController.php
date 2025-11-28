@@ -6,33 +6,32 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\Kecamatan; 
 
 class PetaController extends Controller
 {
-    /**
-     * FUNGSI BARU: Untuk menampilkan halaman peta (peta.blade.php)
-     */
-    public function tampilkanPeta()
-    {
-        return view('peta');
-    }
-
-    /**
-     * API untuk sebaran komplek perumahan (Titik/Point)
-     * PERBAIKAN FINAL: Menggunakan pembagi yang berbeda untuk Lat (10^9) dan Lng (10^7).
-     */
+    // 1. API KOMPLEKS (TITIK)
     public function kompleks(Request $request)
     {
         try {
+            // Mengambil data dari tabel 'kompleks'
             $dataPerumahan = DB::table('kompleks')
                 ->join('kelurahans', 'kompleks.kelurahan_id', '=', 'kelurahans.id')
                 ->join('kecamatans', 'kelurahans.kecamatan_id', '=', 'kecamatans.id')
                 ->select(
                     'kompleks.id',
                     'kompleks.nama_komplek',
+                    'kompleks.nama_pengembang',
+                    // [PERBAIKAN UTAMA DISINI]
+                    'kompleks.alamat_komplek as alamat', // Mengambil 'alamat_komplek' jadi 'alamat'
                     'kompleks.latitude',
                     'kompleks.longitude',
+                    'kompleks.jumlah_sertifikat',
+                    'kompleks.jumlah_unit',
+                    'kompleks.status_aset',
+                    'kompleks.fasilitas_ibadah',
+                    'kompleks.fasilitas_umum',
+                    'kompleks.fasilitas_pendidikan',
+                    'kompleks.fasilitas_kesehatan',
                     'kelurahans.nama_kelurahan',
                     'kecamatans.nama_kecamatan'
                 )
@@ -42,133 +41,85 @@ class PetaController extends Controller
 
             $features = [];
             foreach ($dataPerumahan as $row) {
-                // === PERBAIKAN KOORDINAT FINAL DIMULAI DI SINI ===
-                // Longitude (sekitar 114.xxx): Dibagi 10^7
-                $longitude = (float)$row->longitude / 10000000; 
-                // Latitude (sekitar -3.xxx): Dibagi 10^9
-                $latitude = (float)$row->latitude / 1000000000; 
-                // === PERBAIKAN KOORDINAT FINAL SELESAI DI SINI ===
-                
+                $longitude = (float)$row->longitude;
+                $latitude = (float)$row->latitude;
+
+                // Validasi koordinat
+                if ($longitude == 0 || $latitude == 0) continue;
+
                 $features[] = [
                     'type' => 'Feature',
                     'geometry' => [
                         'type' => 'Point',
-                        // Urutan GeoJSON: [Longitude, Latitude]
-                        'coordinates' => [$longitude, $latitude] 
+                        'coordinates' => [$longitude, $latitude]
                     ],
                     'properties' => [
                         'id' => $row->id,
                         'nama_perumahan' => $row->nama_komplek,
-                        'nama_pengembang' => 'Tidak Diketahui', 
+                        'nama_pengembang' => $row->nama_pengembang ?? '-',
+                        'alamat' => $row->alamat ?? '-', 
                         'kelurahan' => $row->nama_kelurahan,
                         'kecamatan' => $row->nama_kecamatan,
+                        
+                        // Data Detail Lainnya
+                        'jumlah_sertifikat' => $row->jumlah_sertifikat ?? 0,
+                        'jumlah_unit' => $row->jumlah_unit ?? 0,
+                        'status_aset' => $row->status_aset ?? '-',
+                        'fasilitas_ibadah' => $row->fasilitas_ibadah ?? '-',
+                        'fasilitas_umum' => $row->fasilitas_umum ?? '-',
+                        'fasilitas_pendidikan' => $row->fasilitas_pendidikan ?? '-',
+                        'fasilitas_kesehatan' => $row->fasilitas_kesehatan ?? '-',
                     ]
                 ];
             }
             return response()->json(['type' => 'FeatureCollection', 'features' => $features]);
 
         } catch (\Exception $e) {
-            Log::error("Error di API /api/kompleks: " . $e->getMessage());
-            return response()->json(['error' => 'Gagal mengambil data kompleks', 'message' => $e->getMessage()], 500);
+            Log::error("Error API Kompleks: " . $e->getMessage());
+            return response()->json(['error' => 'Gagal', 'msg' => $e->getMessage()], 500);
         }
     }
 
-    /**
-     * API untuk data poligon kecamatan (Area)
-     */
+    // 2. API KECAMATAN (POLIGON)
     public function kecamatan(Request $request)
     {
         try {
-            $dataKecamatan = DB::table('kecamatans')
-                ->whereNotNull('geometri')
-                ->get();
-
+            $data = DB::table('kecamatans')->select('id', 'nama_kecamatan', 'warna', 'geometri')->get();
             $features = [];
-            foreach ($dataKecamatan as $row) {
-                $geometry = null;
-                try {
-                    $geometry = json_decode(trim($row->geometri), false, 512, JSON_THROW_ON_ERROR);
-                } catch (\JsonException $e) {
-                    Log::error("Gagal decode GeoJSON Kecamatan ID {$row->id}: " . $e->getMessage());
-                    continue;
-                }
-
-                if ($geometry) {
-                    $features[] = [
-                        'type' => 'Feature',
-                        'geometry' => $geometry,
-                        'properties' => [
-                            'nama' => $row->nama_kecamatan,
-                            'warna' => $row->warna
-                        ]
-                    ];
-                }
+            foreach ($data as $row) {
+                if (empty($row->geometri)) continue;
+                $geom = json_decode($row->geometri);
+                if (json_last_error() !== JSON_ERROR_NONE) continue;
+                $features[] = [
+                    'type' => 'Feature', 
+                    'geometry' => $geom, 
+                    'properties' => ['nama' => $row->nama_kecamatan, 'warna' => $row->warna]
+                ];
             }
             return response()->json(['type' => 'FeatureCollection', 'features' => $features]);
-
-        } catch (\Exception $e) {
-            Log::error("Error di API /api/kecamatan: " . $e->getMessage());
-            return response()->json(['error' => 'Gagal mengambil data kecamatan', 'message' => $e->getMessage()], 500);
-        }
+        } catch (\Exception $e) { return response()->json(['error' => 'Gagal'], 500); }
     }
 
-    /**
-     * API untuk data poligon kelurahan (Area)
-     */
+    // 3. API KELURAHAN (POLIGON)
     public function kelurahan(Request $request)
     {
         try {
-            $kelurahans = DB::table('kelurahans')
+            $data = DB::table('kelurahans')
                 ->join('kecamatans', 'kelurahans.kecamatan_id', '=', 'kecamatans.id')
-                ->select(
-                    'kelurahans.*', 
-                    'kecamatans.nama_kecamatan' 
-                )
-                ->whereNotNull('kelurahans.geometri') 
+                ->select('kelurahans.id', 'kelurahans.nama_kelurahan', 'kelurahans.geometri', 'kecamatans.nama_kecamatan')
                 ->get();
-
-            $kecamatans = DB::table('kecamatans')->select('id', 'nama_kecamatan')->get();
-
-            $fitur = [];
-            foreach ($kelurahans as $data) {
-                $geometri = null;
-                try {
-                    $geometri = json_decode(trim($data->geometri), false, 512, JSON_THROW_ON_ERROR); 
-                } catch (\JsonException $e) {
-                    Log::error("Gagal decode GeoJSON Kelurahan ID {$data->id}: " . $e->getMessage());
-                    continue;
-                }
-
-                if ($geometri) {
-                    $fitur[] = [
-                        'type' => 'Feature',
-                        'geometry' => $geometri,
-                        'properties' => [
-                            'id' => $data->id, 
-                            'nama_kelurahan' => $data->nama_kelurahan,
-                            'sumber' => $data->sumber, 
-                            'shape_leng' => $data->shape_leng, 
-                            'shape_area' => $data->shape_area, 
-                            'kecamatan_id' => $data->kecamatan_id, 
-                            'nama_kecamatan' => $data->nama_kecamatan,
-                        ]
-                    ];
-                }
+            $features = [];
+            foreach ($data as $row) {
+                if (empty($row->geometri)) continue;
+                $geom = json_decode($row->geometri);
+                if (json_last_error() !== JSON_ERROR_NONE) continue;
+                $features[] = [
+                    'type' => 'Feature', 
+                    'geometry' => $geom, 
+                    'properties' => ['id' => $row->id, 'nama_kelurahan' => $row->nama_kelurahan]
+                ];
             }
-
-            $featureCollection = [
-                'type' => 'FeatureCollection',
-                'features' => $fitur
-            ];
-
-            return response()->json([
-                'geojson' => $featureCollection,
-                'kecamatans' => $kecamatans
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error("Error di API /api/kelurahan: " . $e->getMessage());
-            return response()->json(['error' => 'Gagal mengambil data kelurahan', 'message' => $e->getMessage()], 500);
-        }
+            return response()->json(['geojson' => ['type' => 'FeatureCollection', 'features' => $features]]);
+        } catch (\Exception $e) { return response()->json(['error' => 'Gagal'], 500); }
     }
 }
