@@ -38,7 +38,8 @@ class PengaduanController extends Controller
             'bukti_foto'     => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $filePath = $request->file('bukti_foto')->store('pengaduan', 'public');
+        // Ini akan menyimpan path sebagai pengaduan/foto.jpg
+        $path = $request->file('bukti_foto')->store('pengaduan', 'public'); 
 
         Pengaduan::create([
             'nama_pelapor'   => $validated['nama_pelapor'],
