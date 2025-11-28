@@ -24,33 +24,24 @@ class UserDashboardController extends Controller
             'joined'   => $user->created_at,
         ];
 
-        // ====== PENGADUAN: stats + 5 terbaru (DIPERBARUI) ======
+        // ====== PENGADUAN: stats + 5 terbaru ======
         $pengaduan = [
-            'stats'  => ['diterima'=>0,'diproses'=>0,'selesai'=>0,'total'=>0],
+            'stats'  => ['total' => 0, 'diterima' => 0, 'selesai' => 0],
             'recent' => collect(),
         ];
 
         if (Schema::hasTable('pengaduans')) {
-            // PERBAIKAN (Tahap D): Query statistik menggunakan konstanta status baru
-            $rows = DB::table('pengaduans')
-                ->select('status', DB::raw('COUNT(*) as c'))
-                ->where('user_id', $user->id)
-                ->groupBy('status')
-                ->pluck('c','status');
+            $baseQuery = fn() => DB::table('pengaduans')->where('user_id', $user->id);
 
-            // Sesuaikan perhitungan statistik berdasarkan status baru
-            $pengaduan['stats']['diterima'] = (int) ($rows[Pengaduan::STATUS_DITERIMA] ?? 0) + (int) ($rows[Pengaduan::STATUS_DIVERIFIKASI_JF] ?? 0);
-            $pengaduan['stats']['diproses'] = (int) ($rows[Pengaduan::STATUS_DIPROSES] ?? 0);
-            $pengaduan['stats']['selesai']  = (int) ($rows[Pengaduan::STATUS_SELESAI] ?? 0);
-            $pengaduan['stats']['total']    = $pengaduan['stats']['diterima']
-                                             + $pengaduan['stats']['diproses']
-                                             + $pengaduan['stats']['selesai']
-                                             + (int) ($rows[Pengaduan::STATUS_DITOLAK] ?? 0); // Total termasuk yg ditolak
+            // Hitung statistik berdasarkan definisi baru
+            $pengaduan['stats']['total']    = $baseQuery()->count();
+            $pengaduan['stats']['diterima'] = $baseQuery()->where('status', Pengaduan::STATUS_DITERIMA)->count();
+            $pengaduan['stats']['selesai']  = $baseQuery()->where('status', Pengaduan::STATUS_DISETUJUI_KADIS)->count();
 
-            // PERBAIKAN (Error): Tambahkan 'isi_pengaduan' ke select
+            // Ambil 5 pengaduan terbaru
             $pengaduan['recent'] = DB::table('pengaduans')
                 ->select([
-                    'id','status','created_at', 'isi_pengaduan', // <-- TAMBAHKAN INI
+                    'id','status','created_at', 'isi_pengaduan',
                     DB::raw("
                         COALESCE(
                             NULLIF(TRIM(isi_pengaduan), ''),
@@ -61,13 +52,7 @@ class UserDashboardController extends Controller
                 ->where('user_id', $user->id)
                 ->orderByDesc('created_at')
                 ->limit(5)
-                ->get()
-                ->map(function ($r) {
-                    // PERBAIKAN (Tahap D): Normalisasi status tidak lagi diperlukan
-                    // $s = strtolower($r->status);
-                    // $r->status = $s === 'diproses' ? 'proses' : $s;
-                    return $r;
-                });
+                ->get();
         }
 
         // ====== E-PROPOSAL: stats + 5 terbaru (DIPERBARUI) ======

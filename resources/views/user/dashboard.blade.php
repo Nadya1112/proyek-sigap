@@ -29,8 +29,8 @@
                 Kelola semua pengaduan dan e-proposal Anda dengan mudah dalam satu tempat terpusat.
             </p>
 
-            {{-- Quick Stats (Rapi dengan 3 item) --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10 max-w-3xl mx-auto">
+            {{-- Quick Stats (Rapi dengan 2 item) --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10 max-w-xl mx-auto">
                 <div class="rounded-2xl bg-white/10 p-4 text-center ring-1 ring-white/20 backdrop-blur-sm transition hover:bg-white/15">
                     <div class="text-3xl font-bold">{{ $pengaduan['stats']['total'] ?? 0 }}</div>
                     <div class="mt-1 text-xs uppercase tracking-wider text-white/80">Total Pengaduan</div>
@@ -38,10 +38,6 @@
                 <div class="rounded-2xl bg-white/10 p-4 text-center ring-1 ring-white/20 backdrop-blur-sm transition hover:bg-white/15">
                     <div class="text-3xl font-bold">{{ $proposal['stats']['total'] ?? 0 }}</div>
                     <div class="mt-1 text-xs uppercase tracking-wider text-white/80">Total Proposal</div>
-                </div>
-                <div class="rounded-2xl bg-white/10 p-4 text-center ring-1 ring-white/20 backdrop-blur-sm transition hover:bg-white/15">
-                     <div class="text-3xl font-bold">{{ $pengaduan['stats']['proses'] ?? 0 }}</div>
-                    <div class="mt-1 text-xs uppercase tracking-wider text-white/80">Dalam Proses</div>
                 </div>
             </div>
         </div>
@@ -116,13 +112,13 @@
                 <div class="mt-4 border-t border-gray-100">
                      @forelse($pengaduan['recent'] as $row)
     @php
-        // Logika untuk warna badge berdasarkan status baru
+        // Logika untuk warna badge berdasarkan status yang disamakan dengan proposal
         $colorClass = match($row->status) {
-            \App\Models\Pengaduan::STATUS_SELESAI => 'bg-green-100 text-green-800',
-            \App\Models\Pengaduan::STATUS_DIPROSES => 'bg-orange-100 text-orange-800',
-            \App\Models\Pengaduan::STATUS_DIVERIFIKASI_JF => 'bg-blue-100 text-blue-800',
+            \App\Models\Pengaduan::STATUS_DISETUJUI_KADIS => 'bg-green-100 text-green-800',
+            \App\Models\Pengaduan::STATUS_DISETUJUI_KABID => 'bg-blue-100 text-blue-800',
+            \App\Models\Pengaduan::STATUS_DIVERIFIKASI_JF => 'bg-cyan-100 text-cyan-800',
             \App\Models\Pengaduan::STATUS_DITOLAK => 'bg-red-100 text-red-800',
-            default => 'bg-gray-100 text-gray-800', // Status Diterima
+            default => 'bg-orange-100 text-orange-800', // For STATUS_DIAJUKAN
         };
     @endphp
     <div class="py-4 border-b border-gray-100 flex items-center justify-between gap-4">

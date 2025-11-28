@@ -15,12 +15,11 @@ class PengaduanController extends Controller
 {
     $stats = [
         'total'    => Pengaduan::count(),
-        'diterima' => Pengaduan::whereIn('status', [Pengaduan::STATUS_DITERIMA, Pengaduan::STATUS_DIVERIFIKASI_JF])->count(), // Gabung Diterima & Diverifikasi
-        'proses'   => Pengaduan::where('status', Pengaduan::STATUS_DIPROSES)->count(),
-        'selesai'  => Pengaduan::where('status', Pengaduan::STATUS_SELESAI)->count(),
+        'diterima' => Pengaduan::where('status', Pengaduan::STATUS_DITERIMA)->count(),
+        'selesai'  => Pengaduan::where('status', Pengaduan::STATUS_DISETUJUI_KADIS)->count(),
     ];
     return view('public.pengaduan', $stats);
-}
+} 
 
     /**
      * Menyimpan data pengaduan baru dari form.
@@ -45,11 +44,11 @@ class PengaduanController extends Controller
             'nama_pelapor'   => $validated['nama_pelapor'],
             'kontak_pelapor' => $validated['kontak_pelapor'],
             'isi_pengaduan'  => $validated['isi_pengaduan'],
-            'bukti_foto'     => $filePath,
+            'bukti_foto'     => $path,
             'user_id'        => Auth::id(),
-            'status'         => 'Diterima',
+            'status'         => Pengaduan::STATUS_DIAJUKAN,
         ]);
 
-        return redirect()->back()->with('success', 'Pengaduan Anda berhasil dikirim! Terima kasih.');
+        return redirect()->back()->with('success', 'Pengaduan Anda berhasil diajukan! Terima kasih.');
     }
 }

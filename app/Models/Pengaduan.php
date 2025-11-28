@@ -10,11 +10,12 @@ class Pengaduan extends Model
     use HasFactory;
     protected $guarded = [];
 
-    // Konstanta status pengaduan baru (sesuai migrasi Tahap A)
-    public const STATUS_DITERIMA = 'Diterima';
+    // Konstanta status disamakan dengan Proposal
+    public const STATUS_DIAJUKAN = 'Diajukan';
+    public const STATUS_DITERIMA = 'Diterima'; // Ditambahkan untuk alur baru
     public const STATUS_DIVERIFIKASI_JF = 'Diverifikasi JF';
-    public const STATUS_DIPROSES = 'Diproses';
-    public const STATUS_SELESAI = 'Selesai';
+    public const STATUS_DISETUJUI_KABID = 'Disetujui Kabid';
+    public const STATUS_DISETUJUI_KADIS = 'Disetujui Kadis';
     public const STATUS_DITOLAK = 'Ditolak';
 
     public function user(): BelongsTo

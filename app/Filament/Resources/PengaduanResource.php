@@ -4,12 +4,13 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PengaduanResource\Pages;
 use App\Models\Pengaduan;
-use App\Models\User; // Import User
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,24 +20,20 @@ class PengaduanResource extends Resource
     protected static ?string $navigationGroup = 'Pelayanan Publik';
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
-    // Helper function untuk cek hak ubah status
+    // Helper function untuk cek hak ubah status sesuai alur baru
     private static function canUpdateStatus(User $user, ?string $currentStatus): bool
     {
         if (!$currentStatus) return false;
         if ($user->isSuperAdmin()) return true;
 
+        // Alur status baru
         return match ($currentStatus) {
-            Pengaduan::STATUS_DITERIMA => $user->isStaff() || $user->isJfPsu(),
-            Pengaduan::STATUS_DIVERIFIKASI_JF => $user->isJfPsu(),
-            Pengaduan::STATUS_DIPROSES => $user->isJfPsu(),
-            default => false,
+            Pengaduan::STATUS_DIAJUKAN => $user->isStaff(),
+            Pengaduan::STATUS_DITERIMA => $user->isJfPsu(),
+            Pengaduan::STATUS_DIVERIFIKASI_JF => $user->isKabid(),
+            Pengaduan::STATUS_DISETUJUI_KABID => $user->isKadis(),
+            default => false, // Status final (Disetujui Kadis, Ditolak) tidak bisa diubah
         };
-    }
-    
-    // Helper function untuk cek hak hapus
-    private static function canDeleteAccess(User $user): bool
-    {
-        return $user->isSuperAdmin() || $user->isJfPsu() || $user->isKabid() || $user->isKadis();
     }
     
     public static function form(Form $form): Form
@@ -59,7 +56,7 @@ class PengaduanResource extends Resource
                         Forms\Components\FileUpload::make('bukti_foto')->image()->disabled()->label('Bukti Foto')->disk('public'),
                     ]),
 
-                Forms\Components\Section::make('Tindak Lanjut Admin')
+                Forms\Components\Section::make('Tindak Lanjut')
                     ->visible(fn (?Model $record) => $user->isSuperAdmin() || ($record && self::canUpdateStatus($user, $record->status)))
                     ->schema([
                         Forms\Components\Select::make('status')
@@ -70,35 +67,47 @@ class PengaduanResource extends Resource
 
                                 if ($user->isSuperAdmin()) {
                                     return [
-                                        Pengaduan::STATUS_DITERIMA => 'Diterima',
+                                        Pengaduan::STATUS_DIAJUKAN => 'Diajukan',
+                                        Pengaduan::STATUS_DITERIMA => 'Diterima (Staff)',
                                         Pengaduan::STATUS_DIVERIFIKASI_JF => 'Diverifikasi (JF PSU)',
-                                        Pengaduan::STATUS_DIPROSES => 'Diproses',
-                                        Pengaduan::STATUS_SELESAI => 'Selesai',
-                                        Pengaduan::STATUS_DITOLAK => 'Ditolak',
+                                        Pengaduan::STATUS_DISETUJUI_KABID => 'Setujui (Kabid)',
+                                        Pengaduan::STATUS_DISETUJUI_KADIS => 'Setujui Final (Kadis)',
+                                        Pengaduan::STATUS_DITOLAK => 'Tolak',
                                     ];
                                 }
 
-                                // Logika alur status berdasarkan role
+                                // Logika alur status baru berdasarkan role
                                 switch ($currentStatus) {
-                                    case Pengaduan::STATUS_DITERIMA:
-                                        if ($user->isStaff() || $user->isJfPsu()) $options[Pengaduan::STATUS_DITOLAK] = 'Tolak';
-                                        if ($user->isJfPsu()) $options[Pengaduan::STATUS_DIVERIFIKASI_JF] = 'Verifikasi (JF PSU)';
-                                        break;
-                                    case Pengaduan::STATUS_DIVERIFIKASI_JF:
-                                        if ($user->isJfPsu()) {
-                                             $options[Pengaduan::STATUS_DITOLAK] = 'Tolak';
-                                             $options[Pengaduan::STATUS_DIPROSES] = 'Proses (Tindak Lanjut)';
+                                    case Pengaduan::STATUS_DIAJUKAN:
+                                        if ($user->isStaff()) {
+                                            $options[Pengaduan::STATUS_DITERIMA] = 'Terima';
+                                            $options[Pengaduan::STATUS_DITOLAK] = 'Tolak';
                                         }
                                         break;
-                                    case Pengaduan::STATUS_DIPROSES:
-                                        if ($user->isJfPsu()) $options[Pengaduan::STATUS_SELESAI] = 'Selesai';
+                                    case Pengaduan::STATUS_DITERIMA:
+                                        if ($user->isJfPsu()) {
+                                            $options[Pengaduan::STATUS_DIVERIFIKASI_JF] = 'Verifikasi';
+                                            $options[Pengaduan::STATUS_DITOLAK] = 'Tolak';
+                                        }
+                                        break;
+                                    case Pengaduan::STATUS_DIVERIFIKASI_JF:
+                                        if ($user->isKabid()) {
+                                            $options[Pengaduan::STATUS_DISETUJUI_KABID] = 'Setujui';
+                                            $options[Pengaduan::STATUS_DITOLAK] = 'Tolak';
+                                        }
+                                        break;
+                                    case Pengaduan::STATUS_DISETUJUI_KABID:
+                                        if ($user->isKadis()) {
+                                            $options[Pengaduan::STATUS_DISETUJUI_KADIS] = 'Setujui Final';
+                                            $options[Pengaduan::STATUS_DITOLAK] = 'Tolak';
+                                        }
                                         break;
                                 }
                                 return $options;
                             })
                             ->required(),
-                        Forms\Components\Textarea::make('catatan_admin') // Kolom baru
-                            ->label('Catatan Admin (Internal)')
+                        Forms\Components\Textarea::make('catatan_admin')
+                            ->label('Catatan (Internal)')
                             ->columnSpanFull(),
                     ]),
             ]);
@@ -107,6 +116,7 @@ class PengaduanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(self::getEloquentQueryForTable()) // Terapkan query filter di sini
             ->columns([
                 Tables\Columns\TextColumn::make('nama_pelapor')->searchable(),
                 Tables\Columns\ImageColumn::make('bukti_foto')->label('Bukti')->disk('public'),
@@ -114,10 +124,11 @@ class PengaduanResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        Pengaduan::STATUS_DITERIMA => 'primary',
-                        Pengaduan::STATUS_DIVERIFIKASI_JF => 'info',
-                        Pengaduan::STATUS_DIPROSES => 'warning',
-                        Pengaduan::STATUS_SELESAI => 'success',
+                        Pengaduan::STATUS_DIAJUKAN => 'warning',
+                        Pengaduan::STATUS_DITERIMA => 'info',
+                        Pengaduan::STATUS_DIVERIFIKASI_JF => 'primary',
+                        Pengaduan::STATUS_DISETUJUI_KABID => 'success',
+                        Pengaduan::STATUS_DISETUJUI_KADIS => 'success',
                         Pengaduan::STATUS_DITOLAK => 'danger',
                         default => 'gray',
                     })
@@ -126,19 +137,42 @@ class PengaduanResource extends Resource
             ])
            ->actions([
                 Tables\Actions\EditAction::make(),
-                // PERUBAHAN: Tombol Delete hanya terlihat oleh Super Admin
                 Tables\Actions\DeleteAction::make()
                     ->visible(fn (User $user) => $user->isSuperAdmin()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    // PERUBAHAN: Tombol Bulk Delete hanya terlihat oleh Super Admin
                     Tables\Actions\DeleteBulkAction::make()
                         ->visible(fn (User $user) => $user->isSuperAdmin()),
                 ]),
             ]);
     }
     
+    // Metode baru untuk mendefinisikan query tabel
+    public static function getEloquentQueryForTable(): Builder
+    {
+        $user = Auth::user();
+        $query = Pengaduan::query();
+
+        if ($user->isSuperAdmin()) {
+            return $query;
+        }
+
+        return $query->where(function (Builder $subQuery) use ($user) {
+            if ($user->isKadis()) {
+                $subQuery->where('status', Pengaduan::STATUS_DISETUJUI_KABID);
+            } elseif ($user->isKabid()) {
+                $subQuery->where('status', Pengaduan::STATUS_DIVERIFIKASI_JF);
+            } elseif ($user->isJfPsu()) {
+                $subQuery->where('status', Pengaduan::STATUS_DITERIMA);
+            } elseif ($user->isStaff()) {
+                $subQuery->where('status', Pengaduan::STATUS_DIAJUKAN);
+            } else {
+                $subQuery->whereRaw('1 = 0');
+            }
+        });
+    }
+
     public static function getPages(): array
     {
         return [
@@ -149,18 +183,21 @@ class PengaduanResource extends Resource
     
     public static function canCreate(): bool { return false; }
     
-   // PERUBAHAN: Hanya Super Admin yang bisa menghapus
     public static function canDelete(Model $record): bool
     { return Auth::user()->isSuperAdmin(); }
     
     public static function canDeleteAny(): bool
     { return Auth::user()->isSuperAdmin(); }
     
-    // PERUBAHAN: Edit tetap bisa, sesuai logika status
     public static function canEdit(Model $record): bool
     {
         /** @var User $user */
         $user = Auth::user();
+        
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
         return self::canUpdateStatus($user, $record->status);
     }
 }
