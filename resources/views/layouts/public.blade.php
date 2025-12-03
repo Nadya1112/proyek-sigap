@@ -63,54 +63,72 @@
                 <!-- Login Button / User Dropdown Desktop -->
                 <div id="desktop-user-section" style="display: none;">
                     @auth
-                        <!-- User Dropdown -->
-                        <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open"
-                                class="flex items-center gap-3 text-gray-700 hover:text-sigap-yellow transition-colors duration-300 focus:outline-none">
-                                <div
-                                    class="w-10 h-10 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center transform transition-transform duration-300 hover:scale-110">
-                                    <span class="text-white font-bold text-base">
-                                        {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
-                                    </span>
-                                </div>
-                                <span class="font-semibold">{{ auth()->user()->name }}</span>
-                                <svg class="w-5 h-5 transition-transform duration-300" :class="{ 'rotate-180': open }"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
+                        <div class="flex items-center gap-4">
+                             <!-- Notif Icon -->
+                            <a href="{{ route('user.notifications') }}" class="relative text-gray-600 hover:text-sigap-yellow transition-colors duration-300">
+                                <i data-feather="bell" class="w-6 h-6"></i>
+                                @if(auth()->user()->unreadNotifications->count() > 0)
+                                    <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                                @endif
+                            </a>
+                            <!-- User Dropdown -->
+                            <div class="relative" x-data="{ open: false }">
+                                <button @click="open = !open"
+                                    class="flex items-center gap-3 text-gray-700 hover:text-sigap-yellow transition-colors duration-300 focus:outline-none">
+                                    <div
+                                        class="w-10 h-10 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center transform transition-transform duration-300 hover:scale-110">
+                                        <span class="text-white font-bold text-base">
+                                            {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                        </span>
+                                    </div>
+                                    <span class="font-semibold">{{ auth()->user()->name }}</span>
+                                    <svg class="w-5 h-5 transition-transform duration-300" :class="{ 'rotate-180': open }"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
 
-                            <!-- Dropdown Menu -->
-                            <div x-show="open" @click.away="open = false"
-                                x-transition:enter="transition ease-out duration-200"
-                                x-transition:enter-start="opacity-0 transform scale-95"
-                                x-transition:enter-end="opacity-100 transform scale-100"
-                                x-transition:leave="transition ease-in duration-150"
-                                x-transition:leave-start="opacity-100 transform scale-100"
-                                x-transition:leave-end="opacity-0 transform scale-95"
-                                class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-lg border border-gray-100 z-50">
+                                <!-- Dropdown Menu -->
+                                <div x-show="open" @click.away="open = false"
+                                    x-transition:enter="transition ease-out duration-200"
+                                    x-transition:enter-start="opacity-0 transform scale-95"
+                                    x-transition:enter-end="opacity-100 transform scale-100"
+                                    x-transition:leave="transition ease-in duration-150"
+                                    x-transition:leave-start="opacity-100 transform scale-100"
+                                    x-transition:leave-end="opacity-0 transform scale-95"
+                                    class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-lg border border-gray-100 z-50">
 
-                                <!-- User Info -->
-                                <div class="px-4 py-3 border-b border-gray-100">
-                                    <div class="flex items-center gap-4">
-                                        <div
-                                            class="w-14 h-14 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center">
-                                            <span class="text-white font-bold text-xl">
-                                                {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <p class="font-bold text-gray-800 text-lg">{{ auth()->user()->name }}</p>
-                                            <p class="text-sm text-gray-500">{{ auth()->user()->email }}</p>
+                                    <!-- User Info -->
+                                    <div class="px-4 py-3 border-b border-gray-100">
+                                        <div class="flex items-center gap-4">
+                                            <div
+                                                class="w-14 h-14 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center">
+                                                <span class="text-white font-bold text-xl">
+                                                    {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <p class="font-bold text-gray-800 text-lg">{{ auth()->user()->name }}</p>
+                                                <p class="text-sm text-gray-500">{{ auth()->user()->email }}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="space-y-1 p-2">
+                                    <div class="space-y-1 p-2">
                                     <a href="{{ route('user.dashboard') }}"
                                         class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:text-sigap-yellow {{ request()->routeIs('user.dashboard') ? 'bg-gray-100 text-sigap-yellow' : 'hover:bg-gray-50' }}">
                                         <i data-feather="grid" class="w-5 h-5"></i>
                                         <span>Dashboard</span>
+                                    </a>
+                                    <a href="{{ route('user.notifications') }}"
+                                        class="flex items-center justify-between gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:text-sigap-yellow {{ request()->routeIs('user.notifications') ? 'bg-gray-100 text-sigap-yellow' : 'hover:bg-gray-50' }}">
+                                        <div class="flex items-center gap-3">
+                                            <i data-feather="bell" class="w-5 h-5"></i>
+                                            <span>Notifikasi</span>
+                                        </div>
+                                        @if(auth()->user()->unreadNotifications->count() > 0)
+                                            <span class="text-xs font-bold bg-red-500 text-white rounded-full px-2 py-0.5">{{ auth()->user()->unreadNotifications->count() }}</span>
+                                        @endif
                                     </a>
                                     <a href="{{ route('profil.index') }}#profil" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-sigap-yellow">
                                         <i data-feather="user" class="w-5 h-5"></i>
@@ -135,6 +153,7 @@
                                         </button>
                                     </form>
                                 </div>
+                                </div>
                             </div>
                         </div>
                     @else
@@ -148,15 +167,24 @@
                 </div>
 
                 <!-- Mobile Menu Button & User Icon -->
-                <div id="mobile-controls" style="display: none;">
+                <div id="mobile-controls" style="display: none;" class="flex items-center gap-4">
                     @auth
-                        <!-- Mobile User Button -->
-                        <a href="{{ route('user.dashboard') }}"
-                            class="w-9 h-9 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center transform transition-transform duration-300 hover:scale-110">
-                            <span class="text-white font-bold text-sm">
-                                {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
-                            </span>
-                        </a>
+                        <div class="flex items-center gap-4">
+                            <!-- Notif Icon -->
+                            <a href="{{ route('user.notifications') }}" class="relative text-gray-600 hover:text-sigap-yellow transition-colors duration-300">
+                                <i data-feather="bell" class="w-6 h-6"></i>
+                                @if(auth()->user()->unreadNotifications->count() > 0)
+                                    <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                                @endif
+                            </a>
+                            <!-- Mobile User Button -->
+                            <a href="{{ route('user.dashboard') }}"
+                                class="w-9 h-9 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center transform transition-transform duration-300 hover:scale-110">
+                                <span class="text-white font-bold text-sm">
+                                    {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                </span>
+                            </a>
+                        </div>
                     @else
                         <!-- Mobile Login Button -->
                         <a href="{{ route('login') }}" class="btn-gradient text-sm px-4 py-2">
@@ -228,6 +256,19 @@
                                 @click="mobileMenuOpen = false">
                                 <i data-feather="grid" class="w-5 h-5"></i>
                                 <span>Dashboard</span>
+                            </a>
+                            <a href="{{ route('user.notifications') }}"
+                                class="mobile-nav-link {{ request()->routeIs('user.notifications') ? 'active' : '' }}"
+                                @click="mobileMenuOpen = false">
+                                <div class="flex items-center justify-between w-full">
+                                    <div class="flex items-center gap-4">
+                                        <i data-feather="bell" class="w-5 h-5"></i>
+                                        <span>Notifikasi</span>
+                                    </div>
+                                    @if(auth()->user()->unreadNotifications->count() > 0)
+                                        <span class="text-xs font-bold bg-red-500 text-white rounded-full px-2 py-0.5">{{ auth()->user()->unreadNotifications->count() }}</span>
+                                    @endif
+                                </div>
                             </a>
                             <a href="{{ route('profil.index') }}#profil" 
                                 class="mobile-nav-link"

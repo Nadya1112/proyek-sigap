@@ -4,6 +4,11 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
+use App\Models\Pengaduan;
+use App\Models\Proposal;
+use App\Observers\PengaduanObserver;
+use App\Observers\ProposalObserver;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -23,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Pengaduan::observe(PengaduanObserver::class);
+        Proposal::observe(ProposalObserver::class);
     }
 }

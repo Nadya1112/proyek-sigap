@@ -2,55 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Proposal;
-use App\Models\Komplek;
 use App\Models\Kecamatan;
-use App\Models\Kelurahan; // Pastikan ini di-import
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB; // Import DB Facade untuk query langsung
-use Illuminate\Support\Facades\Log; // Import Log Facade untuk debugging
-use Illuminate\Support\Facades\Storage; // <-- Import Storage Facade
-
-class EproposalController extends Controller
-{
-    /**
-     * Menampilkan form, mengirim data Kecamatan awal.
-     */
-public function showForm()
-{
-    $stats = [
-        'total'         => Proposal::count(),
-        'diajukan'       => Proposal::where('status', Proposal::STATUS_DIAJUKAN)->count(),
-        'diverifikasi'  => Proposal::where('status', Proposal::STATUS_DIVERIFIKASI_JF)->count(),
-        'disetujui'     => Proposal::whereIn('status', [Proposal::STATUS_DISETUJUI_KABID, Proposal::STATUS_DISETUJUI_KADIS])->count(),
-    ];
-    $kecamatans = Kecamatan::orderBy('nama_kecamatan')->get(['id', 'nama_kecamatan']);
-    return view('public.eproposal', compact('stats', 'kecamatans'));
-}
-
-    /**
-     * Menyimpan proposal (Logika ini sudah benar dan tidak berubah).
-     */
-    use App\Models\User;
+use App\Models\Kelurahan;
+use App\Models\Komplek;
+use App\Models\Proposal;
+use App\Models\User;
 use App\Notifications\ProposalUpdatedNotification;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class EproposalController extends Controller
 {
     /**
      * Menampilkan form, mengirim data Kecamatan awal.
      */
-public function showForm()
-{
-    $stats = [
-        'total'         => Proposal::count(),
-        'diajukan'       => Proposal::where('status', Proposal::STATUS_DIAJUKAN)->count(),
-        'diverifikasi'  => Proposal::where('status', Proposal::STATUS_DIVERIFIKASI_JF)->count(),
-        'disetujui'     => Proposal::whereIn('status', [Proposal::STATUS_DISETUJUI_KABID, Proposal::STATUS_DISETUJUI_KADIS])->count(),
-    ];
-    $kecamatans = Kecamatan::orderBy('nama_kecamatan')->get(['id', 'nama_kecamatan']);
-    return view('public.eproposal', compact('stats', 'kecamatans'));
-}
+    public function showForm()
+    {
+        $stats = [
+            'total'         => Proposal::count(),
+            'diajukan'       => Proposal::where('status', Proposal::STATUS_DIAJUKAN)->count(),
+            'diverifikasi'  => Proposal::where('status', Proposal::STATUS_DIVERIFIKASI_JF)->count(),
+            'disetujui'     => Proposal::whereIn('status', [Proposal::STATUS_DISETUJUI_KABID, Proposal::STATUS_DISETUJUI_KADIS])->count(),
+        ];
+        $kecamatans = Kecamatan::orderBy('nama_kecamatan')->get(['id', 'nama_kecamatan']);
+        return view('public.eproposal', compact('stats', 'kecamatans'));
+    }
 
     /**
      * Menyimpan proposal (Logika ini sudah benar dan tidak berubah).
@@ -80,21 +59,6 @@ public function showForm()
             'status'         => 'Diajukan',
         ]);
 
-        // Kirim notifikasi ke semua admin yang relevan
-        $admins = User::whereIn('role', [
-            User::ROLE_STAFF,
-            User::ROLE_JF_PSU,
-            User::ROLE_KABID,
-            User::ROLE_KADIS
-        ])->get();
-
-        $title = 'Proposal Baru Diterima';
-        $body = "Proposal baru telah diajukan oleh {$proposal->nama_pengaju} dan menunggu tinjauan.";
-
-        foreach ($admins as $admin) {
-            $admin->notify(new ProposalUpdatedNotification($proposal, $title, $body));
-        }
-
         return redirect()->route('eproposal')->with('success', 'Proposal Anda berhasil dikirim! Terima kasih.');
     }
 
@@ -107,16 +71,16 @@ public function showForm()
 
         // Validasi sederhana
         if (!ctype_digit((string)$kecamatanId)) {
-             Log::warning("ID Kecamatan tidak valid: " . $kecamatanId);
-             return response()->json([], 400); // Bad request
+            Log::warning("ID Kecamatan tidak valid: " . $kecamatanId);
+            return response()->json([], 400); // Bad request
         }
 
         // Query langsung ke tabel kelurahans
         $kelurahans = DB::table('kelurahans')
-                        ->where('kecamatan_id', $kecamatanId)
-                        ->orderBy('nama_kelurahan')
-                        ->select('id', 'nama_kelurahan') // Eksplisit pilih kolom
-                        ->get();
+            ->where('kecamatan_id', $kecamatanId)
+            ->orderBy('nama_kelurahan')
+            ->select('id', 'nama_kelurahan') // Eksplisit pilih kolom
+            ->get();
 
         Log::info("Kelurahan ditemukan: " . $kelurahans->count());
         return response()->json($kelurahans);
@@ -130,16 +94,16 @@ public function showForm()
         Log::info("Mencari komplek untuk kelurahan ID: " . $kelurahanId);
 
         if (!ctype_digit((string)$kelurahanId)) {
-             Log::warning("ID Kelurahan tidak valid: " . $kelurahanId);
-             return response()->json([], 400);
+            Log::warning("ID Kelurahan tidak valid: " . $kelurahanId);
+            return response()->json([], 400);
         }
 
         // Query langsung ke tabel kompleks
         $kompleks = DB::table('kompleks')
-                      ->where('kelurahan_id', $kelurahanId)
-                      ->orderBy('nama_komplek')
-                      ->select('id', 'nama_komplek') // Eksplisit pilih kolom
-                      ->get();
+            ->where('kelurahan_id', $kelurahanId)
+            ->orderBy('nama_komplek')
+            ->select('id', 'nama_komplek') // Eksplisit pilih kolom
+            ->get();
 
         Log::info("Komplek ditemukan: " . $kompleks->count());
         return response()->json($kompleks);

@@ -112,29 +112,7 @@ class ProposalResource extends Resource
                                 }
                                 return $options;
                             })
-                            ->required()
-                            ->afterStateUpdated(function ($state, $record) {
-                                if (!$record) return;
-                                
-                                /** @var Proposal $proposal */
-                                $proposal = $record;
-                                $author = $proposal->user;
-                            
-                                if (!$author) return;
-                            
-                                // Membuat pesan notifikasi
-                                [$title, $body] = self::getNotificationMessage($state);
-                            
-                                // Kirim notifikasi ke author
-                                $author->notify(new ProposalUpdatedNotification($proposal, $title, $body));
-                            
-                                // Notifikasi sukses untuk admin
-                                FilamentNotification::make()
-                                    ->title('Notifikasi Terkirim')
-                                    ->body("Notifikasi telah dikirim ke '{$author->name}' mengenai perubahan status proposal.")
-                                    ->success()
-                                    ->send();
-                            }),
+                            ->required(),
                         
                         Forms\Components\Textarea::make('catatan_admin')
                             ->label('Catatan Admin (Internal)')

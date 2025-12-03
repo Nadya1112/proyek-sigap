@@ -123,4 +123,15 @@ class UserDashboardController extends Controller
 
         return view('user.dashboard', compact('akun','pengaduan','proposal','timeline','announcements'));
     }
+
+    public function notifications()
+    {
+        $user = Auth::user();
+        $notifications = $user->notifications;
+
+        // Mark all unread notifications as read
+        $user->unreadNotifications->markAsRead();
+
+        return view('user.notifikasi', compact('notifications'));
+    }
 }
