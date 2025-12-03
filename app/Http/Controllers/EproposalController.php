@@ -32,6 +32,29 @@ public function showForm()
     /**
      * Menyimpan proposal (Logika ini sudah benar dan tidak berubah).
      */
+    use App\Models\User;
+use App\Notifications\ProposalUpdatedNotification;
+
+class EproposalController extends Controller
+{
+    /**
+     * Menampilkan form, mengirim data Kecamatan awal.
+     */
+public function showForm()
+{
+    $stats = [
+        'total'         => Proposal::count(),
+        'diajukan'       => Proposal::where('status', Proposal::STATUS_DIAJUKAN)->count(),
+        'diverifikasi'  => Proposal::where('status', Proposal::STATUS_DIVERIFIKASI_JF)->count(),
+        'disetujui'     => Proposal::whereIn('status', [Proposal::STATUS_DISETUJUI_KABID, Proposal::STATUS_DISETUJUI_KADIS])->count(),
+    ];
+    $kecamatans = Kecamatan::orderBy('nama_kecamatan')->get(['id', 'nama_kecamatan']);
+    return view('public.eproposal', compact('stats', 'kecamatans'));
+}
+
+    /**
+     * Menyimpan proposal (Logika ini sudah benar dan tidak berubah).
+     */
     public function store(Request $request)
     {
         if (!Auth::check()) {
@@ -46,7 +69,7 @@ public function showForm()
             'catatan'        => 'nullable|string',
         ]);
         $filePath = $request->file('proposal')->store('proposals', 'public');
-        Proposal::create([
+        $proposal = Proposal::create([
             'user_id'        => Auth::id(),
             'kompleks_id'    => $validated['kompleks_id'],
             'nama_pengaju'   => $validated['nama_pengaju'],
@@ -56,6 +79,22 @@ public function showForm()
             'catatan'        => $validated['catatan'],
             'status'         => 'Diajukan',
         ]);
+
+        // Kirim notifikasi ke semua admin yang relevan
+        $admins = User::whereIn('role', [
+            User::ROLE_STAFF,
+            User::ROLE_JF_PSU,
+            User::ROLE_KABID,
+            User::ROLE_KADIS
+        ])->get();
+
+        $title = 'Proposal Baru Diterima';
+        $body = "Proposal baru telah diajukan oleh {$proposal->nama_pengaju} dan menunggu tinjauan.";
+
+        foreach ($admins as $admin) {
+            $admin->notify(new ProposalUpdatedNotification($proposal, $title, $body));
+        }
+
         return redirect()->route('eproposal')->with('success', 'Proposal Anda berhasil dikirim! Terima kasih.');
     }
 

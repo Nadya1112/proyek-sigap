@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Model; // Import Model
 use Illuminate\Support\Facades\Auth; // Import Auth
 use Illuminate\Support\Facades\Storage; // Import Storage
 
+use App\Notifications\ProposalUpdatedNotification; // Import Notifikasi
+use Filament\Notifications\Notification as FilamentNotification; // Import Filament Notif
+
 class ProposalResource extends Resource
 {
     protected static ?string $model = Proposal::class;
@@ -22,7 +25,7 @@ class ProposalResource extends Resource
     protected static ?int $navigationSort = 2;
 
     // Helper function untuk cek hak ubah status
-private static function canUpdateStatus(User $user, ?string $currentStatus): bool
+    private static function canUpdateStatus(User $user, ?string $currentStatus): bool
     {
         if (!$currentStatus) return false;
         if ($user->isSuperAdmin()) return true; // Super admin bisa kapan saja
@@ -109,7 +112,29 @@ private static function canUpdateStatus(User $user, ?string $currentStatus): boo
                                 }
                                 return $options;
                             })
-                            ->required(),
+                            ->required()
+                            ->afterStateUpdated(function ($state, $record) {
+                                if (!$record) return;
+                                
+                                /** @var Proposal $proposal */
+                                $proposal = $record;
+                                $author = $proposal->user;
+                            
+                                if (!$author) return;
+                            
+                                // Membuat pesan notifikasi
+                                [$title, $body] = self::getNotificationMessage($state);
+                            
+                                // Kirim notifikasi ke author
+                                $author->notify(new ProposalUpdatedNotification($proposal, $title, $body));
+                            
+                                // Notifikasi sukses untuk admin
+                                FilamentNotification::make()
+                                    ->title('Notifikasi Terkirim')
+                                    ->body("Notifikasi telah dikirim ke '{$author->name}' mengenai perubahan status proposal.")
+                                    ->success()
+                                    ->send();
+                            }),
                         
                         Forms\Components\Textarea::make('catatan_admin')
                             ->label('Catatan Admin (Internal)')
@@ -117,6 +142,22 @@ private static function canUpdateStatus(User $user, ?string $currentStatus): boo
                     ]),
             ]);
     }
+
+    private static function getNotificationMessage(string $status): array
+    {
+        $title = 'Status Proposal Anda Diperbarui';
+
+        $body = match ($status) {
+            Proposal::STATUS_DIVERIFIKASI_JF => "Proposal Anda telah diverifikasi oleh Petugas Fungsional.",
+            Proposal::STATUS_DISETUJUI_KABID => "Proposal Anda telah disetujui oleh Kepala Bidang.",
+            Proposal::STATUS_DISETUJUI_KADIS => "Proposal Anda telah disetujui sepenuhnya dan akan segera diproses.",
+            Proposal::STATUS_DITOLAK => "Mohon maaf, proposal Anda ditolak. Silakan periksa detailnya.",
+            default => "Status proposal Anda diperbarui menjadi: {$status}.",
+        };
+
+        return [$title, $body];
+    }
+
 
     public static function table(Table $table): Table
     {
