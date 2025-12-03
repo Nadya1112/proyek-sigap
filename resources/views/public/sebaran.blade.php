@@ -173,7 +173,6 @@
             </div>
             <div class="modal-body">
                 <table class="info-table">
-                    <tr><th>Pengembang</th><td id="m-pengembang">-</td></tr>
                     <tr><th>Alamat</th><td id="m-alamat">-</td></tr>
                     <tr><th>Kelurahan</th><td id="m-lokasi">-</td></tr>
                     <tr><th>Sertifikat</th><td id="m-sertifikat">-</td></tr>
@@ -216,9 +215,9 @@
         };
         const dataStore = {}; 
         const colors = { 
-            "Banjarmasin Barat": "#C2A68C", "Banjarmasin Selatan": "#FDEB9E", 
-            "Banjarmasin Tengah": "#9A3F3F", "Banjarmasin Timur": "#6D94C5", 
-            "Banjarmasin Utara": "#FE7743" 
+            "Banjarmasin Barat": "#8B6F47", "Banjarmasin Selatan": "#D4A574", 
+            "Banjarmasin Tengah": "#C41E3A", "Banjarmasin Timur": "#1F4788", 
+            "Banjarmasin Utara": "#FF6B35" 
         };
 
         // Ikon Rumah Hijau (Kecil)
@@ -268,10 +267,10 @@
                 const layer = L.geoJSON(f, {
                     pane: 'paneKecamatan', 
                     style: {
-                        color: 'rgba(0,0,0,0)', // outline transparan
-                        weight: 0, // tanpa garis
+                        color: 'rgba(0,0,0,0.3)', // outline semi-transparan
+                        weight: 2, // garis outline lebih tebal
                         fillColor: warna,
-                        fillOpacity: 0.65
+                        fillOpacity: 0.75 // lebih tebal/opaque
                     },
                     onEachFeature: (ft, ly) => {
                         ly.bindTooltip(nama, {permanent: false, direction: "center", className: "label-kecamatan"});
@@ -355,7 +354,6 @@
             const d = dataStore[id];
             if(!d) return;
             document.getElementById('m-title').innerText = d.nama_perumahan;
-            document.getElementById('m-pengembang').innerText = (d.nama_pengembang || '-').replace(/;/g, '.');
             document.getElementById('m-alamat').innerText = (d.alamat || '-').replace(/;/g, '.');
             document.getElementById('m-lokasi').innerText = (d.kelurahan || '-').replace(/;/g, '.');
             document.getElementById('m-sertifikat').innerText = d.jumlah_sertifikat;
