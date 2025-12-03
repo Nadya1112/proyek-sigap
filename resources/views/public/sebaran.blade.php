@@ -154,6 +154,11 @@
         </ul>
 
         <div id="status-data" style="margin-top:10px; font-size:10px; color:#aaa; font-style:italic;">Memuat data...</div>
+        <!-- Debug: Tombol bantuan untuk cek kelurahan -->
+        <div style="margin-top:10px;">
+            <button style="background:#495057;color:#fff;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px;" onclick="showKelurahanDebug()">Debug Kelurahan</button>
+        </div>
+        <div id="debug-kelurahan-list" style="display:none;margin-top:10px;color:#ddd;font-size:12px;max-height:220px;overflow:auto;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;"></div>
     </div>
 
     <!-- 4. Container Peta -->
@@ -168,9 +173,8 @@
             </div>
             <div class="modal-body">
                 <table class="info-table">
-                    <tr><th>Pengembang</th><td id="m-pengembang">-</td></tr>
                     <tr><th>Alamat</th><td id="m-alamat">-</td></tr>
-                    <tr><th>Lokasi</th><td id="m-lokasi">-</td></tr>
+                    <tr><th>Kelurahan</th><td id="m-lokasi">-</td></tr>
                     <tr><th>Sertifikat</th><td id="m-sertifikat">-</td></tr>
                     <tr><th>Unit</th><td id="m-unit">-</td></tr>
                     <tr><th>Status Aset</th><td id="m-status">-</td></tr>
@@ -207,12 +211,13 @@
             komplek: L.layerGroup({pane: 'paneKomplek'}).addTo(map), // Tampil
             kecamatan: {}, // Tidak ditampilkan default
             kelurahan: L.layerGroup({pane: 'paneKelurahan'}).addTo(map), // Tampil
+            kelurahanGeoJSON: null // Untuk menyimpan geoJSON layer
         };
         const dataStore = {}; 
         const colors = { 
-            "Banjarmasin Barat": "#C2A68C", "Banjarmasin Selatan": "#FDEB9E", 
-            "Banjarmasin Tengah": "#9A3F3F", "Banjarmasin Timur": "#6D94C5", 
-            "Banjarmasin Utara": "#FE7743" 
+            "Banjarmasin Barat": "#8B6F47", "Banjarmasin Selatan": "#D4A574", 
+            "Banjarmasin Tengah": "#C41E3A", "Banjarmasin Timur": "#1F4788", 
+            "Banjarmasin Utara": "#FF6B35" 
         };
 
         // Ikon Rumah Hijau (Kecil)
@@ -242,7 +247,7 @@
                             <div style="text-align:center; font-family:sans-serif; min-width:200px;">
                                 <h4 style="margin:0 0 8px 0; color:#28a745; font-size:15px;">${p.nama_perumahan}</h4>
                                 <div style="font-size:12px; color:#555; margin-bottom:10px;">
-                                    ${p.kelurahan || '-'}<br>${p.kecamatan || '-'}
+                                    <strong>Pengembang</strong>: ${(p.nama_pengembang || '-').replace(/;/g, '.')}
                                 </div>
                                 <button class="btn-detail" onclick="openDetail(${p.id})">Lihat Detail</button>
                             </div>
@@ -258,39 +263,78 @@
             if(d.features) d.features.forEach(f => {
                 const nama = f.properties.nama;
                 const warna = colors[nama] || '#ccc';
-                
-                // Create layer but DO NOT addTo(map)
+                // Create layer tanpa rectangle/polyline/focus
                 const layer = L.geoJSON(f, {
                     pane: 'paneKecamatan', 
-                    style: { color: "white", weight: 1.5, fillColor: warna, fillOpacity: 0.65 },
+                    style: {
+                        color: 'rgba(0,0,0,0.3)', // outline semi-transparan
+                        weight: 2, // garis outline lebih tebal
+                        fillColor: warna,
+                        fillOpacity: 0.75 // lebih tebal/opaque
+                    },
                     onEachFeature: (ft, ly) => {
                         ly.bindTooltip(nama, {permanent: false, direction: "center", className: "label-kecamatan"});
+                        // Tidak ada kode fitBounds, rectangle, polyline, atau outline tambahan
                     }
                 });
-                
                 layers.kecamatan[nama] = layer;
-
                 const li = document.createElement('li');
-                // CHECKBOX TIDAK DICENTANG
                 li.innerHTML = `<input type="checkbox" value="${nama}" onchange="toggleKecamatan(this)"><label>${nama}</label><div class="legend-box" style="background:${warna}"></div>`;
                 ul.appendChild(li);
             });
         });
 
-        // 3. Fetch Kelurahan (Visible)
+        // 3. Fetch Kelurahan (Visible - SEMUA DITAMPILKAN)
         fetch('{{ url("/api/kelurahan") }}').then(r=>r.json()).then(d => {
-            if(d.geojson) {
-                L.geoJSON(d.geojson, {
+            console.log('Kelurahan Response:', d);
+            const totalKelurahan = d.total_data || 0;
+            const totalFeatures = d.total_features || (d.geojson?.features?.length || 0);
+            console.log(`Kelurahan: ${totalFeatures} dari ${totalKelurahan} data`);
+            
+            if(d.geojson && d.geojson.features && d.geojson.features.length > 0) {
+                layers.kelurahanGeoJSON = L.geoJSON(d.geojson, {
                     pane: 'paneKelurahan',
-                    style: { color: "#555", weight: 1.2, dashArray: '5, 5', fillOpacity: 0 },
+                    style: (feature) => {
+                        // Warna army (hijau gelap)
+                        const armyColor = '#4B5320';
+                        return {
+                            color: armyColor,
+                            weight: 2,
+                            dashArray: '5, 5',
+                            fillOpacity: 0.15,
+                            fillColor: armyColor
+                        };
+                    },
                     onEachFeature: (f, l) => {
-                        l.bindPopup(`<b>Kel. ${f.properties.nama_kelurahan}</b><br>${f.properties.nama_kecamatan}`);
-                        l.on('mouseover', e => e.target.setStyle({ weight: 3, color: '#000' }));
-                        l.on('mouseout', e => layers.kelurahan.resetStyle(e.target));
+                        const props = f.properties;
+                        const popupContent = `
+                            <div style="text-align:left; font-family:sans-serif; min-width:220px;">
+                                <h4 style="margin:0 0 8px 0; color:#4B5320; font-size:15px;">Kelurahan: ${props.nama_kelurahan}</h4>
+                                <div style="font-size:13px; color:#555; margin-bottom:10px;">
+                                    <strong>Kota:</strong> Banjarmasin<br>
+                                    <strong>Kecamatan:</strong> ${props.nama_kecamatan || '-'}<br>
+                                    <strong>Sumber:</strong> ${props.sumber || '-'}
+                                </div>
+                            </div>
+                        `;
+                        l.bindPopup(popupContent, { maxWidth: 250 });
+                        l.on('mouseover', e => {
+                            e.target.setStyle({ weight: 3, dashArray: 'none', fillOpacity: 0.3 });
+                        });
+                        l.on('mouseout', e => {
+                            layers.kelurahanGeoJSON.resetStyle(e.target);
+                        });
                     }
                 }).addTo(layers.kelurahan);
+                // Populate debug list and add helper functions
+                // ...hilangkan fitur debug console kelurahan...
+                
+                // Update status data
+                document.getElementById('status-data').innerText = `Data dimuat: ${totalFeatures} kelurahan`;
+            } else {
+                console.warn('Tidak ada feature kelurahan yang ditemukan');
             }
-        });
+        }).catch(e => console.error("Error Kelurahan:", e));
 
         // --- LOGIC UI ---
 
@@ -310,23 +354,54 @@
             const d = dataStore[id];
             if(!d) return;
             document.getElementById('m-title').innerText = d.nama_perumahan;
-            document.getElementById('m-pengembang').innerText = d.nama_pengembang;
-            document.getElementById('m-alamat').innerText = d.alamat;
-            document.getElementById('m-lokasi').innerText = `${d.kelurahan}, ${d.kecamatan}`;
+            document.getElementById('m-alamat').innerText = (d.alamat || '-').replace(/;/g, '.');
+            document.getElementById('m-lokasi').innerText = (d.kelurahan || '-').replace(/;/g, '.');
             document.getElementById('m-sertifikat').innerText = d.jumlah_sertifikat;
             document.getElementById('m-unit').innerText = d.jumlah_unit;
-            document.getElementById('m-status').innerText = d.status_aset;
+            document.getElementById('m-status').innerText = (d.status_aset || '-').replace(/;/g, '.');
             
-            document.getElementById('m-ibadah').innerText = d.fasilitas_ibadah;
-            document.getElementById('m-umum').innerText = d.fasilitas_umum;
-            document.getElementById('m-pendidikan').innerText = d.fasilitas_pendidikan;
-            document.getElementById('m-kesehatan').innerText = d.fasilitas_kesehatan;
+            document.getElementById('m-ibadah').innerText = (d.fasilitas_ibadah || '-').replace(/;/g, '.');
+            document.getElementById('m-umum').innerText = (d.fasilitas_umum || '-').replace(/;/g, '.');
+            document.getElementById('m-pendidikan').innerText = (d.fasilitas_pendidikan || '-').replace(/;/g, '.');
+            document.getElementById('m-kesehatan').innerText = (d.fasilitas_kesehatan || '-').replace(/;/g, '.');
             
             map.closePopup();
             document.getElementById('modal-detail').style.display = 'flex';
         }
         window.closeModal = () => document.getElementById('modal-detail').style.display = 'none';
         document.getElementById('modal-detail').onclick = (e) => { if(e.target.id === 'modal-detail') closeModal(); };
+
+        // --- Debug helper functions (pop-in) ---
+        window.showKelurahanDebug = () => {
+            const container = document.getElementById('debug-kelurahan-list');
+            if (!container) return;
+            container.style.display = (container.style.display === 'none' ? 'block' : 'none');
+        };
+
+        window.listKelurahanToConsole = () => {
+            if (!layers.kelurahanGeoJSON) return console.warn('kelurahanGeoJSON belum tersedia');
+            const layersArr = layers.kelurahanGeoJSON.getLayers();
+            console.log('Kelurahan layers count:', layersArr.length);
+            layersArr.forEach((ly, i) => console.log(i, ly.feature?.properties));
+        };
+
+        window.highlightKelurahanRandomColors = () => {
+            if (!layers.kelurahanGeoJSON) return;
+            layers.kelurahanGeoJSON.getLayers().forEach((ly, i) => {
+                try {
+                    const color = '#'+(Math.floor(Math.random()*16777215).toString(16).padStart(6,'0'));
+                    ly.setStyle({ color, fillColor: color, fillOpacity: 0.25, weight: 2 });
+                } catch (e) {}
+            });
+        };
+
+        window.fitKelurahanBounds = () => {
+            if (!layers.kelurahanGeoJSON) return;
+            try {
+                const b = layers.kelurahanGeoJSON.getBounds();
+                if (b.isValid()) map.fitBounds(b.pad(0.1));
+            } catch (e) { console.warn('fitKelurahanBounds error', e); }
+        };
 
     </script>
 </body>

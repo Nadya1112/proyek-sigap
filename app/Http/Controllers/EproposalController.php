@@ -59,6 +59,21 @@ class EproposalController extends Controller
             'status'         => 'Diajukan',
         ]);
 
+        // Kirim notifikasi ke semua admin yang relevan
+        $admins = User::whereIn('role', [
+            User::ROLE_STAFF,
+            User::ROLE_JF_PSU,
+            User::ROLE_KABID,
+            User::ROLE_KADIS
+        ])->get();
+
+        $title = 'Proposal Baru Diterima';
+        $body = "Proposal baru telah diajukan oleh {$proposal->nama_pengaju} dan menunggu tinjauan.";
+
+        foreach ($admins as $admin) {
+            $admin->notify(new ProposalUpdatedNotification($proposal, $title, $body));
+        }
+
         return redirect()->route('eproposal')->with('success', 'Proposal Anda berhasil dikirim! Terima kasih.');
     }
 

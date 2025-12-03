@@ -89,24 +89,114 @@ class PetaController extends Controller
 
     // 3. API KELURAHAN (POLIGON)
     public function kelurahan() {
-        $data = DB::table('kelurahans')
-            ->leftJoin('kecamatans', 'kelurahans.kecamatan_id', '=', 'kecamatans.id')
-            ->select('kelurahans.*', 'kecamatans.nama_kecamatan')
-            ->whereNotNull('kelurahans.geometri')->get();
-        
-        $features = [];
-        foreach ($data as $row) {
-            if (empty($row->geometri)) continue;
-            try {
-                $raw = trim($row->geometri, '"');
-                $raw = stripslashes($raw);
-                $geo = json_decode($raw);
-
-                if (json_last_error() === JSON_ERROR_NONE && $geo) {
-                    $features[] = ['type' => 'Feature', 'geometry' => $geo, 'properties' => ['nama_kelurahan' => $row->nama_kelurahan, 'nama_kecamatan' => $row->nama_kecamatan, 'sumber' => $row->sumber]];
+        try {
+            $data = DB::table('kelurahans')
+                ->leftJoin('kecamatans', 'kelurahans.kecamatan_id', '=', 'kecamatans.id')
+                ->select('kelurahans.id', 'kelurahans.nama_kelurahan', 'kelurahans.geometri', 'kelurahans.sumber', 'kecamatans.nama_kecamatan')
+                ->whereNotNull('kelurahans.geometri')
+                ->where('kelurahans.geometri', '!=', '')
+                ->orderBy('kelurahans.id')
+                ->get();
+            
+            Log::info("Kelurahan Query: Found {$data->count()} rows with geometri");
+            
+            $features = [];
+            foreach ($data as $row) {
+                $raw = $row->geometri;
+                if (empty($raw)) {
+                    Log::warning("Row {$row->id}: geometri is empty");
+                    continue;
                 }
-            } catch (\Exception $e) {}
+                try {
+                    if (is_string($raw)) {
+                        $raw = trim($raw, '"');
+                        $raw = stripslashes($raw);
+                        $raw = preg_replace('/[\r\n\t ]+/', '', $raw);
+                    }
+                    $geo = @json_decode($raw, false);
+                    $jsonErr = json_last_error();
+                    if ($jsonErr === JSON_ERROR_NONE && $geo) {
+                        // Jika hasil decode adalah objek Polygon langsung
+                        if (isset($geo->type) && $geo->type === 'Polygon' && isset($geo->coordinates)) {
+                            $features[] = [
+                                'type' => 'Feature',
+                                'geometry' => $geo,
+                                'properties' => [
+                                    'id' => $row->id,
+                                    'nama_kelurahan' => $row->nama_kelurahan ?? '-',
+                                    'nama_kecamatan' => $row->nama_kecamatan ?? '-',
+                                    'sumber' => $row->sumber ?? '-'
+                                ]
+                            ];
+                        }
+                        // Jika FeatureCollection
+                        elseif (isset($geo->type) && $geo->type === 'FeatureCollection' && isset($geo->features) && is_array($geo->features)) {
+                            foreach ($geo->features as $f) {
+                                if (isset($f->geometry) && isset($f->geometry->type) && $f->geometry->type === 'Polygon') {
+                                    $features[] = [
+                                        'type' => 'Feature',
+                                        'geometry' => $f->geometry,
+                                        'properties' => [
+                                            'id' => $row->id,
+                                            'nama_kelurahan' => $row->nama_kelurahan ?? '-',
+                                            'nama_kecamatan' => $row->nama_kecamatan ?? '-',
+                                            'sumber' => $row->sumber ?? '-'
+                                        ]
+                                    ];
+                                    break;
+                                }
+                            }
+                        }
+                        // Jika array campuran: cek Feature Polygon dan geometry Polygon langsung
+                        elseif (is_array($geo)) {
+                            foreach ($geo as $f) {
+                                // Jika elemen array adalah geometry Polygon langsung
+                                if (isset($f->type) && $f->type === 'Polygon' && isset($f->coordinates)) {
+                                    $features[] = [
+                                        'type' => 'Feature',
+                                        'geometry' => $f,
+                                        'properties' => [
+                                            'id' => $row->id,
+                                            'nama_kelurahan' => $row->nama_kelurahan ?? '-',
+                                            'nama_kecamatan' => $row->nama_kecamatan ?? '-',
+                                            'sumber' => $row->sumber ?? '-'
+                                        ]
+                                    ];
+                                    break;
+                                }
+                                // Jika elemen array adalah Feature dengan geometry Polygon
+                                if (isset($f->type) && $f->type === 'Feature' && isset($f->geometry) && isset($f->geometry->type) && $f->geometry->type === 'Polygon') {
+                                    $features[] = [
+                                        'type' => 'Feature',
+                                        'geometry' => $f->geometry,
+                                        'properties' => [
+                                            'id' => $row->id,
+                                            'nama_kelurahan' => $row->nama_kelurahan ?? '-',
+                                            'nama_kecamatan' => $row->nama_kecamatan ?? '-',
+                                            'sumber' => $row->sumber ?? '-'
+                                        ]
+                                    ];
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } catch (\Exception $e) {
+                    // Silent catch
+                }
+            }
+            Log::info("Kelurahan API: Total {success: " . count($features) . ", total_rows: " . $data->count() . "}");
+            return response()->json([
+                'geojson' => [
+                    'type' => 'FeatureCollection',
+                    'features' => $features
+                ],
+                'total_data' => $data->count(),
+                'total_features' => count($features)
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Kelurahan API Error: " . $e->getMessage());
+            return response()->json(['error' => 'Gagal memuat kelurahan', 'message' => $e->getMessage()], 500);
         }
-        return response()->json(['geojson' => ['type' => 'FeatureCollection', 'features' => $features]]);
     }
 }
