@@ -7,32 +7,11 @@ use App\Models\Proposal;
 use App\Models\Komplek;
 use App\Models\Kecamatan;
 use App\Models\Kelurahan; // Pastikan ini di-import
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; // Import DB Facade untuk query langsung
 use Illuminate\Support\Facades\Log; // Import Log Facade untuk debugging
 use Illuminate\Support\Facades\Storage; // <-- Import Storage Facade
-
-class EproposalController extends Controller
-{
-    /**
-     * Menampilkan form, mengirim data Kecamatan awal.
-     */
-public function showForm()
-{
-    $stats = [
-        'total'         => Proposal::count(),
-        'diajukan'       => Proposal::where('status', Proposal::STATUS_DIAJUKAN)->count(),
-        'diverifikasi'  => Proposal::where('status', Proposal::STATUS_DIVERIFIKASI_JF)->count(),
-        'disetujui'     => Proposal::whereIn('status', [Proposal::STATUS_DISETUJUI_KABID, Proposal::STATUS_DISETUJUI_KADIS])->count(),
-    ];
-    $kecamatans = Kecamatan::orderBy('nama_kecamatan')->get(['id', 'nama_kecamatan']);
-    return view('public.eproposal', compact('stats', 'kecamatans'));
-}
-
-    /**
-     * Menyimpan proposal (Logika ini sudah benar dan tidak berubah).
-     */
-    use App\Models\User;
 use App\Notifications\ProposalUpdatedNotification;
 
 class EproposalController extends Controller
@@ -40,17 +19,17 @@ class EproposalController extends Controller
     /**
      * Menampilkan form, mengirim data Kecamatan awal.
      */
-public function showForm()
-{
-    $stats = [
-        'total'         => Proposal::count(),
-        'diajukan'       => Proposal::where('status', Proposal::STATUS_DIAJUKAN)->count(),
-        'diverifikasi'  => Proposal::where('status', Proposal::STATUS_DIVERIFIKASI_JF)->count(),
-        'disetujui'     => Proposal::whereIn('status', [Proposal::STATUS_DISETUJUI_KABID, Proposal::STATUS_DISETUJUI_KADIS])->count(),
-    ];
-    $kecamatans = Kecamatan::orderBy('nama_kecamatan')->get(['id', 'nama_kecamatan']);
-    return view('public.eproposal', compact('stats', 'kecamatans'));
-}
+    public function showForm()
+    {
+        $stats = [
+            'total'         => Proposal::count(),
+            'diajukan'       => Proposal::where('status', Proposal::STATUS_DIAJUKAN)->count(),
+            'diverifikasi'  => Proposal::where('status', Proposal::STATUS_DIVERIFIKASI_JF)->count(),
+            'disetujui'     => Proposal::whereIn('status', [Proposal::STATUS_DISETUJUI_KABID, Proposal::STATUS_DISETUJUI_KADIS])->count(),
+        ];
+        $kecamatans = Kecamatan::orderBy('nama_kecamatan')->get(['id', 'nama_kecamatan']);
+        return view('public.eproposal', compact('stats', 'kecamatans'));
+    }
 
     /**
      * Menyimpan proposal (Logika ini sudah benar dan tidak berubah).
@@ -154,7 +133,8 @@ public function showForm()
         // Cek apakah file ada di disk 'public'
         if (Storage::disk('public')->exists($filePath)) {
             // Jika ada, kembalikan sebagai respons download
-            return Storage::disk('public')->download($filePath, $downloadName);
+            $fullPath = storage_path('app/public/' . $filePath);
+            return response()->download($fullPath, $downloadName);
         } else {
             // Jika file tidak ditemukan, tampilkan error 404
             Log::error("File template tidak ditemukan di: " . $filePath);
