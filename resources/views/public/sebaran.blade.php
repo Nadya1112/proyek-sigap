@@ -3,369 +3,405 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peta Sebaran Wilayah & Kompleks - SIGAP</title>
+    <title>Peta Sebaran - SIGAP KOMPLEK</title>
     
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #f4f4f4; }
-        #map { height: 100vh; width: 100%; }
-
-        /* --- 1. TOMBOL KEMBALI (KIRI ATAS) --- */
-        .btn-back-custom {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 1001;
-            width: 40px; height: 40px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            display: flex; justify-content: center; align-items: center;
-            font-size: 18px; color: #333;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border: 2px solid rgba(0,0,0,0.2);
+        :root {
+            --sigap-orange: #F97316;
+            --sigap-dark-orange: #ea580c;
+            --sigap-gradient: linear-gradient(135deg, #F59E0B 0%, #F97316 100%);
+            --text-dark: #333333;
+            --text-grey: #666666;
+            --border-color: #e5e7eb;
         }
-        .btn-back-custom:hover { background: #f8f9fa; transform: scale(1.05); }
 
-        /* --- 2. HEADER JUDUL (KIRI ATAS - DI BAWAH TOMBOL KEMBALI) --- */
+        body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: #f4f4f4; overflow: hidden; }
+        #map { height: 100vh; width: 100%; z-index: 1; }
+
+        /* --- UI: TOMBOL & HEADER --- */
+        .floating-btn {
+            position: absolute; top: 24px; z-index: 1001;
+            width: 44px; height: 44px; background: #fff; border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center;
+            font-size: 18px; color: var(--sigap-orange); text-decoration: none; cursor: pointer; transition: 0.3s;
+        }
+        .floating-btn:hover { background: var(--sigap-orange); color: #fff; transform: translateY(-2px); }
+        .btn-back { left: 24px; }
+        .btn-layer { right: 24px; }
+
         #map-header-card {
-            position: absolute;
-            top: 70px;
-            left: 20px;
-            z-index: 1001;
-            background: linear-gradient(90deg, #F59E0B, #F97316);
-            color: #333; padding: 10px 20px; border-radius: 50px;
-            font-weight: 800; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border: 2px solid #fff; font-size: 14px; letter-spacing: 0.5px;
-            pointer-events: auto;
+            position: absolute; top: 24px; left: 80px; z-index: 1001;
+            background: rgba(255, 255, 255, 0.95); padding: 0 20px; height: 44px;
+            border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex; align-items: center; gap: 10px; backdrop-filter: blur(5px);
+            text-decoration: none; cursor: pointer; transition: transform 0.2s;
         }
+        #map-header-card:hover { transform: translateY(-2px); }
 
-        /* --- 3. TOMBOL LAYER (KANAN ATAS) --- */
-        .btn-layer-custom {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1001;
-            width: 40px; height: 40px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            display: flex; justify-content: center; align-items: center;
-            font-size: 18px; color: #333;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid rgba(0,0,0,0.2);
-        }
-        .btn-layer-custom:hover { background: #f8f9fa; transform: scale(1.05); }
+        .header-logo { font-weight: 800; font-size: 15px; color: var(--text-dark); }
+        .header-logo span { color: var(--sigap-orange) !important; }
+        .header-subtitle { font-size: 12px; color: var(--text-grey); padding-left: 10px; border-left: 1px solid #ddd; height: 20px; line-height: 20px; }
 
-        /* --- 3. PANEL LAYER (KANAN ATAS - Di Bawah Tombol) --- */
+        /* --- UI: PANEL LAYER (PUTIH) --- */
         .pengaturan-panel {
-            position: absolute; 
-            top: 70px;       
-            right: 20px;     
-            z-index: 1005;   
-            width: 250px; background: rgba(40, 40, 40, 0.95); 
-            color: #fff; border-radius: 12px; padding: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; 
-            font-size: 12px; backdrop-filter: blur(8px); border: 1px solid #555;
+            position: absolute; top: 80px; right: 24px; z-index: 1005;   
+            width: 280px; 
+            background: rgba(255, 255, 255, 0.98); 
+            border-radius: 12px; padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: none; 
+            animation: fadeIn 0.3s ease; max-height: 80vh; overflow-y: auto;
+            backdrop-filter: blur(4px); border: 1px solid #eee;
+            color: #333;
         }
-        .pengaturan-panel h4 { margin: 0 0 10px 0; border-bottom: 1px solid #666; padding-bottom: 8px; font-size: 13px; font-weight: 700; }
-        .pengaturan-panel h5 { margin: 10px 0 5px 0; color: #aaa; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-        .pengaturan-panel ul { list-style: none; padding: 0; margin: 0; }
-        .pengaturan-panel li { display: flex; align-items: center; margin-bottom: 6px; }
-        .pengaturan-panel input[type="checkbox"] { margin-right: 8px; cursor: pointer; accent-color: #28a745; width: 14px; height: 14px; }
-        .pengaturan-panel label { cursor: pointer; flex-grow: 1; }
+        @keyframes fadeIn { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
         
-        /* Kotak Warna Legenda (Untuk Kecamatan) */
-        .legend-box { width: 16px; height: 16px; border-radius: 3px; margin-left: auto; border: 1px solid rgba(255,255,255,0.5); }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        .panel-header h4 { margin: 0; font-size: 15px; font-weight: 700; color: var(--text-dark); }
+        .close-panel { border: none; background: none; cursor: pointer; font-size: 18px; color: #999; }
+        .close-panel:hover { color: var(--sigap-orange); }
+
+        /* SEARCH BOX */
+        .search-container { position: relative; margin-bottom: 15px; }
+        .search-input {
+            width: 100%; padding: 10px 35px 10px 12px; box-sizing: border-box;
+            border-radius: 8px; border: 1px solid #ddd; background: #f9f9f9;
+            color: #333; font-family: 'Poppins', sans-serif; font-size: 13px;
+        }
+        .search-input:focus { outline: none; border-color: var(--sigap-orange); background: #fff; }
+        .search-icon { position: absolute; right: 12px; top: 10px; color: #aaa; font-size: 13px; }
         
-        /* Garis Legenda (Untuk Kelurahan) */
-        .legend-line { width: 20px; height: 0; border-top: 2px dashed #999; margin-left: auto; margin-top: 8px; }
-
-        .close-panel { position: absolute; top: 8px; right: 8px; background: none; border: none; color: #fff; cursor: pointer; font-size: 18px; opacity: 0.7; }
-        .close-panel:hover { opacity: 1; }
-
-        /* --- 4. ZOOM CONTROL (KIRI ATAS - DI BAWAH JUDUL) --- */
-        /* Kita gunakan CSS ini untuk mendorong zoom control ke bawah agar tidak menabrak judul */
-        .leaflet-top.leaflet-left {
-            margin-top: 70px; 
-            margin-left: 20px;
+        #search-results {
+            list-style: none; padding: 0; margin: 5px 0 0 0;
+            background: #fff; border-radius: 8px; overflow: hidden;
+            max-height: 150px; overflow-y: auto; display: none;
+            position: absolute; width: 100%; z-index: 10; box-shadow: 0 5px 15px rgba(0,0,0,0.15); border: 1px solid #eee;
         }
-        .leaflet-control-zoom {
-            border: 2px solid rgba(0,0,0,0.2) !important;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
-            border-radius: 8px !important;
+        #search-results li { padding: 8px 12px; cursor: pointer; color: #333; font-size: 12px; border-bottom: 1px solid #f5f5f5; }
+        #search-results li:hover { background: #fff7ed; color: var(--sigap-orange); font-weight: 600; }
+
+        /* SEPARATOR */
+        .layer-separator {
+            font-size: 11px; font-weight: 700; color: #94a3b8; 
+            text-transform: uppercase; letter-spacing: 0.5px;
+            margin-top: 15px; margin-bottom: 8px;
+            border-bottom: 1px solid #f1f5f9; padding-bottom: 2px;
+        }
+        .layer-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 13px; color: #444; font-weight: 500; }
+        .layer-item input { margin-right: 10px; accent-color: var(--sigap-orange); width: 16px; height: 16px; cursor: pointer; }
+        .legend-box { width: 14px; height: 14px; border-radius: 4px; margin-left: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+        /* LABEL KECAMATAN */
+        .label-kecamatan {
+            background: transparent !important; border: none !important; box-shadow: none !important;
+            color: #fff !important; font-weight: 800 !important; font-size: 11px !important;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.6); text-transform: uppercase;
+            font-family: 'Poppins', sans-serif; letter-spacing: 1px; text-align: center; opacity: 0.9;
         }
 
-        /* Style Ikon Rumah Hijau (KECIL - 20px) */
+        /* CLUSTER STYLE */
+        .cluster-sigap {
+            background: var(--sigap-gradient); border: 2px solid #fff; color: #fff;
+            font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 14px;
+            text-align: center; border-radius: 50%; line-height: 40px;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.5);
+        }
+
+        /* --- IKON RUMAH CUSTOM (ORANYE) --- */
         .icon-rumah-wrapper {
             background: #fff;
-            border: 2px solid #F97316;
+            border: 2px solid var(--sigap-orange); /* Border Oranye */
             border-radius: 50%;
-            width: 20px; height: 20px;
+            width: 28px; height: 28px;
             display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3); /* Bayangan */
             transition: transform 0.2s;
         }
-        .icon-rumah-wrapper:hover { transform: scale(1.5); z-index: 999; border-color: #E11D48; }
-        .icon-rumah-wrapper i { color: #F97316; font-size: 10px; }
+        .icon-rumah-wrapper:hover { 
+            transform: scale(1.3); 
+            background: var(--sigap-orange); /* Hover jadi Oranye Penuh */
+            border-color: #fff; 
+            z-index: 999; 
+        }
+        .icon-rumah-wrapper i { 
+            color: var(--sigap-orange); /* Rumah Oranye */
+            font-size: 14px; 
+        }
+        .icon-rumah-wrapper:hover i { color: #fff; } /* Rumah jadi putih saat hover */
 
-        /* Modal Detail */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
-        .modal-box { background: #fff; width: 90%; max-width: 500px; border-radius: 12px; overflow: hidden; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        @keyframes slideUp { from {transform: translateY(50px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
-        
-        .modal-header { background: #F97316; color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 20px; max-height: 60vh; overflow-y: auto; }
-        .info-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        .info-table th { text-align: left; color: #666; width: 35%; padding: 10px 5px; border-bottom: 1px solid #eee; font-weight: 600; vertical-align: top; }
-        .info-table td { padding: 10px 5px; border-bottom: 1px solid #eee; color: #333; vertical-align: top; }
-        .modal-footer { padding: 15px; text-align: right; background: #f9f9f9; border-top: 1px solid #eee; }
-        .btn-tutup { background: #6c757d; color: white; border: none; padding: 8px 25px; border-radius: 50px; cursor: pointer; font-weight: 600; }
-        .btn-detail { background: #007bff; color: white; border: none; padding: 6px 18px; border-radius: 20px; cursor: pointer; font-size: 12px; margin-top: 8px; width: 100%; font-weight: 600; }
-        .btn-detail:hover { background: #0056b3; }
-        .modal-close-btn { background:none; border:none; color:#fff; font-size:24px; cursor:pointer; line-height: 1; }
+        /* POPUP & MODAL */
+        .leaflet-popup-content-wrapper { border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .leaflet-popup-content { margin: 15px 20px; line-height: 1.6; min-width: 280px; font-family: 'Poppins', sans-serif; }
+        .kelurahan-title { font-size: 16px; font-weight: 700; color: #40513B; margin-bottom: 10px; padding-bottom: 5px; }
+        .komplek-popup-title { font-size: 15px; font-weight: 700; color: var(--sigap-orange); margin-bottom: 5px; }
+        .popup-row { font-size: 13px; color: #333; margin-bottom: 4px; display: flex; }
+        .popup-label { font-weight: 700; width: 90px; color: #444; flex-shrink: 0; }
+        .popup-val { color: #555; }
+        .btn-detail-popup {
+            background: var(--sigap-gradient); color: #fff; border: none; 
+            width: 100%; padding: 8px; margin-top: 10px; border-radius: 6px; 
+            font-size: 12px; font-weight: 600; cursor: pointer; text-align: center;
+        }
+        .btn-detail-popup:hover { opacity: 0.9; }
+
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.6); z-index: 2000; display: none; 
+            justify-content: center; align-items: center; backdrop-filter: blur(2px);
+        }
+        .modal-box { 
+            background: #fff; width: 95%; max-width: 600px; 
+            border-radius: 12px; overflow: hidden; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            display: flex; flex-direction: column; max-height: 90vh;
+        }
+        .modal-header { 
+            background: var(--sigap-gradient); padding: 15px 20px; color: #fff; 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+        .modal-header h3 { margin: 0; font-size: 18px; font-weight: 600; }
+        .btn-close-modal { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; opacity: 0.9; }
+        .modal-body { padding: 0; overflow-y: auto; background: #fff; }
+        .detail-row { display: flex; padding: 12px 20px; border-bottom: 1px solid #eee; font-size: 14px; }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { width: 40%; color: #666; font-weight: 600; }
+        .detail-value { width: 60%; color: #333; font-weight: 500; }
+        .section-fasilitas { padding: 20px 20px 5px 20px; margin-top: 5px; }
+        .text-fasilitas {
+            color: var(--sigap-dark-orange); font-weight: 700; font-size: 13px; text-transform: uppercase;
+            border-bottom: 2px solid var(--sigap-dark-orange); display: inline-block; padding-bottom: 2px; margin-bottom: 10px;
+        }
+        .modal-footer { padding: 15px 20px; border-top: 1px solid #eee; background: #f9f9f9; text-align: right; }
+        .btn-grey-close {
+            background: #6c757d; color: #fff; border: none; padding: 10px 30px; 
+            border-radius: 50px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-grey-close:hover { background: #5a6268; }
+
+        /* Zoom Control */
+        .leaflet-top.leaflet-left { margin-top: 85px; margin-left: 24px; }
+        .leaflet-bar { border: none !important; box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important; border-radius: 8px !important; overflow: hidden; }
+        .leaflet-bar a { background-color: #fff !important; color: var(--sigap-orange) !important; width: 34px !important; height: 34px !important; line-height: 34px !important; font-weight: 600 !important; }
+        .leaflet-bar a:hover { background-color: #fff7ed !important; }
+
     </style>
 </head>
 <body>
 
-    <!-- 1. Tombol Kembali -->
-    <a href="{{ url('/') }}" class="btn-back-custom" title="Kembali ke Beranda">
+    <a href="{{ Auth::check() ? route('user.dashboard') : url('/') }}" class="floating-btn btn-back" title="Kembali">
         <i class="fa-solid fa-arrow-left"></i>
     </a>
+    
+    <a href="{{ Auth::check() ? route('user.dashboard') : route('login') }}" id="map-header-card" title="{{ Auth::check() ? 'Ke Dashboard' : 'Masuk Aplikasi' }}">
+        <div class="header-logo">SIGAP <span>KOMPLEK</span></div>
+        <div class="header-subtitle">Peta Sebaran</div>
+    </a>
 
-    <!-- 2. Header Judul -->
-    <div id="map-header-card">PETA - SEBARAN</div>
+    <div class="floating-btn btn-layer" onclick="togglePanel()"><i class="fa-solid fa-layer-group"></i></div>
 
-    <!-- 2. Tombol Layer Custom -->
-    <div class="btn-layer-custom" onclick="togglePanel()" title="Pengaturan Layer">
-        <i class="fa-solid fa-layer-group"></i>
-    </div>
-
-    <!-- 3. Panel Pengaturan -->
     <div class="pengaturan-panel" id="panel-layer">
-        <button class="close-panel" onclick="togglePanel()">&times;</button>
-        <h4>Pengaturan Layer</h4>
+        <div class="panel-header"><h4>Filter & Cari</h4><button class="close-panel" onclick="togglePanel()">&times;</button></div>
         
-        <!-- SEBARAN KOMPLEK (Urutan Pertama & Checked) -->
-        <h5>SEBARAN KOMPLEK</h5>
-        <ul>
-            <li>
-                <input type="checkbox" id="check-komplek" checked>
-                <label for="check-komplek">Sebaran Komplek</label>
-                <div class="legend-box" style="background: #F97316; border: 2px solid white;"></div>
-            </li>
-        </ul>
-
-        <!-- KECAMATAN (Urutan Kedua - UNCHECKED DEFAULT) -->
-        <h5>KECAMATAN</h5>
-        <ul id="list-kecamatan"></ul>
-
-        <!-- BATAS WILAYAH (Urutan Ketiga) -->
-        <h5>BATAS WILAYAH</h5>
-        <ul>
-            <li>
-                <input type="checkbox" id="check-kelurahan" checked>
-                <label for="check-kelurahan">Batas Kelurahan</label>
-                <div class="legend-line"></div>
-            </li>
-        </ul>
-
-        <div id="status-data" style="margin-top:10px; font-size:10px; color:#aaa; font-style:italic;">Memuat data...</div>
-        <!-- Debug: Tombol bantuan untuk cek kelurahan -->
-        <div style="margin-top:10px;">
-            <button style="background:#495057;color:#fff;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px;" onclick="showKelurahanDebug()">Debug Kelurahan</button>
+        <div class="search-container">
+            <input type="text" id="search-input" class="search-input" placeholder="Cari nama komplek..." onkeyup="searchLocation()">
+            <i class="fa-solid fa-search search-icon"></i>
+            <ul id="search-results"></ul>
         </div>
-        <div id="debug-kelurahan-list" style="display:none;margin-top:10px;color:#ddd;font-size:12px;max-height:220px;overflow:auto;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;"></div>
+        
+        <div class="layer-separator">Kecamatan</div>
+        <div id="list-kecamatan"></div>
+
+        <div class="layer-separator">Sebaran Komplek</div>
+        <div class="layer-item">
+            <input type="checkbox" id="check-komplek" checked>
+            <label for="check-komplek">Titik Komplek</label>
+            <div class="legend-box" style="background:var(--sigap-orange)"></div>
+        </div>
+
+        <div class="layer-separator">Lainnya</div>
+        <div class="layer-item">
+            <input type="checkbox" id="check-kelurahan" checked>
+            <label for="check-kelurahan">Batas Kelurahan</label>
+            <div class="legend-box" style="border:1px dashed #bbb"></div>
+        </div>
     </div>
 
-    <!-- 4. Container Peta -->
     <div id="map"></div>
 
-    <!-- 5. Modal Detail -->
     <div id="modal-detail" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
-                <h3 style="margin:0; font-size:18px;" id="m-title">Detail Komplek</h3>
-                <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+                <h3 id="m-title">Nama Komplek</h3>
+                <button class="btn-close-modal" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <table class="info-table">
-                    <tr><th>Alamat</th><td id="m-alamat">-</td></tr>
-                    <tr><th>Kelurahan</th><td id="m-lokasi">-</td></tr>
-                    <tr><th>Sertifikat</th><td id="m-sertifikat">-</td></tr>
-                    <tr><th>Unit</th><td id="m-unit">-</td></tr>
-                    <tr><th>Status Aset</th><td id="m-status">-</td></tr>
-                    <tr><th colspan="2" style="padding-top:20px; color:#F97316; border-bottom: 2px solid #F97316;">FASILITAS</th></tr>
-                    <tr><th>Ibadah</th><td id="m-ibadah">-</td></tr>
-                    <tr><th>Umum</th><td id="m-umum">-</td></tr>
-                    <tr><th>Pendidikan</th><td id="m-pendidikan">-</td></tr>
-                    <tr><th>Kesehatan</th><td id="m-kesehatan">-</td></tr>
-                </table>
+                <div class="detail-row"><div class="detail-label">Alamat</div><div class="detail-value" id="m-alamat">-</div></div>
+                <div class="detail-row"><div class="detail-label">Kelurahan</div><div class="detail-value" id="m-kelurahan">-</div></div>
+                <div class="detail-row"><div class="detail-label">Sertifikat</div><div class="detail-value" id="m-sertifikat">-</div></div>
+                <div class="detail-row"><div class="detail-label">Unit</div><div class="detail-value" id="m-unit">-</div></div>
+                <div class="detail-row"><div class="detail-label">Status Aset</div><div class="detail-value" id="m-status">-</div></div>
+                <div class="section-fasilitas"><span class="text-fasilitas">FASILITAS</span></div>
+                <div class="detail-row"><div class="detail-label">Ibadah</div><div class="detail-value" id="m-ibadah">-</div></div>
+                <div class="detail-row"><div class="detail-label">Umum</div><div class="detail-value" id="m-umum">-</div></div>
+                <div class="detail-row"><div class="detail-label">Pendidikan</div><div class="detail-value" id="m-pendidikan">-</div></div>
+                <div class="detail-row"><div class="detail-label">Kesehatan</div><div class="detail-value" id="m-kesehatan">-</div></div>
             </div>
-            <div class="modal-footer">
-                <button class="btn-tutup" onclick="closeModal()">Tutup</button>
-            </div>
+            <div class="modal-footer"><button class="btn-grey-close" onclick="closeModal()">Tutup</button></div>
         </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    
     <script>
-        // 1. Inisialisasi Peta
         const map = L.map('map', { zoomControl: false }).setView([-3.32, 114.59], 13);
-        
-        // Zoom Control (Top Left)
         L.control.zoom({ position: 'topleft' }).addTo(map);
-
-        // -- KONFIGURASI PANE (Z-INDEX) --
+        
         map.createPane('paneKecamatan'); map.getPane('paneKecamatan').style.zIndex = 390; 
         map.createPane('paneKelurahan'); map.getPane('paneKelurahan').style.zIndex = 450; 
         map.createPane('paneKomplek');   map.getPane('paneKomplek').style.zIndex = 650; 
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'SIGAP', maxZoom: 19 }).addTo(map);
 
-        // Variabel Global
-        const layers = {
-            komplek: L.layerGroup({pane: 'paneKomplek'}).addTo(map), // Tampil
-            kecamatan: {}, // Tidak ditampilkan default
-            kelurahan: L.layerGroup({pane: 'paneKelurahan'}).addTo(map), // Tampil
-            kelurahanGeoJSON: null // Untuk menyimpan geoJSON layer
-        };
-        const dataStore = {}; 
-        const colors = { 
-            "Banjarmasin Barat": "#8B6F47", "Banjarmasin Selatan": "#D4A574", 
-            "Banjarmasin Tengah": "#C41E3A", "Banjarmasin Timur": "#1F4788", 
-            "Banjarmasin Utara": "#FF6B35" 
+        const layers = { 
+            komplek: L.markerClusterGroup({
+                iconCreateFunction: function(cluster) {
+                    return L.divIcon({
+                        html: '<div>' + cluster.getChildCount() + '</div>',
+                        className: 'cluster-sigap', 
+                        iconSize: [40, 40]
+                    });
+                },
+                pane: 'paneKomplek'
+            }).addTo(map), 
+            kecamatan: {}, 
+            kelurahan: L.layerGroup({pane: 'paneKelurahan'}).addTo(map) 
         };
 
-        // Ikon Rumah Hijau (Kecil)
+        const dataStore = {}; 
+        const markersById = {}; 
+        const searchableList = []; 
+        const colors = { "Banjarmasin Barat": "#F59E0B", "Banjarmasin Selatan": "#10B981", "Banjarmasin Tengah": "#EF4444", "Banjarmasin Timur": "#3B82F6", "Banjarmasin Utara": "#8B5CF6" };
+
+        // IKON RUMAH ORANYE BARU
         const iconRumah = L.divIcon({
             className: 'custom-div-icon',
             html: `<div class="icon-rumah-wrapper"><i class="fa-solid fa-house"></i></div>`,
-            iconSize: [20, 20], 
-            iconAnchor: [10, 10], 
-            popupAnchor: [0, -12] 
+            iconSize: [28, 28], 
+            iconAnchor: [14, 14], 
+            popupAnchor: [0, -16] 
         });
 
         // --- FETCH DATA ---
-
-        // 1. Fetch Kompleks
-        fetch('{{ url("/api/kompleks") }}').then(r=>r.json()).then(d => {
-            const count = d.features ? d.features.length : 0;
-            document.getElementById('status-data').innerText = `Data dimuat: ${count} titik`;
-
-            if(count > 0) {
-                L.geoJSON(d, {
-                    pane: 'paneKomplek', 
-                    pointToLayer: (f, latlng) => L.marker(latlng, { icon: iconRumah }),
-                    onEachFeature: (f, l) => {
-                        const p = f.properties;
-                        dataStore[p.id] = p;
-                        l.bindPopup(`
-                            <div style="text-align:center; font-family:sans-serif; min-width:200px;">
-                                <h4 style="margin:0 0 8px 0; color:#28a745; font-size:15px;">${p.nama_perumahan}</h4>
-                                <div style="font-size:12px; color:#555; margin-bottom:10px;">
-                                    <strong>Pengembang</strong>: ${(p.nama_pengembang || '-').replace(/;/g, '.')}
+        Promise.all([
+            fetch('{{ url("/api/kompleks") }}').then(r=>r.json()).then(d => {
+                if(d.features) {
+                    const geoJsonLayer = L.geoJSON(d, {
+                        pane: 'paneKomplek', 
+                        pointToLayer: (f, latlng) => {
+                            const marker = L.marker(latlng, { icon: iconRumah });
+                            markersById[f.properties.id] = marker; 
+                            return marker;
+                        },
+                        onEachFeature: (f, l) => {
+                            const p = f.properties;
+                            dataStore[p.id] = p;
+                            searchableList.push({ id: p.id, name: p.nama_perumahan, lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] });
+                            
+                            const popupContent = `
+                                <div class="komplek-popup-title">${p.nama_perumahan}</div>
+                                <div style="font-size:12px; color:#666;">
+                                    <strong>Pengembang:</strong><br>
+                                    ${(p.nama_pengembang || '-').replace(/;/g, '.')}
                                 </div>
-                                <button class="btn-detail" onclick="openDetail(${p.id})">Lihat Detail</button>
-                            </div>
-                        `);
-                    }
-                }).addTo(layers.komplek);
-            }
-        }).catch(e => console.error("Error Kompleks:", e));
+                                <button class="btn-detail-popup" onclick="openDetail(${p.id})">Lihat Detail</button>
+                            `;
+                            l.bindPopup(popupContent, { maxWidth: 280 });
+                        }
+                    });
+                    layers.komplek.addLayer(geoJsonLayer);
+                }
+            }),
 
-        // 2. Fetch Kecamatan (TANPA addTo(map) agar default HIDDEN)
-        fetch('{{ url("/api/kecamatan") }}').then(r=>r.json()).then(d => {
-            const ul = document.getElementById('list-kecamatan');
-            if(d.features) d.features.forEach(f => {
-                const nama = f.properties.nama;
-                const warna = colors[nama] || '#ccc';
-                // Create layer tanpa rectangle/polyline/focus
-                const layer = L.geoJSON(f, {
-                    pane: 'paneKecamatan', 
-                    style: {
-                        color: 'rgba(0,0,0,0.3)', // outline semi-transparan
-                        weight: 2, // garis outline lebih tebal
-                        fillColor: warna,
-                        fillOpacity: 0.75 // lebih tebal/opaque
-                    },
-                    onEachFeature: (ft, ly) => {
-                        ly.bindTooltip(nama, {permanent: false, direction: "center", className: "label-kecamatan"});
-                        // Tidak ada kode fitBounds, rectangle, polyline, atau outline tambahan
-                    }
+            fetch('{{ url("/api/kelurahan") }}').then(r=>r.json()).then(d => {
+                if(d.geojson && d.geojson.features) {
+                    L.geoJSON(d.geojson, {
+                        pane: 'paneKelurahan',
+                        style: { color: '#E2E8F0', weight: 1.2, dashArray: '4, 4', fillOpacity: 0, opacity: 0.8 },
+                        filter: function(feature, layer) {
+                            return feature.geometry.type === "Polygon" || feature.geometry.type === "MultiPolygon";
+                        },
+                        onEachFeature: (f, l) => {
+                            const props = f.properties;
+                            const content = `
+                                <div class="kelurahan-title">Kelurahan: ${props.nama_kelurahan}</div>
+                                <div class="popup-row"><div class="popup-label">Kota:</div><div class="popup-val">Banjarmasin</div></div>
+                                <div class="popup-row"><div class="popup-label">Kecamatan:</div><div class="popup-val">${props.nama_kecamatan || '-'}</div></div>
+                                <div class="popup-row"><div class="popup-label">Sumber:</div><div class="popup-val">Dinas Perumahan Rakyat dan Kawasan Permukiman Kota Banjarmasin</div></div>
+                                <button class="btn-detail-popup" style="background: #64748b; margin-top: 15px;" onclick="map.closePopup()">Selesai</button>
+                            `;
+                            l.bindPopup(content, { maxWidth: 320 });
+                            l.on('mouseover', e => e.target.setStyle({ weight: 2, color:'#fff', opacity: 1 }));
+                            l.on('mouseout', e => e.target.setStyle({ weight: 1.2, color:'#E2E8F0', opacity: 0.8 }));
+                        }
+                    }).addTo(layers.kelurahan);
+                }
+            }),
+
+            fetch('{{ url("/api/kecamatan") }}').then(r=>r.json()).then(d => {
+                const ul = document.getElementById('list-kecamatan');
+                if(d.features) d.features.forEach(f => {
+                    const nama = f.properties.nama;
+                    const warna = colors[nama] || '#999';
+                    
+                    layers.kecamatan[nama] = L.geoJSON(f, {
+                        pane: 'paneKecamatan', 
+                        style: { color: warna, weight: 2, opacity: 1, fillColor: warna, fillOpacity: 0.75 },
+                        onEachFeature: (feature, layer) => {
+                            layer.bindTooltip(nama, { permanent: true, direction: "center", className: "label-kecamatan" });
+                        }
+                    });
+
+                    const div = document.createElement('div');
+                    div.className = 'layer-item';
+                    div.innerHTML = `<input type="checkbox" value="${nama}" onchange="toggleKecamatan(this)"><label>${nama}</label><div class="legend-box" style="background:${warna}"></div>`;
+                    ul.appendChild(div);
                 });
-                layers.kecamatan[nama] = layer;
-                const li = document.createElement('li');
-                li.innerHTML = `<input type="checkbox" value="${nama}" onchange="toggleKecamatan(this)"><label>${nama}</label><div class="legend-box" style="background:${warna}"></div>`;
-                ul.appendChild(li);
-            });
-        });
+            })
+        ]).catch(err => { console.error("Gagal memuat data:", err); });
 
-        // 3. Fetch Kelurahan (Visible - SEMUA DITAMPILKAN)
-        fetch('{{ url("/api/kelurahan") }}').then(r=>r.json()).then(d => {
-            console.log('Kelurahan Response:', d);
-            const totalKelurahan = d.total_data || 0;
-            const totalFeatures = d.total_features || (d.geojson?.features?.length || 0);
-            console.log(`Kelurahan: ${totalFeatures} dari ${totalKelurahan} data`);
-            
-            if(d.geojson && d.geojson.features && d.geojson.features.length > 0) {
-                layers.kelurahanGeoJSON = L.geoJSON(d.geojson, {
-                    pane: 'paneKelurahan',
-                    style: (feature) => {
-                        // Warna sigap-blue
-                        const sigapBlue = '#2563EB';
-                        return {
-                            color: sigapBlue,
-                            weight: 2,
-                            dashArray: '5, 5',
-                            fillOpacity: 0.15,
-                            fillColor: sigapBlue
-                        };
-                    },
-                    onEachFeature: (f, l) => {
-                        const props = f.properties;
-                        const popupContent = `
-                            <div style="text-align:left; font-family:sans-serif; min-width:220px;">
-                                <h4 style="margin:0 0 8px 0; color:#2563EB; font-size:15px;">Kelurahan: ${props.nama_kelurahan}</h4>
-                                <div style="font-size:13px; color:#555; margin-bottom:10px;">
-                                    <strong>Kota:</strong> Banjarmasin<br>
-                                    <strong>Kecamatan:</strong> ${props.nama_kecamatan || '-'}<br>
-                                    <strong>Sumber:</strong> ${props.sumber || '-'}
-                                </div>
-                            </div>
-                        `;
-                        l.bindPopup(popupContent, { maxWidth: 250 });
-                        l.on('mouseover', e => {
-                            e.target.setStyle({ weight: 3, dashArray: 'none', fillOpacity: 0.3 });
-                        });
-                        l.on('mouseout', e => {
-                            layers.kelurahanGeoJSON.resetStyle(e.target);
-                        });
-                    }
-                }).addTo(layers.kelurahan);
-                // Populate debug list and add helper functions
-                // ...hilangkan fitur debug console kelurahan...
-                
-                // Update status data
-                document.getElementById('status-data').innerText = `Data dimuat: ${totalFeatures} kelurahan`;
-            } else {
-                console.warn('Tidak ada feature kelurahan yang ditemukan');
-            }
-        }).catch(e => console.error("Error Kelurahan:", e));
-
-        // --- LOGIC UI ---
+        function searchLocation() {
+            const input = document.getElementById('search-input').value.toLowerCase();
+            const results = document.getElementById('search-results');
+            results.innerHTML = '';
+            if(input.length < 3) { results.style.display = 'none'; return; }
+            const matches = searchableList.filter(item => item.name.toLowerCase().includes(input));
+            if(matches.length > 0) {
+                results.style.display = 'block';
+                matches.slice(0, 5).forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<i class="fa-solid fa-house"></i> ${item.name}`;
+                    li.onclick = () => {
+                        map.flyTo([item.lat, item.lng], 18);
+                        const marker = markersById[item.id];
+                        if(marker) { layers.komplek.zoomToShowLayer(marker, function() { marker.openPopup(); }); }
+                        results.style.display = 'none';
+                    };
+                    results.appendChild(li);
+                });
+            } else { results.style.display = 'none'; }
+        }
 
         function togglePanel() {
             const p = document.getElementById('panel-layer');
             p.style.display = (p.style.display === 'none' ? 'block' : 'none');
         }
-        
         window.toggleKecamatan = (cb) => {
             const l = layers.kecamatan[cb.value];
             if(l) cb.checked ? map.addLayer(l) : map.removeLayer(l);
@@ -376,55 +412,25 @@
         window.openDetail = (id) => {
             const d = dataStore[id];
             if(!d) return;
+            map.closePopup();
             document.getElementById('m-title').innerText = d.nama_perumahan;
             document.getElementById('m-alamat').innerText = (d.alamat || '-').replace(/;/g, '.');
-            document.getElementById('m-lokasi').innerText = (d.kelurahan || '-').replace(/;/g, '.');
-            document.getElementById('m-sertifikat').innerText = d.jumlah_sertifikat;
-            document.getElementById('m-unit').innerText = d.jumlah_unit;
-            document.getElementById('m-status').innerText = (d.status_aset || '-').replace(/;/g, '.');
-            
+            document.getElementById('m-kelurahan').innerText = (d.nama_kelurahan || '-').replace(/;/g, '.');
+            document.getElementById('m-sertifikat').innerText = (d.jumlah_sertifikat != null ? d.jumlah_sertifikat : '-');
+            document.getElementById('m-unit').innerText = (d.jumlah_unit != null ? d.jumlah_unit : '-');
+            const status = d.status_aset || '-';
+            let color = '#334155';
+            if(status.includes('Sudah')) color = '#10B981';
+            else if(status.includes('Belum')) color = '#EF4444';
+            document.getElementById('m-status').innerHTML = `<span style="color:${color}; font-weight:700;">${status.replace(/;/g, '.')}</span>`;
             document.getElementById('m-ibadah').innerText = (d.fasilitas_ibadah || '-').replace(/;/g, '.');
             document.getElementById('m-umum').innerText = (d.fasilitas_umum || '-').replace(/;/g, '.');
             document.getElementById('m-pendidikan').innerText = (d.fasilitas_pendidikan || '-').replace(/;/g, '.');
             document.getElementById('m-kesehatan').innerText = (d.fasilitas_kesehatan || '-').replace(/;/g, '.');
-            
-            map.closePopup();
             document.getElementById('modal-detail').style.display = 'flex';
         }
         window.closeModal = () => document.getElementById('modal-detail').style.display = 'none';
         document.getElementById('modal-detail').onclick = (e) => { if(e.target.id === 'modal-detail') closeModal(); };
-
-        // --- Debug helper functions (pop-in) ---
-        window.showKelurahanDebug = () => {
-            const container = document.getElementById('debug-kelurahan-list');
-            if (!container) return;
-            container.style.display = (container.style.display === 'none' ? 'block' : 'none');
-        };
-
-        window.listKelurahanToConsole = () => {
-            if (!layers.kelurahanGeoJSON) return console.warn('kelurahanGeoJSON belum tersedia');
-            const layersArr = layers.kelurahanGeoJSON.getLayers();
-            console.log('Kelurahan layers count:', layersArr.length);
-            layersArr.forEach((ly, i) => console.log(i, ly.feature?.properties));
-        };
-
-        window.highlightKelurahanRandomColors = () => {
-            if (!layers.kelurahanGeoJSON) return;
-            layers.kelurahanGeoJSON.getLayers().forEach((ly, i) => {
-                try {
-                    const color = '#'+(Math.floor(Math.random()*16777215).toString(16).padStart(6,'0'));
-                    ly.setStyle({ color, fillColor: color, fillOpacity: 0.25, weight: 2 });
-                } catch (e) {}
-            });
-        };
-
-        window.fitKelurahanBounds = () => {
-            if (!layers.kelurahanGeoJSON) return;
-            try {
-                const b = layers.kelurahanGeoJSON.getBounds();
-                if (b.isValid()) map.fitBounds(b.pad(0.1));
-            } catch (e) { console.warn('fitKelurahanBounds error', e); }
-        };
 
     </script>
 </body>
