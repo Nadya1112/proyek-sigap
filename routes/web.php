@@ -94,6 +94,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->midd
 */
 Route::middleware(['auth', 'nocache'])->group(function () { 
     Route::get('/dashboard-pengguna', [UserDashboardController::class, 'index'])->name('user.dashboard');
+    Route::get('/notifikasi', [UserDashboardController::class, 'notifications'])->name('user.notifications');
     Route::get('/profil/{token?}', [ProfileController::class, 'index'])->name('profil.index');
     Route::post('/profil/detail', [ProfileController::class, 'updateDetail'])->name('profil.update.detail');
     Route::post('/profil/keamanan/kirim-link', [ProfileController::class, 'sendResetLink'])->name('profil.keamanan.kirim-link');

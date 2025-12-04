@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Proposal;
-use App\Models\Komplek;
 use App\Models\Kecamatan;
-use App\Models\Kelurahan; // Pastikan ini di-import
+use App\Models\Kelurahan;
+use App\Models\Komplek;
+use App\Models\Proposal;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB; // Import DB Facade untuk query langsung
-use Illuminate\Support\Facades\Log; // Import Log Facade untuk debugging
-use Illuminate\Support\Facades\Storage; // <-- Import Storage Facade
 use App\Notifications\ProposalUpdatedNotification;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class EproposalController extends Controller
 {
@@ -86,16 +86,16 @@ class EproposalController extends Controller
 
         // Validasi sederhana
         if (!ctype_digit((string)$kecamatanId)) {
-             Log::warning("ID Kecamatan tidak valid: " . $kecamatanId);
-             return response()->json([], 400); // Bad request
+            Log::warning("ID Kecamatan tidak valid: " . $kecamatanId);
+            return response()->json([], 400); // Bad request
         }
 
         // Query langsung ke tabel kelurahans
         $kelurahans = DB::table('kelurahans')
-                        ->where('kecamatan_id', $kecamatanId)
-                        ->orderBy('nama_kelurahan')
-                        ->select('id', 'nama_kelurahan') // Eksplisit pilih kolom
-                        ->get();
+            ->where('kecamatan_id', $kecamatanId)
+            ->orderBy('nama_kelurahan')
+            ->select('id', 'nama_kelurahan') // Eksplisit pilih kolom
+            ->get();
 
         Log::info("Kelurahan ditemukan: " . $kelurahans->count());
         return response()->json($kelurahans);
@@ -109,16 +109,16 @@ class EproposalController extends Controller
         Log::info("Mencari komplek untuk kelurahan ID: " . $kelurahanId);
 
         if (!ctype_digit((string)$kelurahanId)) {
-             Log::warning("ID Kelurahan tidak valid: " . $kelurahanId);
-             return response()->json([], 400);
+            Log::warning("ID Kelurahan tidak valid: " . $kelurahanId);
+            return response()->json([], 400);
         }
 
         // Query langsung ke tabel kompleks
         $kompleks = DB::table('kompleks')
-                      ->where('kelurahan_id', $kelurahanId)
-                      ->orderBy('nama_komplek')
-                      ->select('id', 'nama_komplek') // Eksplisit pilih kolom
-                      ->get();
+            ->where('kelurahan_id', $kelurahanId)
+            ->orderBy('nama_komplek')
+            ->select('id', 'nama_komplek') // Eksplisit pilih kolom
+            ->get();
 
         Log::info("Komplek ditemukan: " . $kompleks->count());
         return response()->json($kompleks);
@@ -133,8 +133,7 @@ class EproposalController extends Controller
         // Cek apakah file ada di disk 'public'
         if (Storage::disk('public')->exists($filePath)) {
             // Jika ada, kembalikan sebagai respons download
-            $fullPath = storage_path('app/public/' . $filePath);
-            return response()->download($fullPath, $downloadName);
+            return Storage::disk('public')->download($filePath, $downloadName);
         } else {
             // Jika file tidak ditemukan, tampilkan error 404
             Log::error("File template tidak ditemukan di: " . $filePath);

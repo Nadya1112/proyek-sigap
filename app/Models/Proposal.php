@@ -11,6 +11,7 @@ class Proposal extends Model
 
     // Konstanta status proposal baru
     public const STATUS_DIAJUKAN = 'Diajukan';
+    public const STATUS_DITERIMA = 'Diterima';
     public const STATUS_DIVERIFIKASI_JF = 'Diverifikasi JF';
     public const STATUS_DISETUJUI_KABID = 'Disetujui Kabid';
     public const STATUS_DISETUJUI_KADIS = 'Disetujui Kadis';
