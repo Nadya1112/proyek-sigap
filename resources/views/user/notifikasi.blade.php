@@ -3,7 +3,7 @@
 @section('title', 'Notifikasi Saya')
 
 @section('content')
-<header class="relative overflow-hidden" style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #A78BFA 100%);">
+<header class="relative overflow-hidden" style="background: linear-gradient(135deg, #F59E0B 0%, #F97316 50%, #EA580C 100%);">
     <div class="absolute inset-0 pointer-events-none" style="background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.05)" points="0,1000 1000,0 1000,1000"/></svg></div>
     <div class="container mx-auto px-6 py-12 md:py-16 relative">
         <div class="max-w-4xl mx-auto text-center text-white">

@@ -169,14 +169,7 @@
                 <!-- Mobile Menu Button & User Icon -->
                 <div id="mobile-controls" style="display: none;" class="flex items-center gap-4">
                     @auth
-                        <div class="flex items-center gap-4">
-                            <!-- Notif Icon -->
-                            <a href="{{ route('user.notifications') }}" class="relative text-gray-600 hover:text-sigap-yellow transition-colors duration-300">
-                                <i data-feather="bell" class="w-6 h-6"></i>
-                                @if(auth()->user()->unreadNotifications->count() > 0)
-                                    <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-                                @endif
-                            </a>
+                        <div class="flex items-center">
                             <!-- Mobile User Button -->
                             <a href="{{ route('user.dashboard') }}"
                                 class="w-9 h-9 bg-gradient-to-br from-sigap-yellow to-sigap-orange rounded-full flex items-center justify-center transform transition-transform duration-300 hover:scale-110">
