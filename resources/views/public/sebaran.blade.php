@@ -14,24 +14,42 @@
         body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #f4f4f4; }
         #map { height: 100vh; width: 100%; }
 
-        /* --- 1. HEADER JUDUL (KIRI ATAS) --- */
-        #map-header-card {
-            position: absolute; 
-            top: 20px; 
-            left: 20px; 
+        /* --- 1. TOMBOL KEMBALI (KIRI ATAS) --- */
+        .btn-back-custom {
+            position: absolute;
+            top: 20px;
+            left: 20px;
             z-index: 1001;
-            background: linear-gradient(90deg, #FFC107, #FF9800);
+            width: 40px; height: 40px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 18px; color: #333;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(0,0,0,0.2);
+        }
+        .btn-back-custom:hover { background: #f8f9fa; transform: scale(1.05); }
+
+        /* --- 2. HEADER JUDUL (KIRI ATAS - DI BAWAH TOMBOL KEMBALI) --- */
+        #map-header-card {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            z-index: 1001;
+            background: linear-gradient(90deg, #F59E0B, #F97316);
             color: #333; padding: 10px 20px; border-radius: 50px;
             font-weight: 800; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             border: 2px solid #fff; font-size: 14px; letter-spacing: 0.5px;
-            pointer-events: auto; 
+            pointer-events: auto;
         }
 
-        /* --- 2. TOMBOL LAYER (KANAN ATAS) --- */
+        /* --- 3. TOMBOL LAYER (KANAN ATAS) --- */
         .btn-layer-custom {
-            position: absolute; 
-            top: 20px; 
-            right: 20px; 
+            position: absolute;
+            top: 20px;
+            right: 20px;
             z-index: 1001;
             width: 40px; height: 40px;
             background: #fff;
@@ -86,23 +104,23 @@
 
         /* Style Ikon Rumah Hijau (KECIL - 20px) */
         .icon-rumah-wrapper {
-            background: #fff; 
-            border: 2px solid #28a745; 
+            background: #fff;
+            border: 2px solid #F97316;
             border-radius: 50%;
-            width: 20px; height: 20px; 
+            width: 20px; height: 20px;
             display: flex; justify-content: center; align-items: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.4);
             transition: transform 0.2s;
         }
-        .icon-rumah-wrapper:hover { transform: scale(1.5); z-index: 999; border-color: #218838; }
-        .icon-rumah-wrapper i { color: #28a745; font-size: 10px; }
+        .icon-rumah-wrapper:hover { transform: scale(1.5); z-index: 999; border-color: #E11D48; }
+        .icon-rumah-wrapper i { color: #F97316; font-size: 10px; }
 
         /* Modal Detail */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
         .modal-box { background: #fff; width: 90%; max-width: 500px; border-radius: 12px; overflow: hidden; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         @keyframes slideUp { from {transform: translateY(50px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
         
-        .modal-header { background: #28a745; color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header { background: #F97316; color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
         .modal-body { padding: 20px; max-height: 60vh; overflow-y: auto; }
         .info-table { width: 100%; border-collapse: collapse; font-size: 14px; }
         .info-table th { text-align: left; color: #666; width: 35%; padding: 10px 5px; border-bottom: 1px solid #eee; font-weight: 600; vertical-align: top; }
@@ -116,7 +134,12 @@
 </head>
 <body>
 
-    <!-- 1. Header Judul -->
+    <!-- 1. Tombol Kembali -->
+    <a href="{{ url('/') }}" class="btn-back-custom" title="Kembali ke Beranda">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+
+    <!-- 2. Header Judul -->
     <div id="map-header-card">PETA - SEBARAN</div>
 
     <!-- 2. Tombol Layer Custom -->
@@ -135,7 +158,7 @@
             <li>
                 <input type="checkbox" id="check-komplek" checked>
                 <label for="check-komplek">Sebaran Komplek</label>
-                <div class="legend-box" style="background: #28a745; border: 2px solid white;"></div>
+                <div class="legend-box" style="background: #F97316; border: 2px solid white;"></div>
             </li>
         </ul>
 
@@ -178,7 +201,7 @@
                     <tr><th>Sertifikat</th><td id="m-sertifikat">-</td></tr>
                     <tr><th>Unit</th><td id="m-unit">-</td></tr>
                     <tr><th>Status Aset</th><td id="m-status">-</td></tr>
-                    <tr><th colspan="2" style="padding-top:20px; color:#28a745; border-bottom: 2px solid #28a745;">FASILITAS</th></tr>
+                    <tr><th colspan="2" style="padding-top:20px; color:#F97316; border-bottom: 2px solid #F97316;">FASILITAS</th></tr>
                     <tr><th>Ibadah</th><td id="m-ibadah">-</td></tr>
                     <tr><th>Umum</th><td id="m-umum">-</td></tr>
                     <tr><th>Pendidikan</th><td id="m-pendidikan">-</td></tr>
@@ -295,21 +318,21 @@
                 layers.kelurahanGeoJSON = L.geoJSON(d.geojson, {
                     pane: 'paneKelurahan',
                     style: (feature) => {
-                        // Warna army (hijau gelap)
-                        const armyColor = '#4B5320';
+                        // Warna sigap-blue
+                        const sigapBlue = '#2563EB';
                         return {
-                            color: armyColor,
+                            color: sigapBlue,
                             weight: 2,
                             dashArray: '5, 5',
                             fillOpacity: 0.15,
-                            fillColor: armyColor
+                            fillColor: sigapBlue
                         };
                     },
                     onEachFeature: (f, l) => {
                         const props = f.properties;
                         const popupContent = `
                             <div style="text-align:left; font-family:sans-serif; min-width:220px;">
-                                <h4 style="margin:0 0 8px 0; color:#4B5320; font-size:15px;">Kelurahan: ${props.nama_kelurahan}</h4>
+                                <h4 style="margin:0 0 8px 0; color:#2563EB; font-size:15px;">Kelurahan: ${props.nama_kelurahan}</h4>
                                 <div style="font-size:13px; color:#555; margin-bottom:10px;">
                                     <strong>Kota:</strong> Banjarmasin<br>
                                     <strong>Kecamatan:</strong> ${props.nama_kecamatan || '-'}<br>
