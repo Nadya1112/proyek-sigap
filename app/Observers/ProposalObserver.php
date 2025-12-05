@@ -20,11 +20,11 @@ class ProposalObserver
         Notification::make()
             ->title('E-Proposal Baru Masuk')
             ->body("Proposal dari {$proposal->nama_pengaju} menunggu verifikasi awal.")
-            ->icon('heroicon-o-document-plus')
+            ->icon('heroicon-o-inbox-arrow-down')
             ->iconColor('primary')
             ->actions([
                 Action::make('view')
-                    ->label('Lihat')
+                    ->label('Tinjau')
                     ->url(fn() => "/admin/proposals/{$proposal->id}/edit")
                     ->button(),
             ])

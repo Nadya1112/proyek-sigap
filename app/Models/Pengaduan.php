@@ -12,7 +12,7 @@ class Pengaduan extends Model
 
     // Konstanta status disamakan dengan Proposal
     public const STATUS_DIAJUKAN = 'Diajukan';
-    public const STATUS_DITERIMA = 'Diterima'; // Ditambahkan untuk alur baru
+    public const STATUS_DITERIMA = 'Diterima';
     public const STATUS_DIVERIFIKASI_JF = 'Diverifikasi JF';
     public const STATUS_DISETUJUI_KABID = 'Disetujui Kabid';
     public const STATUS_DISETUJUI_KADIS = 'Disetujui Kadis';

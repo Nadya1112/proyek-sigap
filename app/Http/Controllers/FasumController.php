@@ -48,8 +48,7 @@ class FasumController extends Controller
             $s = trim($request->input('search'));
             $query->where(function ($w) use ($s) {
                 $w->where('nama_komplek', 'like', "%{$s}%")
-                  ->orWhere('alamat', 'like', "%{$s}%")
-                  ->orWhere('nomor', 'like', "%{$s}%");
+                  ->orWhere('alamat_komplek', 'like', "%{$s}%");
             });
         }
 

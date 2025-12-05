@@ -10,12 +10,10 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder; // Import Builder
 use Illuminate\Database\Eloquent\Model; // Import Model
 use Illuminate\Support\Facades\Auth; // Import Auth
 use Illuminate\Support\Facades\Storage; // Import Storage
-
-use App\Notifications\ProposalUpdatedNotification; // Import Notifikasi
-use Filament\Notifications\Notification as FilamentNotification; // Import Filament Notif
 
 class ProposalResource extends Resource
 {
@@ -24,6 +22,31 @@ class ProposalResource extends Resource
     protected static ?string $navigationGroup = 'Pelayanan Publik';
     protected static ?int $navigationSort = 2;
 
+    public static function getEloquentQuery(): Builder
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        $query = parent::getEloquentQuery();
+
+        // Super Admin dapat melihat semua proposal
+        if ($user->isSuperAdmin()) {
+            return $query;
+        }
+
+        // Filter proposal berdasarkan peran pengguna untuk alur bertingkat
+        return $query->where(function (Builder $q) use ($user) {
+            if ($user->isStaff()) {
+                $q->where('status', Proposal::STATUS_DIAJUKAN);
+            } elseif ($user->isJfPsu()) {
+                $q->where('status', Proposal::STATUS_DITERIMA);
+            } elseif ($user->isKabid()) {
+                $q->where('status', Proposal::STATUS_DIVERIFIKASI_JF);
+            } elseif ($user->isKadis()) {
+                $q->where('status', Proposal::STATUS_DISETUJUI_KABID);
+            }
+        });
+    }
+
     // Helper function untuk cek hak ubah status
     private static function canUpdateStatus(User $user, ?string $currentStatus): bool
     {
@@ -31,9 +54,10 @@ class ProposalResource extends Resource
         if ($user->isSuperAdmin()) return true; // Super admin bisa kapan saja
 
         return match ($currentStatus) {
-            Proposal::STATUS_DIAJUKAN => $user->isStaff() || $user->isJfPsu(),
-            Proposal::STATUS_DIVERIFIKASI_JF => $user->isJfPsu() || $user->isKabid(),
-            Proposal::STATUS_DISETUJUI_KABID => $user->isKabid() || $user->isKadis(),
+            Proposal::STATUS_DIAJUKAN => $user->isStaff(),
+            Proposal::STATUS_DITERIMA => $user->isJfPsu(),
+            Proposal::STATUS_DIVERIFIKASI_JF => $user->isKabid(),
+            Proposal::STATUS_DISETUJUI_KABID => $user->isKadis(),
             default => false,
         };
     }
@@ -74,7 +98,7 @@ class ProposalResource extends Resource
                         ])->label('Dokumen Proposal'),
                     ]),
                 
-                Forms\Components\Section::make('Tindakan Admin')
+                Forms\Components\Section::make('Tindak Lanjut')
                     // Hanya tampil jika user punya hak update status
                     ->visible(fn (?Model $record) => $user->isSuperAdmin() || ($record && self::canUpdateStatus($user, $record->status)))
                     ->schema([
@@ -88,6 +112,7 @@ class ProposalResource extends Resource
                                 if ($user->isSuperAdmin()) {
                                     return [
                                         Proposal::STATUS_DIAJUKAN => 'Diajukan',
+                                        Proposal::STATUS_DITERIMA => 'Diterima (Staff)',
                                         Proposal::STATUS_DIVERIFIKASI_JF => 'Diverifikasi (JF PSU)',
                                         Proposal::STATUS_DISETUJUI_KABID => 'Setujui (Kabid)',
                                         Proposal::STATUS_DISETUJUI_KADIS => 'Setujui Final (Kadis)',
@@ -98,16 +123,28 @@ class ProposalResource extends Resource
                                 // Logika alur status berdasarkan role
                                 switch ($currentStatus) {
                                     case Proposal::STATUS_DIAJUKAN:
-                                        if ($user->isStaff() || $user->isJfPsu()) $options[Proposal::STATUS_DITOLAK] = 'Tolak';
-                                        if ($user->isJfPsu()) $options[Proposal::STATUS_DIVERIFIKASI_JF] = 'Verifikasi (JF PSU)';
+                                        if ($user->isStaff()) {
+                                            $options[Proposal::STATUS_DITERIMA] = 'Terima';
+                                            $options[Proposal::STATUS_DITOLAK] = 'Tolak';
+                                        }
+                                        break;
+                                    case Proposal::STATUS_DITERIMA:
+                                        if ($user->isJfPsu()) {
+                                            $options[Proposal::STATUS_DIVERIFIKASI_JF] = 'Verifikasi';
+                                            $options[Proposal::STATUS_DITOLAK] = 'Tolak';
+                                        }
                                         break;
                                     case Proposal::STATUS_DIVERIFIKASI_JF:
-                                        if ($user->isJfPsu() || $user->isKabid()) $options[Proposal::STATUS_DITOLAK] = 'Tolak';
-                                        if ($user->isKabid()) $options[Proposal::STATUS_DISETUJUI_KABID] = 'Setujui (Kabid)';
+                                        if ($user->isKabid()) {
+                                            $options[Proposal::STATUS_DISETUJUI_KABID] = 'Setujui';
+                                            $options[Proposal::STATUS_DITOLAK] = 'Tolak';
+                                        }
                                         break;
                                     case Proposal::STATUS_DISETUJUI_KABID:
-                                        if ($user->isKabid() || $user->isKadis()) $options[Proposal::STATUS_DITOLAK] = 'Tolak';
-                                        if ($user->isKadis()) $options[Proposal::STATUS_DISETUJUI_KADIS] = 'Setujui Final (Kadis)';
+                                        if ($user->isKadis()) {
+                                            $options[Proposal::STATUS_DISETUJUI_KADIS] = 'Setujui Final';
+                                            $options[Proposal::STATUS_DITOLAK] = 'Tolak';
+                                        }
                                         break;
                                 }
                                 return $options;
@@ -121,22 +158,6 @@ class ProposalResource extends Resource
             ]);
     }
 
-    private static function getNotificationMessage(string $status): array
-    {
-        $title = 'Status Proposal Anda Diperbarui';
-
-        $body = match ($status) {
-            Proposal::STATUS_DIVERIFIKASI_JF => "Proposal Anda telah diverifikasi oleh Petugas Fungsional.",
-            Proposal::STATUS_DISETUJUI_KABID => "Proposal Anda telah disetujui oleh Kepala Bidang.",
-            Proposal::STATUS_DISETUJUI_KADIS => "Proposal Anda telah disetujui sepenuhnya dan akan segera diproses.",
-            Proposal::STATUS_DITOLAK => "Mohon maaf, proposal Anda ditolak. Silakan periksa detailnya.",
-            default => "Status proposal Anda diperbarui menjadi: {$status}.",
-        };
-
-        return [$title, $body];
-    }
-
-
     public static function table(Table $table): Table
     {
         return $table
@@ -147,8 +168,9 @@ class ProposalResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         Proposal::STATUS_DIAJUKAN => 'warning',
-                        Proposal::STATUS_DIVERIFIKASI_JF => 'info',
-                        Proposal::STATUS_DISETUJUI_KABID => 'primary',
+                        Proposal::STATUS_DITERIMA => 'info',
+                        Proposal::STATUS_DIVERIFIKASI_JF => 'primary',
+                        Proposal::STATUS_DISETUJUI_KABID => 'success',
                         Proposal::STATUS_DISETUJUI_KADIS => 'success',
                         Proposal::STATUS_DITOLAK => 'danger',
                         default => 'gray',
@@ -175,6 +197,7 @@ class ProposalResource extends Resource
     {
         return [
             'index' => Pages\ListProposals::route('/'),
+            // Menggunakan halaman EditProposal yang sudah dimodifikasi
             'edit' => Pages\EditProposal::route('/{record}/edit'),
         ];
     }
