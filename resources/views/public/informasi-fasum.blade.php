@@ -3,7 +3,6 @@
 @section('title', 'SIGAP KOMPLEK')
 
 @section('content')
-    <!-- Page Header -->
     <section class="relative overflow-hidden">
         <div class="relative"
             style="background: linear-gradient(135deg, #F7A623 0%, #FF7A00 45%, #F25C3B 70%, #F04949 100%);">
@@ -32,7 +31,6 @@
                         Data real-time yang akurat dan terpercaya untuk kemudahan masyarakat.
                     </p>
 
-                    <!-- Quick Stats -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
                         <div class="quick-stat">
                             <div class="stat-number">{{ $totalKomplek ?? '0' }}</div>
@@ -56,11 +54,9 @@
         </div>
     </section>
 
-    <!-- Main Content -->
     <main class="py-8 lg:py-16 bg-gray-50">
         <div class="container mx-auto px-6">
 
-            <!-- Filter Section -->
             <div class="filter-card">
                 <div class="filter-header">
                     <h2 class="filter-title">
@@ -75,7 +71,6 @@
                 </div>
 
                 <form action="{{ route('informasi-fasum') }}" method="GET" class="filter-form">
-                    <!-- Filter Row 1 -->
                     <div class="filter-row">
                         <div class="filter-group">
                             <label for="kecamatan" class="form-label">
@@ -141,7 +136,6 @@
                         </div>
                     </div>
 
-                    <!-- Filter Row 2 -->
                     <div class="filter-row">
                         <div class="filter-group lg:col-span-2">
                             <label for="search" class="form-label">
@@ -188,7 +182,6 @@
                 </form>
             </div>
 
-            <!-- Results Info -->
             <div class="results-info">
                 <div class="results-summary">
                     <span class="results-count">{{ $kompleks->total() }}</span> komplek ditemukan
@@ -206,26 +199,15 @@
                         <svg class="w-4 h-4 view-icon-grid hidden" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
                             </path>
                         </svg>
                         <span class="view-label">Tampilan Grid</span>
                     </button>
-
-                    <button id="exportBtn" class="export-btn">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                            </path>
-                        </svg>
-                        Export
-                    </button>
                 </div>
             </div>
 
-            <!-- Data Table -->
             <div class="data-container mb-3">
-                <!-- Table View -->
                 <div id="tableView" class="data-table">
                     <div class="table-wrapper">
                         <table class="data-table-element">
@@ -341,9 +323,8 @@
                                                         </path>
                                                     </svg>
                                                 </button>
-                                                <button class="action-btn action-btn-map"
-                                                    onclick="showMap({{ $item->latitude ?? 0 }}, {{ $item->longitude ?? 0 }})"
-                                                    title="Lihat Peta">
+                                                <a href="{{ route('sebaran', ['location' => $item->id]) }}"
+                                                    class="action-btn action-btn-map" title="Lihat Peta">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -353,7 +334,7 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                     </svg>
-                                                </button>
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
@@ -391,7 +372,6 @@
                     </div>
                 </div>
 
-                <!-- Grid View (Hidden by default) -->
                 <div id="gridView" class="data-grid hidden">
                     <div class="grid-container">
                         @forelse ($kompleks as $item)
@@ -442,15 +422,15 @@
                                         </svg>
                                         Lihat Detail
                                     </button>
-                                    <button class="grid-action-btn grid-btn-secondary"
-                                        onclick="showMap({{ $item->latitude ?? 0 }}, {{ $item->longitude ?? 0 }})">
+                                    <a href="{{ route('sebaran', ['location' => $item->id]) }}"
+                                        class="grid-action-btn grid-btn-secondary">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
                                             </path>
                                         </svg>
                                         Peta
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         @empty
@@ -473,7 +453,6 @@
                 </div>
             </div>
 
-            <!-- Pagination -->
             @if ($kompleks->hasPages())
                 <div class="pagination-wrapper">
                     {{ $kompleks->appends(request()->query())->links() }}
@@ -483,7 +462,92 @@
         </div>
     </main>
 
+    <div id="detailModal" class="modal-backdrop hidden">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modal-nama-komplek">Memuat...</h3>
+                    <button class="modal-close" onclick="closeModal()">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div id="modal-loading" class="flex justify-center py-8">
+                        <svg class="animate-spin h-8 w-8 text-orange-500" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                    </div>
+
+                    <div id="modal-content-data" class="hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <div class="modal-image-wrapper">
+                                    <img id="modal-image" src="" alt="Foto Komplek" class="modal-image">
+                                </div>
+                                <div class="mt-4 space-y-3">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Pengembang</span>
+                                        <span class="detail-value" id="modal-pengembang">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Alamat</span>
+                                        <span class="detail-value" id="modal-alamat">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Lokasi</span>
+                                        <span class="detail-value" id="modal-lokasi">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div class="grid grid-cols-3 gap-3">
+                                    <div class="modal-stat-card">
+                                        <div class="stat-num" id="modal-unit">-</div>
+                                        <div class="stat-desc">Total Unit</div>
+                                    </div>
+                                    <div class="modal-stat-card">
+                                        <div class="stat-num" id="modal-sertifikat">-</div>
+                                        <div class="stat-desc">Sertifikat</div>
+                                    </div>
+                                    <div class="modal-stat-card">
+                                        <div class="stat-num" id="modal-aset">-</div>
+                                        <div class="stat-desc">Jumlah Aset</div>
+                                    </div>
+                                </div>
+
+                                <div class="facility-section">
+                                    <h4 class="facility-title">Fasilitas Umum</h4>
+                                    <p class="facility-text" id="modal-fasum">-</p>
+                                </div>
+                                <div class="facility-section">
+                                    <h4 class="facility-title">Fasilitas Ibadah</h4>
+                                    <p class="facility-text" id="modal-ibadah">-</p>
+                                </div>
+                                <div class="facility-section">
+                                    <h4 class="facility-title">Fasilitas Pendidikan</h4>
+                                    <p class="facility-text" id="modal-pendidikan">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <style>
+        /* Existing Styles ... */
+        /* ... (Paste your existing styles here) ... */
         /* Page Header */
         .page-header {
             background: linear-gradient(135deg, #F59E0B 0%, #F97316 50%, #EA580C 100%);
@@ -1267,24 +1331,179 @@
             }
         }
 
-        /* Loading States */
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
+        /* NEW MODAL STYLES */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            backdrop-filter: blur(4px);
         }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
+        .modal-backdrop.hidden {
+            display: none;
         }
 
-        @keyframes fadeIn {
+        .modal-container {
+            background-color: white;
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
             from {
                 opacity: 0;
+                transform: scale(0.95);
             }
 
             to {
                 opacity: 1;
+                transform: scale(1);
             }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #E5E7EB;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1F2937;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #6B7280;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background-color: #F3F4F6;
+            color: #111827;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-image-wrapper {
+            width: 100%;
+            height: 250px;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background-color: #F3F4F6;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid #F3F4F6;
+            padding-bottom: 0.5rem;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            color: #6B7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .detail-value {
+            font-size: 0.95rem;
+            color: #1F2937;
+            font-weight: 500;
+        }
+
+        .modal-stat-card {
+            background-color: #FFF7ED;
+            border: 1px solid #FFEDD5;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .modal-stat-card .stat-num {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #EA580C;
+        }
+
+        .modal-stat-card .stat-desc {
+            font-size: 0.7rem;
+            color: #9A3412;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .facility-section {
+            margin-top: 1rem;
+        }
+
+        .facility-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .facility-title::before {
+            content: '';
+            width: 4px;
+            height: 1rem;
+            background-color: #F97316;
+            border-radius: 2px;
+            display: inline-block;
+        }
+
+        .facility-text {
+            font-size: 0.9rem;
+            color: #4B5563;
+            line-height: 1.5;
+            background-color: #F9FAFB;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin: 0;
         }
     </style>
 
@@ -1330,8 +1549,8 @@
             if (!kecamatanId) return;
 
             try {
-                const url = `{{ route('get.kelurahan', ['kecamatanId' => ':kecamatanId']) }}`.replace(':kecamatanId', kecamatanId);
-                console.log('Fetching kelurahan from:', url); // Debug: Log URL
+                const url = `{{ route('get.kelurahan', ['kecamatanId' => ':kecamatanId']) }}`.replace(
+                    ':kecamatanId', kecamatanId);
 
                 const res = await fetch(url, {
                     headers: {
@@ -1339,15 +1558,11 @@
                     }
                 });
 
-                const responseText = await res.text();
-                console.log('Server response:', responseText); // Debug: Log raw response
-
                 if (!res.ok) {
-                    throw new Error(`Gagal memuat data kelurahan. Status: ${res.status}`);
+                    throw new Error(`Gagal memuat data kelurahan.`);
                 }
 
-                const data = JSON.parse(responseText);
-                console.log('Parsed data:', data); // Debug: Log parsed data
+                const data = await res.json();
 
                 // Populate opsi kelurahan
                 data.forEach(k => {
@@ -1359,23 +1574,10 @@
 
                 kelurahanSelect.disabled = false;
             } catch (e) {
-                console.error('Error fetching kelurahan:', e); // Debug: Log error
+                console.error('Error fetching kelurahan:', e);
                 alert('Tidak bisa memuat daftar kelurahan. Coba lagi.');
             }
         });
-
-        // (opsional) Saat halaman pertama kali load, jika ada kecamatan terpilih dari query string,
-        // dropdown kelurahan sudah diload server-side via controller.
-        // Kalau mau force refresh lewat AJAX juga, bisa panggil event change:
-        @if ($request->filled('kecamatan') && $kelurahans->isEmpty())
-            document.addEventListener('DOMContentLoaded', () => {
-                const kecSel = document.getElementById('kecamatan');
-                if (kecSel.value) {
-                    const event = new Event('change');
-                    kecSel.dispatchEvent(event);
-                }
-            });
-        @endif
 
         // Search with debounce
         let searchTimeout;
@@ -1384,23 +1586,14 @@
             const searchTerm = this.value;
 
             searchTimeout = setTimeout(() => {
-                // You can implement live search here
-                console.log('Searching for:', searchTerm);
+                // You can implement live search here if needed
             }, 500);
         });
 
-        // Export functionality
+        // Export functionality placeholder
         document.getElementById('exportBtn').addEventListener('click', function() {
-            // Implement export functionality
-            alert('Export functionality will be implemented');
+            alert('Fitur export akan segera tersedia');
         });
-
-        // View detail function
-        function viewDetail(id) {
-            // Implement view detail functionality
-            console.log('View detail for komplek ID:', id);
-            // You can redirect to detail page or show modal
-        }
 
         // Show map function
         function showMap(lat, lng) {
@@ -1408,27 +1601,97 @@
                 alert('Koordinat lokasi tidak tersedia untuk komplek ini.');
                 return;
             }
-
-            // Open Google Maps
-            const url = `https://www.google.com/maps?q=${lat},${lng}`;
+            const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
             window.open(url, '_blank');
         }
 
-        // Add loading states to buttons
+        // --- NEW MODAL LOGIC ---
+
+        function viewDetail(id) {
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('modal-content-data');
+            const loading = document.getElementById('modal-loading');
+
+            // Show modal and loading state
+            modal.classList.remove('hidden');
+            loading.classList.remove('hidden');
+            content.classList.add('hidden');
+            document.getElementById('modal-nama-komplek').textContent = 'Memuat Data...';
+
+            // Fetch data
+            fetch(`/informasi-fasum/${id}/detail`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Gagal mengambil data');
+                    return response.json();
+                })
+                .then(data => {
+                    // Populate data
+                    document.getElementById('modal-nama-komplek').textContent = data.nama_komplek;
+                    document.getElementById('modal-pengembang').textContent = data.nama_pengembang || '-';
+                    document.getElementById('modal-alamat').textContent = data.alamat_komplek || '-';
+
+                    const lokasi = (data.kelurahan ? data.kelurahan.nama_kelurahan : '-') +
+                        (data.kelurahan && data.kelurahan.kecamatan ? ', ' + data.kelurahan.kecamatan.nama_kecamatan :
+                            '');
+                    document.getElementById('modal-lokasi').textContent = lokasi;
+
+                    document.getElementById('modal-sertifikat').textContent = data.jumlah_sertifikat ?? 0;
+                    document.getElementById('modal-unit').textContent = data.jumlah_unit ?? 0;
+                    document.getElementById('modal-aset').textContent = data.jumlah_aset ?? 0;
+
+                    document.getElementById('modal-fasum').textContent = data.fasilitas_umum || 'Tidak ada data';
+                    document.getElementById('modal-ibadah').textContent = data.fasilitas_ibadah || 'Tidak ada data';
+                    document.getElementById('modal-pendidikan').textContent = data.fasilitas_pendidikan ||
+                        'Tidak ada data';
+
+                    // Handle Image
+                    const img = document.getElementById('modal-image');
+                    if (data.foto_komplek) {
+                        img.src = `/storage/${data.foto_komplek}`;
+                    } else {
+                        img.src = "{{ asset('img/placeholder-komplek.jpg') }}";
+                    }
+
+                    // Show content
+                    loading.classList.add('hidden');
+                    content.classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('modal-nama-komplek').textContent = 'Error';
+                    loading.innerHTML = '<p class="text-red-500 text-center">Gagal memuat data.</p>';
+                });
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('detailModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Loading states for filter form
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.querySelector('.filter-form');
             const submitBtn = document.querySelector('.btn-filter-apply');
 
-            form.addEventListener('submit', function() {
-                submitBtn.innerHTML = `
-                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Memproses...
-                `;
-                submitBtn.disabled = true;
-            });
+            if (form && submitBtn) {
+                form.addEventListener('submit', function() {
+                    submitBtn.innerHTML = `
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Memproses...
+                    `;
+                    submitBtn.disabled = true;
+                });
+            }
         });
     </script>
 @endsection

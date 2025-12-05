@@ -97,4 +97,12 @@ class FasumController extends Controller
 
         return response()->json($kelurahans);
     }
+
+    public function showDetail($id)
+    {
+        // Pastikan meload relasi kelurahan dan kecamatan agar namanya muncul
+        $komplek = \App\Models\Komplek::with('kelurahan.kecamatan')->findOrFail($id);
+        
+        return response()->json($komplek);
+    }
 }

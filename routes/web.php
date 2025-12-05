@@ -34,7 +34,7 @@ Route::redirect('/', '/home');
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::view('/fitur', 'public.fitur')->name('fitur');
 Route::get('/informasi-fasum', [FasumController::class, 'index'])->name('informasi-fasum');
-Route::get('/regulasi', [RegulasiController::class, 'index'])->name('regulasi');
+Route::get('/informasi-fasum/{id}/detail', [App\Http\Controllers\FasumController::class, 'showDetail'])->name('fasum.detail');Route::get('/regulasi', [RegulasiController::class, 'index'])->name('regulasi');
 Route::get('/regulasi/unduh/{id}', [RegulasiController::class, 'download'])
     ->where('id', '[A-Za-z0-9_-]+')
     ->name('regulasi.download')

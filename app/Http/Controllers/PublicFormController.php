@@ -15,7 +15,7 @@ class PublicFormController extends Controller
     /**
      * Menampilkan form pengaduan beserta statistik.
      */
-    public function showPengaduanForm()
+    public function showPengaduanForm()// Di dalam file app/Http/Controllers/PublicController.php
     {
         $stats = [
             'total'    => Pengaduan::count(),
