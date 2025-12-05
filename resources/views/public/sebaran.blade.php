@@ -86,18 +86,32 @@
         #search-results li { padding: 8px 12px; cursor: pointer; color: #333; font-size: 12px; border-bottom: 1px solid #f5f5f5; }
         #search-results li:hover { background: #fff7ed; color: var(--sigap-orange); font-weight: 600; }
 
-        /* SEPARATOR */
+        /* SEPARATOR & GLOBAL CHECK */
         .layer-separator {
             font-size: 11px; font-weight: 700; color: #94a3b8; 
             text-transform: uppercase; letter-spacing: 0.5px;
             margin-top: 15px; margin-bottom: 8px;
             border-bottom: 1px solid #f1f5f9; padding-bottom: 2px;
+            display: flex; justify-content: space-between; align-items: center;
         }
+        .layer-separator:first-of-type { margin-top: 5px; }
+        
+        .check-all-wrapper { display: flex; align-items: center; gap: 5px; cursor: pointer; text-transform: none; color: var(--sigap-orange); }
+        .check-all-wrapper input { cursor: pointer; accent-color: var(--sigap-orange); }
+
+        .global-check {
+            background: #fff7ed; border: 1px solid #ffedd5; border-radius: 8px;
+            padding: 10px; margin-bottom: 15px; display: flex; align-items: center;
+        }
+        .global-check label { font-weight: 700; color: var(--sigap-orange); font-size: 13px; cursor: pointer; flex-grow: 1; margin-left: 8px; }
+        .global-check input { accent-color: var(--sigap-orange); width: 16px; height: 16px; cursor: pointer; }
+
+        /* LAYER ITEMS */
         .layer-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 13px; color: #444; font-weight: 500; }
         .layer-item input { margin-right: 10px; accent-color: var(--sigap-orange); width: 16px; height: 16px; cursor: pointer; }
         .legend-box { width: 14px; height: 14px; border-radius: 4px; margin-left: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-        /* LABEL KECAMATAN */
+        /* LABEL KECAMATAN (DOFF) */
         .label-kecamatan {
             background: transparent !important; border: none !important; box-shadow: none !important;
             color: #fff !important; font-weight: 800 !important; font-size: 11px !important;
@@ -105,7 +119,7 @@
             font-family: 'Poppins', sans-serif; letter-spacing: 1px; text-align: center; opacity: 0.9;
         }
 
-        /* CLUSTER STYLE */
+        /* CLUSTER (ORANYE) */
         .cluster-sigap {
             background: var(--sigap-gradient); border: 2px solid #fff; color: #fff;
             font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 14px;
@@ -113,27 +127,17 @@
             box-shadow: 0 4px 15px rgba(249, 115, 22, 0.5);
         }
 
-        /* --- IKON RUMAH CUSTOM (ORANYE) --- */
+        /* --- IKON RUMAH CUSTOM (AGAR TIDAK HITAM) --- */
         .icon-rumah-wrapper {
             background: #fff;
-            border: 2px solid var(--sigap-orange); /* Border Oranye */
-            border-radius: 50%;
-            width: 28px; height: 28px;
+            border: 2px solid var(--sigap-orange);
+            border-radius: 50%; width: 28px; height: 28px;
             display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.3); /* Bayangan */
-            transition: transform 0.2s;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3); transition: transform 0.2s;
         }
-        .icon-rumah-wrapper:hover { 
-            transform: scale(1.3); 
-            background: var(--sigap-orange); /* Hover jadi Oranye Penuh */
-            border-color: #fff; 
-            z-index: 999; 
-        }
-        .icon-rumah-wrapper i { 
-            color: var(--sigap-orange); /* Rumah Oranye */
-            font-size: 14px; 
-        }
-        .icon-rumah-wrapper:hover i { color: #fff; } /* Rumah jadi putih saat hover */
+        .icon-rumah-wrapper:hover { transform: scale(1.3); background: var(--sigap-orange); border-color: #fff; z-index: 999; }
+        .icon-rumah-wrapper i { color: var(--sigap-orange); font-size: 14px; }
+        .icon-rumah-wrapper:hover i { color: #fff; }
 
         /* POPUP & MODAL */
         .leaflet-popup-content-wrapper { border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
@@ -213,8 +217,28 @@
             <i class="fa-solid fa-search search-icon"></i>
             <ul id="search-results"></ul>
         </div>
+
+        <div class="global-check">
+            <input type="checkbox" id="check-global" checked onchange="toggleGlobal(this)">
+            <label for="check-global">TAMPILKAN SEMUA DATA</label>
+        </div>
+
+        <div class="layer-separator">Tipe Peta</div>
+        <div class="layer-item">
+            <input type="radio" name="basemap" id="base-osm" checked onchange="switchBaseMap('osm')">
+            <label for="base-osm">Standar (Jalan)</label>
+        </div>
+        <div class="layer-item">
+            <input type="radio" name="basemap" id="base-sat" onchange="switchBaseMap('sat')">
+            <label for="base-sat">Satelit</label>
+        </div>
         
-        <div class="layer-separator">Kecamatan</div>
+        <div class="layer-separator">
+            <span>Kecamatan</span>
+            <label class="check-all-wrapper" style="font-size:10px; display:flex; align-items:center; gap:4px;">
+                <input type="checkbox" id="check-all-kecamatan" checked onchange="toggleAllKecamatan(this)"> Kec. Saja
+            </label>
+        </div>
         <div id="list-kecamatan"></div>
 
         <div class="layer-separator">Sebaran Komplek</div>
@@ -260,14 +284,21 @@
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
     
     <script>
-        const map = L.map('map', { zoomControl: false }).setView([-3.32, 114.59], 13);
+        // BASE LAYERS
+        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+            attribution: 'SIGAP', maxZoom: 19 
+        });
+        const satLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3']
+        });
+
+        const map = L.map('map', { zoomControl: false, layers: [osmLayer] }).setView([-3.32, 114.59], 13);
         L.control.zoom({ position: 'topleft' }).addTo(map);
         
         map.createPane('paneKecamatan'); map.getPane('paneKecamatan').style.zIndex = 390; 
         map.createPane('paneKelurahan'); map.getPane('paneKelurahan').style.zIndex = 450; 
         map.createPane('paneKomplek');   map.getPane('paneKomplek').style.zIndex = 650; 
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'SIGAP', maxZoom: 19 }).addTo(map);
 
         const layers = { 
             komplek: L.markerClusterGroup({
@@ -289,14 +320,18 @@
         const searchableList = []; 
         const colors = { "Banjarmasin Barat": "#F59E0B", "Banjarmasin Selatan": "#10B981", "Banjarmasin Tengah": "#EF4444", "Banjarmasin Timur": "#3B82F6", "Banjarmasin Utara": "#8B5CF6" };
 
-        // IKON RUMAH ORANYE BARU
+        // IKON RUMAH ORANYE
         const iconRumah = L.divIcon({
             className: 'custom-div-icon',
             html: `<div class="icon-rumah-wrapper"><i class="fa-solid fa-house"></i></div>`,
-            iconSize: [28, 28], 
-            iconAnchor: [14, 14], 
-            popupAnchor: [0, -16] 
+            iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -16] 
         });
+
+        // --- SWITCH BASEMAP ---
+        window.switchBaseMap = (type) => {
+            if (type === 'osm') { map.addLayer(osmLayer); map.removeLayer(satLayer); } 
+            else { map.addLayer(satLayer); map.removeLayer(osmLayer); }
+        }
 
         // --- FETCH DATA ---
         Promise.all([
@@ -305,6 +340,7 @@
                     const geoJsonLayer = L.geoJSON(d, {
                         pane: 'paneKomplek', 
                         pointToLayer: (f, latlng) => {
+                            // Pakai iconRumah yang sudah didefinisikan
                             const marker = L.marker(latlng, { icon: iconRumah });
                             markersById[f.properties.id] = marker; 
                             return marker;
@@ -370,8 +406,13 @@
 
                     const div = document.createElement('div');
                     div.className = 'layer-item';
-                    div.innerHTML = `<input type="checkbox" value="${nama}" onchange="toggleKecamatan(this)"><label>${nama}</label><div class="legend-box" style="background:${warna}"></div>`;
+                    div.innerHTML = `
+                        <input type="checkbox" value="${nama}" checked onchange="toggleKecamatan(this); checkMasterState();">
+                        <label>${nama}</label>
+                        <div class="legend-box" style="background:${warna}"></div>
+                    `;
                     ul.appendChild(div);
+                    map.addLayer(layers.kecamatan[nama]);
                 });
             })
         ]).catch(err => { console.error("Gagal memuat data:", err); });
@@ -402,12 +443,62 @@
             const p = document.getElementById('panel-layer');
             p.style.display = (p.style.display === 'none' ? 'block' : 'none');
         }
+        
         window.toggleKecamatan = (cb) => {
             const l = layers.kecamatan[cb.value];
             if(l) cb.checked ? map.addLayer(l) : map.removeLayer(l);
         }
-        document.getElementById('check-kelurahan').onchange = (e) => e.target.checked ? map.addLayer(layers.kelurahan) : map.removeLayer(layers.kelurahan);
-        document.getElementById('check-komplek').onchange = (e) => e.target.checked ? map.addLayer(layers.komplek) : map.removeLayer(layers.komplek);
+
+        // --- CHECK ALL LOGIC ---
+        window.toggleGlobal = (source) => {
+            const isChecked = source.checked;
+            
+            const chkKomplek = document.getElementById('check-komplek');
+            chkKomplek.checked = isChecked;
+            chkKomplek.dispatchEvent(new Event('change'));
+
+            const chkKelurahan = document.getElementById('check-kelurahan');
+            chkKelurahan.checked = isChecked;
+            chkKelurahan.dispatchEvent(new Event('change'));
+
+            const chkAllKec = document.getElementById('check-all-kecamatan');
+            chkAllKec.checked = isChecked;
+            toggleAllKecamatan(chkAllKec);
+        }
+
+        window.toggleAllKecamatan = (source) => {
+            const checkboxes = document.querySelectorAll('#list-kecamatan input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                if(cb.checked !== source.checked) {
+                    cb.checked = source.checked;
+                    toggleKecamatan(cb);
+                }
+            });
+            updateGlobalState();
+        }
+
+        window.checkMasterState = () => {
+            const checkboxes = document.querySelectorAll('#list-kecamatan input[type="checkbox"]');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            document.getElementById('check-all-kecamatan').checked = allChecked;
+            updateGlobalState();
+        }
+
+        window.updateGlobalState = () => {
+            const keca = document.getElementById('check-all-kecamatan').checked;
+            const komp = document.getElementById('check-komplek').checked;
+            const kelu = document.getElementById('check-kelurahan').checked;
+            document.getElementById('check-global').checked = (keca && komp && kelu);
+        }
+
+        document.getElementById('check-kelurahan').onchange = (e) => {
+            e.target.checked ? map.addLayer(layers.kelurahan) : map.removeLayer(layers.kelurahan);
+            updateGlobalState();
+        };
+        document.getElementById('check-komplek').onchange = (e) => {
+            e.target.checked ? map.addLayer(layers.komplek) : map.removeLayer(layers.komplek);
+            updateGlobalState();
+        };
 
         window.openDetail = (id) => {
             const d = dataStore[id];
