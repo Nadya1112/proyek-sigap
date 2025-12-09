@@ -30,10 +30,11 @@
   </div>
 </section>
 
-{{-- ===== KONTEN: Diperbarui dengan Alpine.js untuk Live Search ===== --}}
+{{-- ===== KONTEN: Ditingkatkan dengan Alpine.js & Desain Baru ===== --}}
 <main class="py-16 lg:py-24 bg-gray-50">
   <div class="container mx-auto px-6">
     <div 
+        {{-- Logika Alpine.js untuk live search (sama seperti file Anda) --}}
         x-data="{
             searchQuery: '{{ addslashes($q ?? '') }}',
             allDocs: {{ json_encode($docs) }},
@@ -48,12 +49,14 @@
         }" 
         class="max-w-5xl mx-auto"
     >
-      <div class="rounded-xl bg-white ring-1 ring-gray-100 shadow-xl p-6 md:p-10">
+      {{-- Card Utama --}}
+      <div class="rounded-xl bg-white shadow-xl border border-gray-100 p-6 md:p-10">
         <div class="text-center">
           <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Daftar Dokumen</h2>
           <p class="text-gray-500 mt-2">Gunakan pencarian untuk menemukan dokumen lebih cepat.</p>
         </div>
 
+        {{-- Kolom Pencarian --}}
         <div class="mt-6 flex justify-center">
           <div class="relative w-full max-w-lg">
             <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="2"></circle><path d="M21 21l-4.3-4.3" stroke-width="2" stroke-linecap="round"></path></svg>
@@ -62,39 +65,51 @@
           </div>
         </div>
 
-        <ul class="mt-8 max-w-4xl mx-auto divide-y divide-gray-100">
-          <template x-for="doc in filteredDocs" :key="doc.id">
-            <li class="group flex items-center justify-between gap-4 px-2 py-4 transition-colors hover:bg-gray-50/80 rounded-lg">
-              <div class="flex items-center gap-4 min-w-0">
-                <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-50 ring-1 ring-orange-100 grid place-content-center">
-                    <svg class="w-5 h-5 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h6l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke-width="1.7"/><path d="M13 3v6h6" stroke-width="1.7"/></svg>
-                </div>
-                <div class="min-w-0">
-                  <p class="text-gray-800 font-semibold truncate" x-text="doc.judul"></p>
-                  <div class="mt-1 flex flex-wrap items-center gap-3 text-xs text-gray-500">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 font-medium" x-text="doc.tipe_file.toUpperCase()"></span>
-                    <span x-show="doc.tahun" x-text="doc.tahun"></span>
-                    <span x-show="doc.ukuran_file"><span class="mx-1">•</span> <span x-text="`${Math.round(doc.ukuran_file)} KB`"></span></span>
+        {{-- Daftar Dokumen (Desain Baru) --}}
+        <div class="mt-8 max-w-4xl mx-auto">
+          <ul class="space-y-3"> {{-- Menggunakan space-y untuk jarak antar item --}}
+            <template x-for="doc in filteredDocs" :key="doc.id">
+              <li x-transition:enter="transition ease-out duration-300"
+                  x-transition:enter-start="opacity-0 transform -translate-y-2"
+                  x-transition:enter-end="opacity-100 transform translate-y-0"
+                  class="group flex items-center justify-between gap-4 p-4 transition-all duration-300 hover:bg-gray-50 hover:shadow-md rounded-lg border border-gray-100 hover:border-orange-200">
+                
+                {{-- Info Dokumen --}}
+                <div class="flex items-center gap-4 min-w-0">
+                  <div class="flex-shrink-0 w-11 h-11 rounded-lg bg-orange-100 text-orange-600 grid place-content-center">
+                      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h6l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke-width="1.7"/><path d="M13 3v6h6" stroke-width="1.7"/></svg>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-gray-800 font-semibold truncate" x-text="doc.judul"></p>
+                    <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 font-medium" x-text="doc.tipe_file.toUpperCase()"></span>
+                      <span x-show="doc.tahun"><span class="text-gray-300">|</span> Tahun: <strong class="text-gray-600" x-text="doc.tahun"></strong></span>
+                      <span x-show="doc.ukuran_file"><span class="text-gray-300">|</span> Ukuran: <strong class="text-gray-600" x-text="`${Math.round(doc.ukuran_file)} KB`"></strong></span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div class="flex items-center">
-                <a :href="`{{ url('/regulasi/unduh') }}/${doc.id}`"
-                   class="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-white text-sm font-semibold bg-gradient-to-r from-orange-500 to-orange-600 shadow-md hover:from-orange-600 hover:to-orange-700 active:scale-[.98] transition-all transform group-hover:scale-105">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
-                  Unduh
-                </a>
-              </div>
-            </li>
-          </template>
-          
-          <template x-if="filteredDocs.length === 0">
-            <li class="py-10 text-center">
-                <p class="text-gray-500">Dokumen dengan kata kunci "<strong x-text="searchQuery"></strong>" tidak ditemukan.</p>
-            </li>
-          </template>
-        </ul>
+                {{-- Tombol Unduh --}}
+                <div class="flex items-center flex-shrink-0">
+                  <a :href="`{{ url('/regulasi/unduh') }}/${doc.id}`"
+                     class="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-white text-sm font-semibold bg-gradient-to-r from-orange-500 to-orange-600 shadow-md hover:from-orange-600 hover:to-orange-700 active:scale-[.98] transition-all transform opacity-80 group-hover:opacity-100 group-hover:scale-105">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+                    Unduh
+                  </a>
+                </div>
+              </li>
+            </template>
+            
+            {{-- Pesan Jika Kosong --}}
+            <template x-if="filteredDocs.length === 0">
+              <li class="py-10 text-center border-t border-gray-100 mt-4">
+                  <svg class="w-12 h-12 mx-auto text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m-1.125 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                  <p class="text-gray-500 mt-3 font-semibold">Dokumen Tidak Ditemukan</p>
+                  <p class="text-sm text-gray-500 mt-1">Dokumen dengan kata kunci "<strong x-text="searchQuery"></strong>" tidak ada dalam daftar kami.</p>
+              </li>
+            </template>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

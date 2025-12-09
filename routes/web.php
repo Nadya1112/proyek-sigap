@@ -54,6 +54,8 @@ Route::view('/kebijakan-privasi', 'public.kebijakanprivasi')->name('kebijakanpri
 */
 Route::post('/e-proposal-psu', [EproposalController::class, 'store'])->name('eproposal.store');
 Route::post('/pengaduan-masyarakat', [PengaduanController::class, 'storePengaduan'])->name('pengaduan.store');
+Route::post('/ajukan-komplek-baru', [EproposalController::class, 'storeKomplekBaru'])
+    ->name('komplek.baru.store');
 
 /*
 |--------------------------------------------------------------------------

@@ -140,4 +140,35 @@ class EproposalController extends Controller
             abort(404, 'File template tidak ditemukan.');
         }
     }
+
+    public function storeKomplekBaru(Request $request)
+    {
+        // 1. Validasi
+        $validated = $request->validate([
+            'kecamatan_id' => 'required|exists:kecamatans,id',
+            'kelurahan_id' => 'required|exists:kelurahans,id',
+            'nama_komplek' => 'required|string|max:255',
+            'alamat'       => 'required|string|max:500',
+            'nomor_hp'     => 'required|string|max:20',
+        ]);
+
+        // 2. Simpan ke tabel arsip (komplek_barus)
+        try {
+            \App\Models\KomplekBaru::create([
+                'user_id'      => Auth::id() ?? null, // Bisa null jika user belum login, tapi idealnya login
+                'kecamatan_id' => $validated['kecamatan_id'],
+                'kelurahan_id' => $validated['kelurahan_id'],
+                'nama_komplek' => $validated['nama_komplek'],
+                'alamat'       => $validated['alamat'],
+                'nomor_hp'     => $validated['nomor_hp'],
+                'status'       => 'Pending',
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'Pengajuan berhasil dikirim.']);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal menyimpan data.'], 500);
+        }
+    }
+
 }
