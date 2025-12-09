@@ -109,7 +109,9 @@ class KomplekBaruResource extends Resource
     }
     
     // --- HAK AKSES ---
-    public static function canViewAny(): bool { return true; } 
+    public static function canViewAny(): bool { 
+        return auth()->user()->role === 'admin';
+    } 
     public static function canCreate(): bool { return false; } 
     public static function canEdit(Model $record): bool { return true; } 
     

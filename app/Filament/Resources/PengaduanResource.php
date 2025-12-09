@@ -20,6 +20,17 @@ class PengaduanResource extends Resource
     protected static ?string $navigationGroup = 'Pelayanan Publik';
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
+    public static function canViewAny(): bool
+    {
+        return in_array(auth()->user()->role, [
+            'admin',
+            'Staff',
+            'JF PSU',
+            'Kabid',
+            'Kadis',
+        ]);
+    }
+
     // Helper function untuk cek hak ubah status sesuai alur baru
     private static function canUpdateStatus(User $user, ?string $currentStatus): bool
     {

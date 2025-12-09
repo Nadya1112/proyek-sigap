@@ -23,7 +23,6 @@ class UserResource extends Resource
     // PERMINTAAN 1: Mengganti judul
     protected static ?string $title = 'Pengguna';
     protected static ?string $navigationLabel = 'Pengguna';
-    protected static ?string $navigationGroup = 'Manajemen Admin'; // Grup baru
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
     public static function form(Form $form): Form {
@@ -79,7 +78,7 @@ class UserResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         User::ROLE_ADMIN => 'danger',
-                        User::ROLE_STAFF => 'gray',
+                        User::ROLE_STAFF => 'blue',
                         User::ROLE_JF_PSU => 'info',
                         User::ROLE_KABID => 'warning',
                         User::ROLE_KADIS => 'primary',
@@ -143,6 +142,11 @@ class UserResource extends Resource
 
     // --- IMPLEMENTASI HAK AKSES SESUAI PERMINTAAN ---
 
+    public static function canViewAny(): bool
+    {
+        return Auth::user()->isSuperAdmin();
+    }
+
     // Hanya Super Admin (role 'admin') yang bisa membuat user baru.
     public static function canCreate(): bool
     { 
@@ -166,7 +170,4 @@ class UserResource extends Resource
     { 
         return Auth::user()->isSuperAdmin(); 
     }
-
-    // SEMUA role admin bisa melihat (Read) daftar user.
-    // Ini sudah ditangani oleh fungsi canAccessPanel() di Model User.
 }

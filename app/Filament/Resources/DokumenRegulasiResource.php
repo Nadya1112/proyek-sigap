@@ -20,7 +20,13 @@ class DokumenRegulasiResource extends Resource
     protected static ?string $slug = 'dokumen-regulasi';
     protected static ?string $navigationIcon = 'heroicon-o-folder-open';
     protected static ?string $navigationLabel = 'Dokumen Regulasi';
+    protected static ?string $navigationGroup = 'Manajemen Admin';
     protected static ?int $navigationSort = 3;
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->isSuperAdmin();
+    }
 
     public static function form(Form $form): Form
     {

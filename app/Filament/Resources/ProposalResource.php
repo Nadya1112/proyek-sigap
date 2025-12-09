@@ -22,6 +22,17 @@ class ProposalResource extends Resource
     protected static ?string $navigationGroup = 'Pelayanan Publik';
     protected static ?int $navigationSort = 2;
 
+    public static function canViewAny(): bool
+    {
+        return in_array(auth()->user()->role, [
+            'admin',
+            'Staff',
+            'JF PSU',
+            'Kabid',
+            'Kadis',
+        ]);
+    }
+
     public static function getEloquentQuery(): Builder
     {
         /** @var User $user */

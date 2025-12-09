@@ -81,6 +81,17 @@ class KelurahanResource extends Resource
         ];
     }
 
+    public static function canViewAny(): bool
+    {
+        return in_array(auth()->user()->role, [
+            'admin',
+            'Staff',
+            'JF PSU',
+            'Kabid',
+            'Kadis',
+        ]);
+    }
+
     public static function canCreate(): bool
 { return Auth::user()->isSuperAdmin(); }
 
