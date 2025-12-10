@@ -13,11 +13,14 @@ use Filament\Tables\Table;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-
-// Import komponen form yang baru
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\CodeEditor; // Lebih baik untuk JSON
+use Filament\Forms\Components\CodeEditor;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions\DeleteBulkAction;
 
 class KecamatanResource extends Resource
 {
@@ -35,17 +38,15 @@ class KecamatanResource extends Resource
                     ->label('Kecamatan')
                     ->required()
                     ->unique(ignoreRecord: true)
-                    ->columnSpanFull(), // Buat field ini jadi lebar penuh
+                    ->columnSpanFull(),
                 
-                // --- FIELD WARNA ---
                 ColorPicker::make('warna')
                     ->label('Warna Wilayah')
                     ->required(),
 
-                // --- FIELD GEOMETRI ---
                 CodeEditor::make('geometri')
                     ->label('Data Geometri (GeoJSON)')
-                    ->json() // Memberi tahu editor ini adalah format JSON
+                    ->json()
                     ->required()
                     ->columnSpanFull(),
             ]);
@@ -59,7 +60,6 @@ class KecamatanResource extends Resource
                     ->label('Kecamatan')
                     ->searchable(),
                 
-                // --- TAMPILKAN WARNA DI TABEL ---
                 Tables\Columns\ColorColumn::make('warna')
                     ->label('Warna'),
 
@@ -69,15 +69,19 @@ class KecamatanResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                TrashedFilter::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                ForceDeleteAction::make(),
+                RestoreAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -120,4 +124,4 @@ class KecamatanResource extends Resource
     public static function canDeleteAny(): bool
     { return Auth::user()->isSuperAdmin(); }
 
-} // <-- Ini adalah kurung kurawal penutup untuk 'class KecamatanResource'
+}

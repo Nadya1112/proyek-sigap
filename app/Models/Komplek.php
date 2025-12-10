@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 // Hapus import untuk MatanYadaev
 
 class Komplek extends Model
 {
-    use HasFactory; // Hapus HasSpatial untuk sementara
+    use HasFactory, SoftDeletes; // Hapus HasSpatial untuk sementara
 
     protected $table = 'kompleks';
 

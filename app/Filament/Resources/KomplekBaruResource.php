@@ -11,6 +11,11 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Actions\Action; // Import Action khusus
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Filters\TrashedFilter;
 
 class KomplekBaruResource extends Resource
 {
@@ -70,6 +75,7 @@ class KomplekBaruResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->label('Tanggal Ajuan')->sortable(),
             ])
             ->filters([
+                TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
                         'Pending' => 'Pending',
@@ -89,10 +95,14 @@ class KomplekBaruResource extends Resource
                 Tables\Actions\EditAction::make()->label('Proses'),
                 // TAMBAHAN 3: Tombol Delete (untuk semua admin, karena logic canDelete diubah)
                 Tables\Actions\DeleteAction::make(),
+                ForceDeleteAction::make(),
+                RestoreAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ]),
             ]);
     }

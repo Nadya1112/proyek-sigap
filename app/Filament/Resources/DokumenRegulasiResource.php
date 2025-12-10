@@ -13,6 +13,12 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model; // Import Model
 use Illuminate\Support\Facades\Auth; // Import Auth
 use Illuminate\Support\Facades\Storage;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions\DeleteBulkAction;
 
 class DokumenRegulasiResource extends Resource
 {
@@ -65,17 +71,19 @@ class DokumenRegulasiResource extends Resource
                 Tables\Columns\TextColumn::make('ukuran_file')->label('Ukuran (KB)')->numeric()->sortable(),
             ])
             ->filters([
-                //
+                TrashedFilter::make(),
             ])
             ->actions([
-                // Tambahkan ViewAction untuk read-only
                 Tables\Actions\ViewAction::make(),
-                // Edit & Delete hanya untuk Super Admin
                 Tables\Actions\EditAction::make()
                     ->visible(fn (User $user) => $user->isSuperAdmin()),
                 Tables\Actions\DeleteAction::make()
                     ->visible(fn (User $user) => $user->isSuperAdmin())
                     ->after(function (Regulasi $record) { /* ... (logika hapus file) ... */ }),
+                ForceDeleteAction::make()
+                    ->visible(fn (User $user) => $user->isSuperAdmin()),
+                RestoreAction::make()
+                    ->visible(fn (User $user) => $user->isSuperAdmin()),
                 Tables\Actions\Action::make('unduh')
                     ->label('Unduh')
                     ->icon('heroicon-o-arrow-down-tray')
@@ -83,7 +91,11 @@ class DokumenRegulasiResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+                    DeleteBulkAction::make()
+                        ->visible(fn (User $user) => $user->isSuperAdmin()),
+                    ForceDeleteBulkAction::make()
+                        ->visible(fn (User $user) => $user->isSuperAdmin()),
+                    RestoreBulkAction::make()
                         ->visible(fn (User $user) => $user->isSuperAdmin()),
                 ]),
             ]);
@@ -97,7 +109,7 @@ class DokumenRegulasiResource extends Resource
             'edit' => Pages\EditDokumenRegulasi::route('/{record}/edit'),
         ];
     }
-// --- PENERAPAN HAK AKSES READ-ONLY ---
+
     public static function canCreate(): bool
     { return Auth::user()->isSuperAdmin(); }
 

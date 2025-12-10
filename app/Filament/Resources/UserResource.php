@@ -11,10 +11,15 @@ use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UserResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UserResource\RelationManagers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions\DeleteBulkAction;
 
 class UserResource extends Resource
 {
@@ -87,7 +92,7 @@ class UserResource extends Resource
                     }),
             ])
             ->filters([
-                // PERMINTAAN 3: Tambahkan filter berdasarkan role
+                TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('role')
                     ->label('Filter Berdasarkan Role')
                     ->options([
@@ -101,22 +106,27 @@ class UserResource extends Resource
                     ->multiple(), // Izinkan filter beberapa role
             ])
             ->actions([
-                // Aksi 'View' untuk role Read-Only
                 Tables\Actions\ViewAction::make()
-                    ->visible(fn () => !$user->isSuperAdmin()), // Tampil jika BUKAN super admin
+                    ->visible(fn () => !$user->isSuperAdmin()),
                 
-                // Aksi 'Edit' untuk Super Admin
                 Tables\Actions\EditAction::make()
-                    ->label('Ubah') // Ganti label 'Edit' menjadi 'Ubah'
-                    ->visible(fn () => $user->isSuperAdmin()), // Tampil HANYA jika super admin
+                    ->label('Ubah')
+                    ->visible(fn () => $user->isSuperAdmin()),
                 
-                // PERMINTAAN 2: Tambahkan tombol Delete
                 Tables\Actions\DeleteAction::make()
-                    ->visible(fn () => $user->isSuperAdmin()), // Tampil HANYA jika super admin
+                    ->visible(fn () => $user->isSuperAdmin()),
+                ForceDeleteAction::make()
+                    ->visible(fn () => $user->isSuperAdmin()),
+                RestoreAction::make()
+                    ->visible(fn () => $user->isSuperAdmin()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+                    DeleteBulkAction::make()
+                        ->visible(fn () => $user->isSuperAdmin()),
+                    ForceDeleteBulkAction::make()
+                        ->visible(fn () => $user->isSuperAdmin()),
+                    RestoreBulkAction::make()
                         ->visible(fn () => $user->isSuperAdmin()),
                 ]),
             ]);
@@ -135,37 +145,30 @@ class UserResource extends Resource
             'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
-            // Tambahkan halaman View
             'view' => Pages\ViewUser::route('/{record}'),
         ];
     }
-
-    // --- IMPLEMENTASI HAK AKSES SESUAI PERMINTAAN ---
 
     public static function canViewAny(): bool
     {
         return Auth::user()->isSuperAdmin();
     }
 
-    // Hanya Super Admin (role 'admin') yang bisa membuat user baru.
     public static function canCreate(): bool
     { 
         return Auth::user()->isSuperAdmin(); 
     }
 
-    // Hanya Super Admin (role 'admin') yang bisa mengedit user.
     public static function canEdit(Model $record): bool
     { 
         return Auth::user()->isSuperAdmin(); 
     }
 
-    // Hanya Super Admin (role 'admin') yang bisa menghapus user.
     public static function canDelete(Model $record): bool
     { 
         return Auth::user()->isSuperAdmin(); 
     }
 
-    // Hanya Super Admin (role 'admin') yang bisa bulk delete.
     public static function canDeleteAny(): bool
     { 
         return Auth::user()->isSuperAdmin(); 
