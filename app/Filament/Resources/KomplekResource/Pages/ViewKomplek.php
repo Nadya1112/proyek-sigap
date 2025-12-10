@@ -4,17 +4,16 @@ namespace App\Filament\Resources\KomplekResource\Pages;
 
 use App\Filament\Resources\KomplekResource;
 use Filament\Actions;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\ViewRecord;
 
-class EditKomplek extends EditRecord
+class ViewKomplek extends ViewRecord
 {
     protected static string $resource = KomplekResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
+            Actions\EditAction::make(),
         ];
     }
 }

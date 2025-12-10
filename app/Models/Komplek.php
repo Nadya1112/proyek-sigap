@@ -18,9 +18,16 @@ class Komplek extends Model
         'kelurahan_id',
         'nomor',
         'nama_komplek',
+        'nama_pengembang',
+        'alamat_komplek',
         'foto_komplek',
         'jumlah_sertifikat',
+        'jumlah_unit',
         'status_aset',
+        'fasilitas_ibadah',
+        'fasilitas_umum',
+        'fasilitas_pendidikan',
+        'fasilitas_kesehatan',
         // 'area', // Dinonaktifkan sementara
     ];
 

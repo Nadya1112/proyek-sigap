@@ -32,7 +32,7 @@ class KecamatanResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('nama_kecamatan')
-                    ->label('Nama Kecamatan')
+                    ->label('Kecamatan')
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->columnSpanFull(), // Buat field ini jadi lebar penuh
@@ -56,7 +56,7 @@ class KecamatanResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nama_kecamatan')
-                    ->label('Nama Kecamatan')
+                    ->label('Kecamatan')
                     ->searchable(),
                 
                 // --- TAMPILKAN WARNA DI TABEL ---

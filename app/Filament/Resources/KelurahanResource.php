@@ -33,7 +33,7 @@ class KelurahanResource extends Resource
             ->preload()
             ->required(),
             Forms\Components\TextInput::make('nama_kelurahan')
-            ->label('Nama Kelurahan')
+            ->label('Kelurahan')
             ->required()
             ->maxLength(255),
         ]);
@@ -43,13 +43,16 @@ class KelurahanResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('kecamatan_id')
+                Tables\Columns\TextColumn::make('kecamatan.nama_kecamatan')
                     ->label('Kecamatan')
-                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('nama_kelurahan')
-                    ->label('Nama Kelurahan')
+                    ->label('Kelurahan')
+                    ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('kompleks_count')
+                    ->label('Jumlah Komplek')
+                    ->sortable(),
             ])
             ->filters([
                 //
@@ -63,6 +66,11 @@ class KelurahanResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withCount('kompleks');
     }
 
     public static function getRelations(): array
