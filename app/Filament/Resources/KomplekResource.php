@@ -20,6 +20,8 @@ use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Actions\DeleteBulkAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class KomplekResource extends Resource
 {
@@ -125,6 +127,9 @@ class KomplekResource extends Resource
             ->filters([
                 TrashedFilter::make(),
             ])
+            ->headerActions([
+                ExportAction::make()->visible(fn () => auth()->user()->isSuperAdmin()),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -136,6 +141,7 @@ class KomplekResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
+                    ExportBulkAction::make(),
                 ]),
             ]);
     }
