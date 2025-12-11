@@ -6,29 +6,49 @@ use App\Models\Proposal;
 use App\Models\User;
 use Filament\Notifications\Notification;
 use Filament\Notifications\Actions\Action;
+use Illuminate\Support\Facades\Cache;
 
 class ProposalObserver
 {
     /**
+     * Cache key prefix for tracking notifications.
+     *
+     * @var string
+     */
+    private const CACHE_PREFIX = 'notification_sent_proposal_';
+
+    /**
      * Handle the Proposal "created" event.
+     *
+     * @param  \App\Models\Proposal  $proposal
+     * @return void
      */
     public function created(Proposal $proposal): void
     {
-        // 1. Pengguna mengajukan -> Notifikasi ke Staff
+        $cacheKey = self::CACHE_PREFIX . 'created_' . $proposal->id;
+        if (Cache::has($cacheKey)) {
+            return;
+        }
+
+        // 1. Pengguna mengajukan -> Notifikasi ke Staff & Super Admin
         $staffUsers = User::where('role', User::ROLE_STAFF)->get();
-        
-        Notification::make()
-            ->title('E-Proposal Baru Masuk')
-            ->body("Proposal dari {$proposal->nama_pengaju} menunggu verifikasi awal.")
-            ->icon('heroicon-o-inbox-arrow-down')
-            ->iconColor('primary')
-            ->actions([
-                Action::make('view')
-                    ->label('Tinjau')
-                    ->url(fn() => "/admin/proposals/{$proposal->id}/edit")
-                    ->button(),
-            ])
-            ->sendToDatabase($staffUsers);
+        $superAdmins = User::where('role', User::ROLE_ADMIN)->get();
+        $recipients = $staffUsers->merge($superAdmins);
+
+        if ($recipients->isNotEmpty()) {
+            Notification::make()
+                ->title('E-Proposal Baru Masuk')
+                ->body("Proposal dari {$proposal->nama_pengaju} menunggu verifikasi awal.")
+                ->icon('heroicon-o-inbox-arrow-down')
+                ->iconColor('primary')
+                ->actions([
+                    Action::make('view')
+                        ->label('Tinjau')
+                        ->url(fn() => "/admin/proposals/{$proposal->id}/edit")
+                        ->button(),
+                ])
+                ->sendToDatabase($recipients);
+        }
 
         // 2. Notifikasi ke pengguna bahwa proposal telah diterima
         if ($proposal->user) {
@@ -39,47 +59,53 @@ class ProposalObserver
                 ->iconColor('success')
                 ->sendToDatabase($proposal->user);
         }
+
+        Cache::put($cacheKey, true, now()->addMinutes(1));
     }
 
     /**
      * Handle the Proposal "updated" event.
+     *
+     * @param  \App\Models\Proposal  $proposal
+     * @return void
      */
     public function updated(Proposal $proposal): void
     {
         if ($proposal->isDirty('status')) {
+            $cacheKey = self::CACHE_PREFIX . 'updated_' . $proposal->id . '_' . $proposal->status;
+            if (Cache::has($cacheKey)) {
+                return;
+            }
+            
             $newStatus = $proposal->status;
             
             $targetAdmins = collect();
             $title = '';
             $body = '';
             $url = "/admin/proposals/{$proposal->id}/edit";
+            $superAdmins = User::where('role', User::ROLE_ADMIN)->get();
 
-            // LOGIKA NOTIFIKASI BERTINGKAT ADMIN
             switch ($newStatus) {
-                // Staff menerima -> Kirim ke JF PSU
                 case Proposal::STATUS_DITERIMA:
                     $targetAdmins = User::where('role', User::ROLE_JF_PSU)->get();
                     $title = 'Proposal Perlu Verifikasi';
                     $body = "Proposal {$proposal->nama_pengaju} telah diterima Staff.";
                     break;
-
-                // JF PSU memverifikasi -> Kirim ke Kabid
                 case Proposal::STATUS_DIVERIFIKASI_JF:
                     $targetAdmins = User::where('role', User::ROLE_KABID)->get();
                     $title = 'Menunggu Persetujuan Kabid';
                     $body = "Proposal {$proposal->nama_pengaju} telah diverifikasi JF PSU.";
                     break;
-
-                // Kabid menyetujui -> Kirim ke Kadis
                 case Proposal::STATUS_DISETUJUI_KABID:
                     $targetAdmins = User::where('role', User::ROLE_KADIS)->get();
                     $title = 'Menunggu Persetujuan Akhir';
                     $body = "Proposal {$proposal->nama_pengaju} menunggu persetujuan Kepala Dinas.";
                     break;
             }
+            
+            $recipients = $targetAdmins->merge($superAdmins);
 
-            // Kirim notifikasi ke Admin Selanjutnya (jika ada)
-            if ($targetAdmins->isNotEmpty()) {
+            if ($recipients->isNotEmpty()) {
                 Notification::make()
                     ->title($title)
                     ->body($body)
@@ -91,10 +117,9 @@ class ProposalObserver
                             ->url($url)
                             ->markAsRead(),
                     ])
-                    ->sendToDatabase($targetAdmins);
+                    ->sendToDatabase($recipients);
             }
 
-            // LOGIKA NOTIFIKASI KE PENGGUNA (Author)
             if ($proposal->user) {
                 $userTitle = 'Status Proposal Diperbarui';
                 $userBody = "Status proposal Anda sekarang: {$newStatus}.";
@@ -120,6 +145,8 @@ class ProposalObserver
                     ->iconColor($color)
                     ->sendToDatabase($proposal->user);
             }
+
+            Cache::put($cacheKey, true, now()->addMinutes(1));
         }
     }
 }

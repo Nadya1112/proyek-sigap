@@ -15,6 +15,14 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions\DeleteBulkAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class KelurahanResource extends Resource
 {
@@ -33,7 +41,7 @@ class KelurahanResource extends Resource
             ->preload()
             ->required(),
             Forms\Components\TextInput::make('nama_kelurahan')
-            ->label('Nama Kelurahan')
+            ->label('Kelurahan')
             ->required()
             ->maxLength(255),
         ]);
@@ -43,26 +51,42 @@ class KelurahanResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('kecamatan_id')
+                Tables\Columns\TextColumn::make('kecamatan.nama_kecamatan')
                     ->label('Kecamatan')
-                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('nama_kelurahan')
-                    ->label('Nama Kelurahan')
+                    ->label('Kelurahan')
+                    ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('kompleks_count')
+                    ->label('Jumlah Komplek')
+                    ->sortable(),
             ])
             ->filters([
-                //
+                TrashedFilter::make(),
+            ])
+            ->headerActions([
+                ExportAction::make()->visible(fn () => auth()->user()->isSuperAdmin()),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                ForceDeleteAction::make(),
+                RestoreAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                    ExportBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withCount('kompleks');
     }
 
     public static function getRelations(): array

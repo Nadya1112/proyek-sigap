@@ -14,6 +14,12 @@ use Illuminate\Database\Eloquent\Builder; // Import Builder
 use Illuminate\Database\Eloquent\Model; // Import Model
 use Illuminate\Support\Facades\Auth; // Import Auth
 use Illuminate\Support\Facades\Storage; // Import Storage
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions\DeleteBulkAction;
 
 class ProposalResource extends Resource
 {
@@ -189,16 +195,25 @@ class ProposalResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->label('Tanggal Masuk'),
             ])
+            ->filters([
+                TrashedFilter::make(),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                // PERUBAHAN: Tombol Delete hanya terlihat oleh Super Admin
                 Tables\Actions\DeleteAction::make()
+                    ->visible(fn (User $user) => $user->isSuperAdmin()),
+                ForceDeleteAction::make()
+                    ->visible(fn (User $user) => $user->isSuperAdmin()),
+                RestoreAction::make()
                     ->visible(fn (User $user) => $user->isSuperAdmin()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    // PERUBAHAN: Tombol Bulk Delete hanya terlihat oleh Super Admin
-                    Tables\Actions\DeleteBulkAction::make()
+                    DeleteBulkAction::make()
+                        ->visible(fn (User $user) => $user->isSuperAdmin()),
+                    ForceDeleteBulkAction::make()
+                        ->visible(fn (User $user) => $user->isSuperAdmin()),
+                    RestoreBulkAction::make()
                         ->visible(fn (User $user) => $user->isSuperAdmin()),
                 ]),
             ]);
@@ -208,21 +223,18 @@ class ProposalResource extends Resource
     {
         return [
             'index' => Pages\ListProposals::route('/'),
-            // Menggunakan halaman EditProposal yang sudah dimodifikasi
             'edit' => Pages\EditProposal::route('/{record}/edit'),
         ];
     }
     
     public static function canCreate(): bool { return false; }
 
-// PERUBAHAN: Hanya Super Admin yang bisa menghapus
     public static function canDelete(Model $record): bool
     { return Auth::user()->isSuperAdmin(); }
     
     public static function canDeleteAny(): bool
     { return Auth::user()->isSuperAdmin(); }
     
-    // PERUBAHAN: Edit tetap bisa, sesuai logika status
     public static function canEdit(Model $record): bool
     {
         /** @var User $user */

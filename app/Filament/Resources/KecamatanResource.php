@@ -13,11 +13,16 @@ use Filament\Tables\Table;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-
-// Import komponen form yang baru
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\CodeEditor; // Lebih baik untuk JSON
+use Filament\Forms\Components\CodeEditor;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions\DeleteBulkAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class KecamatanResource extends Resource
 {
@@ -32,20 +37,18 @@ class KecamatanResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('nama_kecamatan')
-                    ->label('Nama Kecamatan')
+                    ->label('Kecamatan')
                     ->required()
                     ->unique(ignoreRecord: true)
-                    ->columnSpanFull(), // Buat field ini jadi lebar penuh
+                    ->columnSpanFull(),
                 
-                // --- FIELD WARNA ---
                 ColorPicker::make('warna')
                     ->label('Warna Wilayah')
                     ->required(),
 
-                // --- FIELD GEOMETRI ---
                 CodeEditor::make('geometri')
                     ->label('Data Geometri (GeoJSON)')
-                    ->json() // Memberi tahu editor ini adalah format JSON
+                    ->json()
                     ->required()
                     ->columnSpanFull(),
             ]);
@@ -56,10 +59,9 @@ class KecamatanResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nama_kecamatan')
-                    ->label('Nama Kecamatan')
+                    ->label('Kecamatan')
                     ->searchable(),
                 
-                // --- TAMPILKAN WARNA DI TABEL ---
                 Tables\Columns\ColorColumn::make('warna')
                     ->label('Warna'),
 
@@ -69,15 +71,23 @@ class KecamatanResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                TrashedFilter::make(),
+            ])
+            ->headerActions([
+                ExportAction::make()->visible(fn () => auth()->user()->isSuperAdmin()),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                ForceDeleteAction::make(),
+                RestoreAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                    ExportBulkAction::make(),
                 ]),
             ]);
     }
@@ -120,4 +130,4 @@ class KecamatanResource extends Resource
     public static function canDeleteAny(): bool
     { return Auth::user()->isSuperAdmin(); }
 
-} // <-- Ini adalah kurung kurawal penutup untuk 'class KecamatanResource'
+}

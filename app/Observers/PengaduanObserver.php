@@ -6,29 +6,49 @@ use App\Models\Pengaduan;
 use App\Models\User;
 use Filament\Notifications\Notification;
 use Filament\Notifications\Actions\Action;
+use Illuminate\Support\Facades\Cache;
 
 class PengaduanObserver
 {
     /**
+     * Cache key prefix for tracking notifications.
+     *
+     * @var string
+     */
+    private const CACHE_PREFIX = 'notification_sent_pengaduan_';
+
+    /**
      * Handle the Pengaduan "created" event.
+     *
+     * @param  \App\Models\Pengaduan  $pengaduan
+     * @return void
      */
     public function created(Pengaduan $pengaduan): void
     {
-        // 1. Pengguna mengajukan -> Notifikasi ke Staff
+        $cacheKey = self::CACHE_PREFIX . 'created_' . $pengaduan->id;
+        if (Cache::has($cacheKey)) {
+            return;
+        }
+
+        // 1. Pengguna mengajukan -> Notifikasi ke Staff & Super Admin
         $staffUsers = User::where('role', User::ROLE_STAFF)->get();
+        $superAdmins = User::where('role', User::ROLE_ADMIN)->get();
+        $recipients = $staffUsers->merge($superAdmins);
         
-        Notification::make()
-            ->title('Pengaduan Baru Masuk')
-            ->body("Pengaduan dari {$pengaduan->nama_pelapor} menunggu untuk tindak lanjut.")
-            ->icon('heroicon-o-inbox-arrow-down') // Ikon keren
-            ->iconColor('primary')
-            ->actions([
-                Action::make('view')
-                    ->label('Lihat')
-                    ->url(fn() => "/admin/pengaduans/{$pengaduan->id}/edit") // Link ke halaman detail
-                    ->button(),
-            ])
-            ->sendToDatabase($staffUsers); // Kirim ke database notifikasi Staff
+        if ($recipients->isNotEmpty()) {
+            Notification::make()
+                ->title('Pengaduan Baru Masuk')
+                ->body("Pengaduan dari {$pengaduan->nama_pelapor} menunggu untuk tindak lanjut.")
+                ->icon('heroicon-o-inbox-arrow-down')
+                ->iconColor('primary')
+                ->actions([
+                    Action::make('view')
+                        ->label('Lihat')
+                        ->url(fn() => "/admin/pengaduans/{$pengaduan->id}/edit")
+                        ->button(),
+                ])
+                ->sendToDatabase($recipients);
+        }
 
         // 2. Notifikasi ke pengguna bahwa pengaduan telah diterima
         if ($pengaduan->user) {
@@ -39,38 +59,43 @@ class PengaduanObserver
                 ->iconColor('success')
                 ->sendToDatabase($pengaduan->user);
         }
+
+        Cache::put($cacheKey, true, now()->addMinutes(1));
     }
 
     /**
      * Handle the Pengaduan "updated" event.
+     *
+     * @param  \App\Models\Pengaduan  $pengaduan
+     * @return void
      */
     public function updated(Pengaduan $pengaduan): void
     {
         if ($pengaduan->isDirty('status')) {
+            $cacheKey = self::CACHE_PREFIX . 'updated_' . $pengaduan->id . '_' . $pengaduan->status;
+            if (Cache::has($cacheKey)) {
+                return;
+            }
+
             $newStatus = $pengaduan->status;
             
             $targetAdmins = collect();
             $title = '';
             $body = '';
             $url = "/admin/pengaduans/{$pengaduan->id}/edit";
+            $superAdmins = User::where('role', User::ROLE_ADMIN)->get();
 
-            // LOGIKA NOTIFIKASI BERTINGKAT
             switch ($newStatus) {
-                // Staff menerima -> Kirim ke JF PSU
                 case Pengaduan::STATUS_DITERIMA:
                     $targetAdmins = User::where('role', User::ROLE_JF_PSU)->get();
                     $title = 'Pengaduan Perlu Verifikasi';
                     $body = "Pengaduan {$pengaduan->nama_pelapor} telah diterima Staff.";
                     break;
-
-                // JF PSU memverifikasi -> Kirim ke Kabid
                 case Pengaduan::STATUS_DIVERIFIKASI_JF:
                     $targetAdmins = User::where('role', User::ROLE_KABID)->get();
                     $title = 'Menunggu Persetujuan Kabid';
                     $body = "Pengaduan {$pengaduan->nama_pelapor} telah diverifikasi JF PSU.";
                     break;
-
-                // Kabid menyetujui -> Kirim ke Kadis
                 case Pengaduan::STATUS_DISETUJUI_KABID:
                     $targetAdmins = User::where('role', User::ROLE_KADIS)->get();
                     $title = 'Menunggu Persetujuan Akhir';
@@ -78,23 +103,23 @@ class PengaduanObserver
                     break;
             }
 
-            // Kirim notifikasi ke Admin Selanjutnya
-            if ($targetAdmins->isNotEmpty()) {
+            $recipients = $targetAdmins->merge($superAdmins);
+            
+            if ($recipients->isNotEmpty()) {
                 Notification::make()
                     ->title($title)
                     ->body($body)
                     ->icon('heroicon-o-bell')
-                    ->warning() // Warna kuning/orange
+                    ->warning()
                     ->actions([
                         Action::make('view')
                             ->label('Tinjau')
                             ->url($url)
-                            ->markAsRead(), // Otomatis tandai terbaca saat diklik (seperti di video)
+                            ->markAsRead(),
                     ])
-                    ->sendToDatabase($targetAdmins);
+                    ->sendToDatabase($recipients);
             }
 
-            // LOGIKA NOTIFIKASI KE PENGGUNA (Author)
             if ($pengaduan->user) {
                 $userTitle = 'Status Pengaduan Diperbarui';
                 $userBody = "Status pengaduan Anda untuk '{$pengaduan->judul_pengaduan}' sekarang: {$newStatus}.";
@@ -120,6 +145,8 @@ class PengaduanObserver
                     ->iconColor($color)
                     ->sendToDatabase($pengaduan->user);
             }
+            
+            Cache::put($cacheKey, true, now()->addMinutes(1));
         }
     }
 }

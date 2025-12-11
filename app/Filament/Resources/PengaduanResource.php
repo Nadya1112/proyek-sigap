@@ -13,6 +13,12 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions\DeleteBulkAction;
 
 class PengaduanResource extends Resource
 {
@@ -127,7 +133,7 @@ class PengaduanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(self::getEloquentQueryForTable()) // Terapkan query filter di sini
+            ->query(self::getEloquentQuery()) 
             ->columns([
                 Tables\Columns\TextColumn::make('nama_pelapor')->searchable(),
                 Tables\Columns\ImageColumn::make('bukti_foto')->label('Bukti')->disk('public'),
@@ -146,24 +152,35 @@ class PengaduanResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->label('Tanggal Masuk'),
             ])
+            ->filters([
+                TrashedFilter::make(),
+            ])
            ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
+                    ->visible(fn (User $user) => $user->isSuperAdmin()),
+                ForceDeleteAction::make()
+                    ->visible(fn (User $user) => $user->isSuperAdmin()),
+                RestoreAction::make()
                     ->visible(fn (User $user) => $user->isSuperAdmin()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->visible(fn (User $user) => $user->isSuperAdmin()),
+                    ForceDeleteBulkAction::make()
+                        ->visible(fn (User $user) => $user->isSuperAdmin()),
+                    RestoreBulkAction::make()
+                        ->visible(fn (User $user) => $user->isSuperAdmin()),
                 ]),
             ]);
     }
     
-    // Metode baru untuk mendefinisikan query tabel
-    public static function getEloquentQueryForTable(): Builder
+    
+    public static function getEloquentQuery(): Builder
     {
         $user = Auth::user();
-        $query = Pengaduan::query();
+        $query = parent::getEloquentQuery();
 
         if ($user->isSuperAdmin()) {
             return $query;
