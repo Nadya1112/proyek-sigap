@@ -757,11 +757,11 @@
         const markersById = {};
         const searchableList = [];
         const colors = {
-            "Banjarmasin Barat": "#F59E0B",
-            "Banjarmasin Selatan": "#10B981",
-            "Banjarmasin Tengah": "#EF4444",
-            "Banjarmasin Timur": "#3B82F6",
-            "Banjarmasin Utara": "#8B5CF6"
+            "Banjarmasin Barat": "#C2A68C",
+            "Banjarmasin Selatan": "#FDEB9E",
+            "Banjarmasin Tengah": "#9A3F3F",
+            "Banjarmasin Timur": "#6D94C5",
+            "Banjarmasin Utara": "#FE7743"
         };
 
         // IKON RUMAH ORANYE
