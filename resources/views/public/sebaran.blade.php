@@ -756,13 +756,6 @@
         const dataStore = {};
         const markersById = {};
         const searchableList = [];
-        const colors = {
-            "Banjarmasin Barat": "#C2A68C",
-            "Banjarmasin Selatan": "#FDEB9E",
-            "Banjarmasin Tengah": "#9A3F3F",
-            "Banjarmasin Timur": "#6D94C5",
-            "Banjarmasin Utara": "#FE7743"
-        };
 
         // IKON RUMAH ORANYE
         const iconRumah = L.divIcon({
@@ -870,8 +863,10 @@
             fetch('{{ url('/api/kecamatan') }}').then(r => r.json()).then(d => {
                 const ul = document.getElementById('list-kecamatan');
                 if (d.features) d.features.forEach(f => {
-                    const nama = f.properties.nama;
-                    const warna = colors[nama] || '#999';
+                    const nama = f.properties.nama_kecamatan; // Pastikan nama properti benar
+                    // Mengambil warna dari properti GeoJSON yang didapat dari API
+                    // Fallback ke oranye jika tidak ada warna di database
+                    const warna = f.properties.warna || '#F97316';
 
                     layers.kecamatan[nama] = L.geoJSON(f, {
                         pane: 'paneKecamatan',
