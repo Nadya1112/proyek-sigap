@@ -39,7 +39,6 @@ class KecamatanResource extends Resource
 
     public static function form(Form $form): Form
     {
-<<<<<<< HEAD
         return $form
             ->schema([
                 Forms\Components\TextInput::make('nama_kecamatan')
@@ -57,18 +56,6 @@ class KecamatanResource extends Resource
                     ->required()
                     ->columnSpanFull(),
             ]);
-=======
-        return $form->schema([
-            Forms\Components\TextInput::make('nama_kecamatan')->label('Kecamatan')->required()->unique(ignoreRecord: true)->columnSpanFull(),
-            ColorPicker::make('warna')->label('Warna Wilayah')->required(),
-            Forms\Components\Textarea::make('geometri')
-                ->label('Data Geometri (GeoJSON)')
-                ->helperText('Paste kode GeoJSON di sini.')
-                ->rows(10) // Agar kotaknya tinggi
-                ->required()
-                ->columnSpanFull(),
-        ]);
->>>>>>> 7e5a171f29fc6ab1be7c9cba2b80b2ed5b0844c9
     }
 
     public static function table(Table $table): Table
