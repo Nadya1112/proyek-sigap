@@ -88,7 +88,7 @@ class PetaController extends Controller
                 $clean = stripslashes($clean);
                 $geo = json_decode($clean);
                 if (json_last_error() === JSON_ERROR_NONE && $geo) {
-                    $features[] = ['type' => 'Feature', 'geometry' => $geo, 'properties' => ['nama' => $row->nama_kecamatan, 'warna' => $row->warna]];
+                    $features[] = ['type' => 'Feature', 'geometry' => $geo, 'properties' => ['nama_kecamatan' => $row->nama_kecamatan, 'warna' => $row->warna]];
                 }
             } catch (\Exception $e) {}
         }
