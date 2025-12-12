@@ -54,7 +54,7 @@ class KelurahanResource extends Resource
             ])
             ->filters([TrashedFilter::make()])
             ->headerActions([
-                ExportAction::make()->visible(fn () => auth()->user()->isSuperAdmin()),
+                ExportAction::make()->icon('heroicon-o-arrow-up-tray')->visible(fn () => auth()->user()->isSuperAdmin()),
                 
                 // --- ACTION IMPORT XLSX ---
             Action::make('importExcel')
@@ -128,7 +128,7 @@ class KelurahanResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
-                    ExportBulkAction::make(),
+                    ExportBulkAction::make()->icon('heroicon-o-arrow-up-tray'),
                 ]),
             ]);
     }
