@@ -93,7 +93,7 @@ class AdminPanelProvider extends PanelProvider
                                     ->url(fn (): string => Pages\Dashboard::getUrl()),
                                 ...UserResource::getNavigationItems(),
                                 ...DokumenRegulasiResource::getNavigationItems(),
-                                ...KomplekBaruResource::getNavigationItems(),
+                                // ...KomplekBaruResource::getNavigationItems(),
                             ]),
                         NavigationGroup::make('Informasi FASUM')
                             ->items([

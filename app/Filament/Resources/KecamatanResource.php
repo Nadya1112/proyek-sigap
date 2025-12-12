@@ -14,7 +14,6 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\CodeEditor;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ForceDeleteAction;
@@ -46,9 +45,8 @@ class KecamatanResource extends Resource
                     ->label('Warna Wilayah')
                     ->required(),
 
-                CodeEditor::make('geometri')
+                Forms\Components\Textarea::make('geometri')
                     ->label('Data Geometri (GeoJSON)')
-                    ->json()
                     ->required()
                     ->columnSpanFull(),
             ]);
