@@ -34,7 +34,7 @@ class KomplekResource extends Resource
     protected static ?string $model = Komplek::class;
     protected static ?string $navigationGroup = 'Informasi FASUM';
     protected static ?string $title = 'Komplek';
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-home-modern';
 
     public static function form(Form $form): Form
     {

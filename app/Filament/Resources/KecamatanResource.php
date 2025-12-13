@@ -35,8 +35,7 @@ class KecamatanResource extends Resource
     protected static ?string $navigationGroup = 'Informasi FASUM';
     protected static ?string $title = 'Kecamatan';
     protected static ?string $navigationLabel = 'Kecamatan';
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
+    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
     public static function form(Form $form): Form
     {
         return $form
