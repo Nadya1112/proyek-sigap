@@ -32,22 +32,25 @@ class EproposalController extends Controller
     }
 
     /**
-     * Menyimpan proposal (Logika ini sudah benar dan tidak berubah).
+     * Menyimpan proposal (Standard E-Proposal Logic).
      */
     public function store(Request $request)
     {
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Anda harus login untuk mengajukan proposal.');
         }
+        
         $validated = $request->validate([
             'nama_pengaju'   => 'required|string|max:255',
             'kontak_pengaju' => 'required|string|max:20',
-            'kompleks_id'    => 'required|exists:kompleks,id', // Validasi kunci
+            'kompleks_id'    => 'required|exists:kompleks,id',
             'alamat'         => 'required|string',
             'proposal'       => 'required|file|mimes:pdf,doc,docx|max:10240',
             'catatan'        => 'nullable|string',
         ]);
+
         $filePath = $request->file('proposal')->store('proposals', 'public');
+        
         $proposal = Proposal::create([
             'user_id'        => Auth::id(),
             'kompleks_id'    => $validated['kompleks_id'],
@@ -78,97 +81,53 @@ class EproposalController extends Controller
     }
 
     /**
-     * Mengambil Kelurahan berdasarkan Kecamatan ID (Menggunakan Query Builder).
+     * Mengambil Kelurahan berdasarkan Kecamatan ID (AJAX).
      */
-    public function getKelurahan($kecamatanId) // Terima ID langsung
+    public function getKelurahan($kecamatanId)
     {
-        Log::info("Mencari kelurahan untuk kecamatan ID: " . $kecamatanId);
-
-        // Validasi sederhana
         if (!ctype_digit((string)$kecamatanId)) {
-            Log::warning("ID Kecamatan tidak valid: " . $kecamatanId);
-            return response()->json([], 400); // Bad request
+            return response()->json([], 400);
         }
 
-        // Query langsung ke tabel kelurahans
         $kelurahans = DB::table('kelurahans')
             ->where('kecamatan_id', $kecamatanId)
             ->orderBy('nama_kelurahan')
-            ->select('id', 'nama_kelurahan') // Eksplisit pilih kolom
+            ->select('id', 'nama_kelurahan')
             ->get();
 
-        Log::info("Kelurahan ditemukan: " . $kelurahans->count());
         return response()->json($kelurahans);
     }
 
     /**
-     * Mengambil Komplek berdasarkan Kelurahan ID (Menggunakan Query Builder).
+     * Mengambil Komplek berdasarkan Kelurahan ID (AJAX).
      */
-    public function getKompleksByKelurahan($kelurahanId) // Terima ID langsung
+    public function getKompleksByKelurahan($kelurahanId)
     {
-        Log::info("Mencari komplek untuk kelurahan ID: " . $kelurahanId);
-
         if (!ctype_digit((string)$kelurahanId)) {
-            Log::warning("ID Kelurahan tidak valid: " . $kelurahanId);
             return response()->json([], 400);
         }
 
-        // Query langsung ke tabel kompleks
         $kompleks = DB::table('kompleks')
             ->where('kelurahan_id', $kelurahanId)
             ->orderBy('nama_komplek')
-            ->select('id', 'nama_komplek') // Eksplisit pilih kolom
+            ->select('id', 'nama_komplek')
             ->get();
 
-        Log::info("Komplek ditemukan: " . $kompleks->count());
         return response()->json($kompleks);
     }
 
+    /**
+     * Download Template Proposal.
+     */
     public function downloadTemplate()
     {
-        // Path relatif terhadap disk 'public' (storage/app/public)
         $filePath = 'templates/template-proposal.docx';
-        $downloadName = 'Template-Proposal-PSU-SIGAP.docx'; // Nama file saat diunduh
+        $downloadName = 'Template-Proposal-PSU-SIGAP.docx';
 
-        // Cek apakah file ada di disk 'public'
         if (Storage::disk('public')->exists($filePath)) {
-            // Jika ada, kembalikan sebagai respons download
             return Storage::disk('public')->download($filePath, $downloadName);
         } else {
-            // Jika file tidak ditemukan, tampilkan error 404
-            Log::error("File template tidak ditemukan di: " . $filePath);
             abort(404, 'File template tidak ditemukan.');
         }
     }
-
-    public function storeKomplekBaru(Request $request)
-    {
-        // 1. Validasi
-        $validated = $request->validate([
-            'kecamatan_id' => 'required|exists:kecamatans,id',
-            'kelurahan_id' => 'required|exists:kelurahans,id',
-            'nama_komplek' => 'required|string|max:255',
-            'alamat'       => 'required|string|max:500',
-            'nomor_hp'     => 'required|string|max:20',
-        ]);
-
-        // 2. Simpan ke tabel arsip (komplek_barus)
-        try {
-            \App\Models\KomplekBaru::create([
-                'user_id'      => Auth::id() ?? null, // Bisa null jika user belum login, tapi idealnya login
-                'kecamatan_id' => $validated['kecamatan_id'],
-                'kelurahan_id' => $validated['kelurahan_id'],
-                'nama_komplek' => $validated['nama_komplek'],
-                'alamat'       => $validated['alamat'],
-                'nomor_hp'     => $validated['nomor_hp'],
-                'status'       => 'Pending',
-            ]);
-
-            return response()->json(['success' => true, 'message' => 'Pengajuan berhasil dikirim.']);
-
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Gagal menyimpan data.'], 500);
-        }
-    }
-
 }

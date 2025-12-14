@@ -187,42 +187,6 @@
                 </div>
             </div>
 
-            {{-- === BAGIAN BARU: DAFTAR PENGAJUAN KOMPLEK === --}}
-            <div id="daftar-komplek-baru" class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
-                 <div class="flex items-start justify-between gap-4">
-                    <div>
-                        <h2 class="text-lg font-bold text-gray-800">Riwayat Pendaftaran Komplek</h2>
-                        <p class="text-sm text-gray-500 mt-1">Status pengajuan pendaftaran perumahan baru Anda.</p>
-                    </div>
-                </div>
-                 <div class="mt-4 border-t border-gray-100">
-                    @forelse($komplekBaru as $row)
-                        @php
-                            $colorClass = match($row->status) {
-                                'Diterima' => 'bg-green-100 text-green-800',
-                                'Ditolak' => 'bg-red-100 text-red-800',
-                                'Diproses' => 'bg-blue-100 text-blue-800',
-                                default => 'bg-gray-100 text-gray-800', // Pending
-                            };
-                        @endphp
-                        <div class="py-4 border-b border-gray-100 flex items-center justify-between gap-4">
-                            <div class="min-w-0">
-                                <p class="text-sm font-semibold text-gray-800 truncate">{{ $row->nama_komplek }}</p>
-                                <p class="text-xs text-gray-500 mt-1">{{ $row->alamat }}</p>
-                                <p class="text-[10px] text-gray-400 mt-0.5">Diajukan pada: {{ \Carbon\Carbon::parse($row->created_at)->format('d M Y, H:i') }}</p>
-                            </div>
-                            <span class="px-3 py-1 text-xs font-medium rounded-full flex-shrink-0 {{ $colorClass }}">
-                                {{ $row->status }}
-                            </span>
-                        </div>
-                    @empty
-                        <div class="text-center py-10">
-                            <p class="text-sm text-gray-500">Belum ada pengajuan pendaftaran komplek.</p>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-
             <!-- <div class="text-center">
                  <p class="text-sm text-gray-500">Sesi Anda akan berakhir secara otomatis. Klik untuk keluar sekarang.</p>
                  <div class="mt-4 flex items-center justify-center">

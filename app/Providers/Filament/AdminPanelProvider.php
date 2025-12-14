@@ -3,7 +3,6 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Resources\DokumenRegulasiResource;
-use App\Filament\Resources\KomplekBaruResource;
 use App\Filament\Resources\KecamatanResource;
 use App\Filament\Resources\KelurahanResource;
 use App\Filament\Resources\KomplekResource;
@@ -46,7 +45,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->resources([
                 DokumenRegulasiResource::class,
-                KomplekBaruResource::class,
                 KecamatanResource::class,
                 KelurahanResource::class,
                 KomplekResource::class,
@@ -93,7 +91,6 @@ class AdminPanelProvider extends PanelProvider
                                     ->url(fn (): string => Pages\Dashboard::getUrl()),
                                 ...UserResource::getNavigationItems(),
                                 ...DokumenRegulasiResource::getNavigationItems(),
-                                // ...KomplekBaruResource::getNavigationItems(),
                             ]),
                         NavigationGroup::make('Informasi FASUM')
                             ->items([

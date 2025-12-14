@@ -1,11 +1,6 @@
 @extends('layouts.public')
 @section('title','E-Proposal PSU')
 
-{{-- Tambahkan CSRF Token di head layout utama agar AJAX berfungsi --}}
-@push('meta')
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-@endpush
-
 @section('content')
 
 {{-- ========== HERO SECTION ========== --}}
@@ -100,14 +95,14 @@
                       {{-- ================================================= --}}
                       {{-- LANGKAH 1: PILIH LOKASI                           --}}
                       {{-- ================================================= --}}
-                      <div class="p-5 rounded-lg border-2 space-y-4 mb-6"
+                      <div class="p-6 rounded-lg border-2 space-y-5 mb-6"
                            :class="kompleksId ? 'border-green-300 bg-green-50' : 'border-gray-200 bg-gray-50'">
-                          <h3 class="font-bold text-gray-800">Langkah 1: Pilih Perumahan Anda</h3>
-                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <h3 class="font-bold text-gray-800 text-base mb-4">Langkah 1: Pilih Perumahan Anda</h3>
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                               {{-- Dropdown Kecamatan --}}
                               <div>
                                   <label for="kecamatan" class="form-label">1. Pilih Kecamatan</label>
-                                  <select id="kecamatan" x-model="kecamatanId" @change="fetchKelurahans" class="form-input" :disabled="!!kompleksId || newKomplek.isSuccess">
+                                  <select id="kecamatan" x-model="kecamatanId" @change="fetchKelurahans" class="form-input" :disabled="!!kompleksId">
                                       <option value="">-Pilih Kecamatan-</option>
                                       @foreach($kecamatans as $kecamatan)
                                         <option value="{{ $kecamatan->id }}">{{ $kecamatan->nama_kecamatan }}</option>
@@ -117,7 +112,7 @@
                               {{-- Dropdown Kelurahan --}}
                               <div>
                                   <label for="kelurahan" class="form-label">2. Pilih Kelurahan</label>
-                                  <select id="kelurahan" x-model="kelurahanId" @change="fetchKompleks" class="form-input" :disabled="!kecamatanId || kelurahansLoading || !!kompleksId || newKomplek.isSuccess">
+                                  <select id="kelurahan" x-model="kelurahanId" @change="fetchKompleks" class="form-input" :disabled="!kecamatanId || kelurahansLoading || !!kompleksId">
                                       <option value="">-Pilih Kelurahan-</option>
                                       <option x-show="kelurahansLoading" disabled>Memuat Kelurahan...</option>
                                       <template x-for="kelurahan in kelurahans" :key="kelurahan.id">
@@ -127,99 +122,48 @@
                               </div>
                           </div>
                           {{-- Dropdown Nama Komplek --}}
-                          <div x-show="kelurahanId && !newKomplek.isSuccess" x-transition>
+                          <div x-show="kelurahanId" x-transition>
                               <label for="kompleks_select" class="form-label">3. Pilih Nama Perumahan</label>
-                              <select id="kompleks_select" x-model="kompleksId" @change="handleKompleksSelection" class="form-input" :disabled="!kelurahanId || kompleksLoading || !!kompleksId">
+                              <select id="kompleks_select" x-model="kompleksId" class="form-input" :disabled="!kelurahanId || kompleksLoading || !!kompleksId">
                                   <option value="">-- Pilih Nama Komplek Perumahan --</option>
                                   <option x-show="kompleksLoading" disabled>Memuat Komplek...</option>
-                                  <option x-show="isKompleksListEmpty" disabled value="">-Pilih Nama Komplek Perumahan-</option>
+                                  <option x-show="isKompleksListEmpty" disabled value="">-Data Perumahan Tidak Ditemukan-</option>
                                   <template x-for="komplek in kompleksList" :key="komplek.id">
                                       <option :value="komplek.id" x-text="komplek.nama_komplek"></option>
                                   </template>
                               </select>
-                              @error('kompleks_id')<p class="form-error">Anda harus memilih komplek dari daftar.</p>@enderror
+                              
+                              {{-- WARNING MERAH - SELALU MUNCUL --}}
+                              <div class="mt-3 p-3 rounded-lg bg-red-50 border border-red-300 flex items-start gap-2">
+                                  <svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                  </svg>
+                                  <p class="text-sm text-red-700 leading-relaxed">
+                                      <span class="font-semibold">Jika nama komplek Anda tidak tersedia:</span><br/>
+                                      Mohon maaf, sertifikat FASUM Anda belum diserahkan ke Pemkot Kota Banjarmasin.
+                                  </p>
+                              </div>
+
+                              <!-- {{-- Pesan jika kosong (tanpa form pendaftaran baru) --}}
+                              <div x-show="isKompleksListEmpty" class="mt-3 text-sm text-red-600">
+                                  <p>Belum ada data komplek perumahan di kelurahan ini.</p>
+                              </div> -->
+                              @error('kompleks_id')<p class="form-error mt-2">Anda harus memilih komplek dari daftar.</p>@enderror
                           </div>
 
                            {{-- Tombol Reset / Ganti Lokasi --}}
-                           <div x-show="!!kompleksId" x-transition class="text-right pt-2">
+                           <div x-show="!!kompleksId" x-transition class="text-right pt-3">
                                <button type="button" @click="resetSelection" class="text-sm font-semibold text-blue-600 hover:underline">Pilih Lokasi Lain</button>
                            </div>
                       </div>
 
                       {{-- ================================================= --}}
-                      {{-- FITUR BARU: PENGAJUAN KOMPLEK BARU                --}}
-                      {{-- ================================================= --}}
-                      <div x-show="kelurahanId && !kompleksId" x-transition class="mb-6">
-                          
-                          {{-- STATE 1: FORMULIR PENGAJUAN --}}
-                          <div x-show="!newKomplek.isSuccess" class="p-6 rounded-lg border-2 border-dashed border-orange-300 bg-orange-50 text-center">
-                                <h3 class="font-bold text-orange-800">Perumahan Belum Terdaftar?</h3>
-                                <p class="text-sm text-orange-700 mt-2 max-w-lg mx-auto">Jika nama perumahan Anda tidak ada dalam daftar di atas untuk Kelurahan <strong x-text="selectedKelurahanName || 'yang dipilih'"></strong>, Anda dapat mengajukan pendaftaran komplek baru.</p>
-                                
-                                <div class="mt-6 text-left max-w-lg mx-auto space-y-4">
-                                    <div>
-                                        <label for="new_kompleks_name" class="form-label text-sm text-gray-700">Nama Perumahan Baru</label>
-                                        <input type="text" id="new_kompleks_name" x-model="newKomplek.nama" placeholder="Contoh: Komplek Melati Indah" class="form-input text-sm">
-                                    </div>
-                                    <div>
-                                        <label for="new_kompleks_alamat" class="form-label text-sm text-gray-700">Alamat Singkat Perumahan</label>
-                                        <input type="text" id="new_kompleks_alamat" x-model="newKomplek.alamat" placeholder="Contoh: Jl. Melati RT 05 RW 01" class="form-input text-sm">
-                                    </div>
-                                    <div>
-                                        <label for="new_kompleks_hp" class="form-label text-sm text-gray-700">Nomor HP Pengaju (WA)</label>
-                                        <input type="number" id="new_kompleks_hp" x-model="newKomplek.hp" placeholder="08xxxxxxxxxx" class="form-input text-sm">
-                                    </div>
-
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="form-label text-sm text-gray-700">Kecamatan</label>
-                                            <input type="text" :value="getSelectedKecamatanName()" disabled class="form-input text-sm bg-gray-100 cursor-not-allowed">
-                                        </div>
-                                        <div>
-                                            <label class="form-label text-sm text-gray-700">Kelurahan</label>
-                                            <input type="text" :value="selectedKelurahanName" disabled class="form-input text-sm bg-gray-100 cursor-not-allowed">
-                                        </div>
-                                    </div>
-
-                                    <div class="pt-4 flex justify-between items-center gap-4">
-                                        <button type="button" @click="resetSelection(false)" class="text-sm font-semibold text-gray-600 hover:underline">Batal</button>
-                                        
-                                        <button type="button" 
-                                                @click="submitKomplekBaru" 
-                                                :disabled="newKomplek.isSubmitting"
-                                                class="px-5 py-2.5 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition shadow disabled:opacity-70 disabled:cursor-wait">
-                                            <span x-show="!newKomplek.isSubmitting">Ajukan Pendaftaran Komplek Baru</span>
-                                            <span x-show="newKomplek.isSubmitting">Mengirim...</span>
-                                        </button>
-                                    </div>
-                                    <p class="text-xs text-gray-500 mt-2 text-center italic">Pengajuan akan ditinjau oleh Admin sebelum muncul di daftar.</p>
-                                </div>
-                          </div>
-
-                          {{-- STATE 2: TAMPILAN SUKSES / MENUNGGU --}}
-                          <div x-show="newKomplek.isSuccess" x-transition class="p-8 rounded-lg border border-green-200 bg-green-50 text-center">
-                                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 mb-4">
-                                    <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-bold text-gray-800 mb-2">Pendaftaran Sedang Diproses</h3>
-                                <p class="text-gray-600 max-w-md mx-auto mb-6">
-                                    Terima kasih! Data komplek baru telah kami terima. Admin akan memverifikasi pengajuan Anda. Silakan tunggu informasi selanjutnya atau cek daftar secara berkala nanti.
-                                </p>
-                                <button type="button" @click="resetSelection(true)" class="text-sm font-semibold text-green-700 hover:underline">
-                                    Kembali ke Form Utama
-                                </button>
-                          </div>
-                      </div>
-
-                      {{-- ================================================= --}}
                       {{-- LANGKAH 2: FORMULIR PROPOSAL (DISABLED SBLM OK)   --}}
                       {{-- ================================================= --}}
-                      <fieldset :disabled="!kompleksId" class="border-t pt-6 mt-6">
-                          <legend class="font-bold text-gray-800 mb-4">Langkah 2: Lengkapi Detail Proposal</legend>
+                      <fieldset :disabled="!kompleksId" class="border-t pt-8 mt-6">
+                          <legend class="font-bold text-gray-800 text-base mb-6">Langkah 2: Lengkapi Detail Proposal</legend>
                           <div class="space-y-6">
-                              <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                   {{-- Nama Pengaju --}}
                                   <div>
                                     <label for="nama_pengaju" class="form-label">Nama Lengkap Pengaju</label>
@@ -245,12 +189,12 @@
                               <div class="pt-2">
                                   <label class="form-label">Template Proposal</label>
                                   <a href="{{ route('template.proposal.download') }}"
-                                     class="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-orange-700 bg-orange-100 border border-orange-200 hover:bg-orange-200 transition"
+                                     class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-orange-700 bg-orange-100 border border-orange-200 hover:bg-orange-200 transition"
                                      :class="{ 'opacity-50 pointer-events-none': !kompleksId }">
                                       <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
                                       Unduh Template Proposal (.docx)
                                   </a>
-                                  <p class="text-xs text-gray-500 mt-1">Gunakan template ini untuk pengajuan Anda.</p>
+                                  <p class="text-xs text-gray-500 mt-2">Gunakan template ini untuk pengajuan Anda.</p>
                               </div>
 
                               {{-- Unggah Proposal --}}
@@ -268,7 +212,7 @@
                           </div>
 
                           {{-- Tombol Kirim Proposal --}}
-                          <div class="flex justify-end pt-6">
+                          <div class="flex justify-end pt-8">
                             <button type="submit" class="btn-gradient w-full md:w-auto" :disabled="!kompleksId">Kirim Proposal</button>
                           </div>
                       </fieldset>
@@ -302,11 +246,48 @@
 
 {{-- ========== STYLE CUSTOM ========== --}}
 <style>
-    .form-label { display: block; margin-bottom: 0.5rem; font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; color: #374151; }
-    .form-error { margin-top: 0.25rem; font-size: 0.75rem; line-height: 1rem; color: #EF4444; }
-    .form-input { width: 100%; border-radius: 0.75rem; border-width: 1px; border-color: #D1D5DB; background-color: #FFFFFF; padding: 0.75rem 1rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition: all 0.2s ease-in-out; }
-    .form-input:disabled { background-color: #f3f4f6; cursor: not-allowed; color: #9ca3af; border-color: #e5e7eb; }
-    .form-input:focus { border-color: #F97316; outline: 2px solid transparent; outline-offset: 2px; --tw-ring-color: rgba(249, 115, 22, 0.5); box-shadow: 0 0 0 2px var(--tw-ring-color); }
+    .form-label { 
+        display: block; 
+        margin-bottom: 0.625rem; 
+        font-size: 0.875rem; 
+        line-height: 1.25rem; 
+        font-weight: 600; 
+        color: #374151;
+        letter-spacing: 0.01em;
+    }
+    .form-error { 
+        margin-top: 0.5rem; 
+        font-size: 0.75rem; 
+        line-height: 1.25rem; 
+        color: #EF4444;
+        letter-spacing: 0.01em;
+    }
+    .form-input { 
+        width: 100%; 
+        border-radius: 0.75rem; 
+        border-width: 1px; 
+        border-color: #D1D5DB; 
+        background-color: #FFFFFF; 
+        padding: 0.875rem 1rem; 
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); 
+        transition: all 0.2s ease-in-out;
+        font-size: 0.9375rem;
+        line-height: 1.5;
+        letter-spacing: 0.01em;
+    }
+    .form-input:disabled { 
+        background-color: #f3f4f6; 
+        cursor: not-allowed; 
+        color: #9ca3af; 
+        border-color: #e5e7eb; 
+    }
+    .form-input:focus { 
+        border-color: #F97316; 
+        outline: 2px solid transparent; 
+        outline-offset: 2px; 
+        --tw-ring-color: rgba(249, 115, 22, 0.5); 
+        box-shadow: 0 0 0 2px var(--tw-ring-color); 
+    }
 </style>
 
 {{-- ========== SCRIPT ALPINE.JS ========== --}}
@@ -317,16 +298,6 @@
             kecamatanId: '', kelurahanId: '', kompleksId: '',
             kelurahans: [], kompleksList: [],
             kelurahansLoading: false, kompleksLoading: false,
-            selectedKelurahanName: '',
-            
-            // Variabel untuk fitur Komplek Baru
-            newKomplek: {
-                nama: '',
-                alamat: '',
-                hp: '',
-                isSubmitting: false,
-                isSuccess: false
-            },
 
             // Cek jika: Tidak loading + Kelurahan dipilih + List Komplek Kosong
             get isKompleksListEmpty() {
@@ -338,7 +309,7 @@
             },
 
             fetchKelurahans() {
-                this.resetSelection(false); // Reset bawahnya
+                this.resetSelection(false); 
                 this.kelurahanId = ''; this.kompleksId = '';
                 this.kelurahans = []; this.kompleksList = [];
                 if (!this.kecamatanId) return;
@@ -353,13 +324,7 @@
 
             fetchKompleks() {
                 this.kompleksId = ''; this.kompleksList = [];
-                // Reset state komplek baru jika user ganti kelurahan
-                this.newKomplek.isSuccess = false; 
-
                 if (!this.kelurahanId) return;
-
-                const selectedKel = this.kelurahans.find(k => k.id == this.kelurahanId);
-                this.selectedKelurahanName = selectedKel ? selectedKel.nama_kelurahan : '';
 
                 this.kompleksLoading = true;
                 fetch(`/get-kompleks-by-kelurahan/${this.kelurahanId}`)
@@ -369,73 +334,12 @@
                     .finally(() => this.kompleksLoading = false);
             },
 
-            handleKompleksSelection() {
-                // Saat user memilih komplek dari list, pastikan form komplek baru tertutup
-                this.newKomplek.isSuccess = false;
-            },
-
             resetSelection(resetKecamatan = true) {
                  if (resetKecamatan) this.kecamatanId = '';
                  this.kelurahanId = '';
                  this.kompleksId = '';
                  this.kelurahans = [];
                  this.kompleksList = [];
-                 this.selectedKelurahanName = '';
-                 
-                 // Reset form komplek baru
-                 this.newKomplek.nama = '';
-                 this.newKomplek.alamat = '';
-                 this.newKomplek.hp = '';
-                 this.newKomplek.isSuccess = false;
-            },
-
-            // --- LOGIKA BARU: Submit Komplek Baru ---
-            submitKomplekBaru() {
-                // Validasi Sederhana
-                if(!this.newKomplek.nama || !this.newKomplek.alamat || !this.newKomplek.hp) {
-                    alert('Mohon lengkapi Nama Perumahan, Alamat, dan Nomor HP.');
-                    return;
-                }
-
-                this.newKomplek.isSubmitting = true;
-
-                // Kirim data via Fetch API
-                fetch('{{ route("komplek.baru.store") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // Ambil CSRF token dari meta tag
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({
-                        kecamatan_id: this.kecamatanId,
-                        kelurahan_id: this.kelurahanId,
-                        nama_komplek: this.newKomplek.nama,
-                        alamat: this.newKomplek.alamat,
-                        nomor_hp: this.newKomplek.hp
-                    })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error('Network response was not ok.');
-                })
-                .then(data => {
-                    // Sukses
-                    this.newKomplek.isSuccess = true;
-                    // Bersihkan form
-                    this.newKomplek.nama = '';
-                    this.newKomplek.alamat = '';
-                    this.newKomplek.hp = '';
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Terjadi kesalahan saat mengirim pengajuan. Silakan coba lagi.');
-                })
-                .finally(() => {
-                    this.newKomplek.isSubmitting = false;
-                });
             }
         }
     }

@@ -8,6 +8,7 @@
         "php": "^8.2",
         "doctrine/dbal": "^4.3",
         "filament/filament": "^3.2",
+        "filament/notifications": "^3.3",
         "google/apiclient": "^2.15",
         "guzzlehttp/guzzle": "^7.0.1",
         "konnco/filament-import": "^3.0",

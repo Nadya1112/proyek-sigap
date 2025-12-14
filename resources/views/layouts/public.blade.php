@@ -142,11 +142,11 @@
                                         <i data-feather="message-square" class="w-5 h-5"></i>
                                         <span>Pengaduan Saya</span>
                                     </a>
-                                    <a href="{{ route('user.dashboard') }}#daftar-komplek-baru" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-orange-500">
+                                    <!-- <a href="{{ route('user.dashboard') }}#daftar-komplek-baru" class="flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-orange-500">
                                         <i data-feather="home" class="w-5 h-5"></i>
                                         <span>Ajuan Komplek Baru</span>
                                     </a>
-                                    <div class="my-1 h-px bg-gray-200"></div>
+                                    <div class="my-1 h-px bg-gray-200"></div> -->
 
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
