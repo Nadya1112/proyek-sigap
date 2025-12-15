@@ -34,10 +34,11 @@ class Komplek extends Model
         // 'area', // Dinonaktifkan sementara
     ];
 
-    // Casts untuk 'area' dinonaktifkan sementara
-    // protected $casts = [
-    //     'area' => MultiPolygon::class,
-    // ];
+    protected $casts = [
+        'latitude' => 'integer',
+        'longitude' => 'integer',
+        // 'area' => MultiPolygon::class,
+    ];
 
     public function kelurahan(): BelongsTo
     {

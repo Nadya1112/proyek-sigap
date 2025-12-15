@@ -90,8 +90,8 @@ class KomplekImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
                 'fasilitas_umum'      => $row['fasilitas_umum'] ?? null,
                 'fasilitas_pendidikan'=> $row['fasilitas_pendidikan'] ?? null,
                 'fasilitas_kesehatan' => $row['fasilitas_kesehatan'] ?? null,
-                'latitude'            => isset($row['latitude']) && is_numeric($row['latitude']) ? (float) $row['latitude'] / 100000000 : null,
-                'longitude'           => isset($row['longitude']) && is_numeric($row['longitude']) ? (float) $row['longitude'] / 100000000 : null,
+                'latitude'            => isset($row['latitude']) && is_numeric($row['latitude']) ? (string) ($row['latitude']) : null,
+                'longitude'           => isset($row['longitude']) && is_numeric($row['longitude']) ? (string) ($row['longitude']) : null,
             ]
         );
 
