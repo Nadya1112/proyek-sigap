@@ -56,6 +56,8 @@ class KomplekResource extends Resource
             Forms\Components\TextInput::make('fasilitas_umum'),
             Forms\Components\TextInput::make('fasilitas_pendidikan'),
             Forms\Components\TextInput::make('fasilitas_kesehatan'),
+            Forms\Components\TextInput::make('latitude'),
+            Forms\Components\TextInput::make('longitude'),
         ]);
     }
 
@@ -83,6 +85,8 @@ class KomplekResource extends Resource
                 Tables\Columns\TextColumn::make('fasilitas_umum')->label('Fasilitas Umum'),
                 Tables\Columns\TextColumn::make('fasilitas_pendidikan')->label('Fasilitas Pendidikan'),
                 Tables\Columns\TextColumn::make('fasilitas_kesehatan')->label('Fasilitas Kesehatan'),
+                Tables\Columns\TextColumn::make('latitude')->label('Latitude'),
+                Tables\Columns\TextColumn::make('longitude')->label('Longitude'),
             ])
             ->filters([TrashedFilter::make()])
             ->headerActions([
@@ -92,7 +96,6 @@ class KomplekResource extends Resource
                 Action::make('importExcel')
                 ->label('Impor')
                 ->icon('heroicon-o-arrow-down-tray')
-                ->color('success')
                 ->form([
                     FileUpload::make('file_excel')
                         ->label('File Excel (.xlsx)')

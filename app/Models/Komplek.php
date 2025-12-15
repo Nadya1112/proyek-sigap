@@ -29,6 +29,8 @@ class Komplek extends Model
         'fasilitas_umum',
         'fasilitas_pendidikan',
         'fasilitas_kesehatan',
+        'latitude',
+        'longitude',
         // 'area', // Dinonaktifkan sementara
     ];
 
