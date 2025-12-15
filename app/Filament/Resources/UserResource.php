@@ -28,6 +28,8 @@ class UserResource extends Resource
     // PERMINTAAN 1: Mengganti judul
     protected static ?string $title = 'Pengguna';
     protected static ?string $navigationLabel = 'Pengguna';
+    protected static ?string $modelLabel = 'Pengguna';
+    protected static ?string $pluralModelLabel = 'Pengguna';
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
     public static function form(Form $form): Form {
@@ -115,10 +117,10 @@ class UserResource extends Resource
                 
                 Tables\Actions\DeleteAction::make()
                     ->visible(fn () => $user->isSuperAdmin()),
-                ForceDeleteAction::make()
-                    ->visible(fn () => $user->isSuperAdmin()),
-                RestoreAction::make()
-                    ->visible(fn () => $user->isSuperAdmin()),
+                // ForceDeleteAction::make()
+                //     ->visible(fn () => $user->isSuperAdmin()),
+                // RestoreAction::make()
+                //     ->visible(fn () => $user->isSuperAdmin()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
