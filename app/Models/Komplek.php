@@ -35,8 +35,8 @@ class Komplek extends Model
     ];
 
     protected $casts = [
-        'latitude' => 'integer',
-        'longitude' => 'integer',
+        'latitude' => 'float',
+        'longitude' => 'float',
         // 'area' => MultiPolygon::class,
     ];
 
