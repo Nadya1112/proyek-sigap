@@ -58,8 +58,8 @@
                 <p class="text-sm text-blue-700 mt-1 mb-3">Pastikan Anda memenuhi kriteria sebelum mengajukan proposal:</p>
                 <ul class="list-disc list-inside text-sm text-blue-700 space-y-1">
                     <li>Proposal diajukan oleh perwakilan resmi warga (RT/RW) atau Pengembang.</li>
-                    <li>Status aset PSU (lahan) perumahan **sudah diserahkan** kepada Pemerintah Kota.</li>
-                    <li>Menggunakan **template proposal** yang disediakan (dapat diunduh di Langkah 2).</li>
+                    <li>Status aset PSU (lahan) perumahan <strong>sudah diserahkan</strong> kepada Pemerintah Kota.</li>
+                    <li>Menggunakan <strong>template proposal</strong> yang disediakan (dapat diunduh di Langkah 2).</li>
                 </ul>
             </div>
         </div>
@@ -103,7 +103,7 @@
                               <div>
                                   <label for="kecamatan" class="form-label">1. Pilih Kecamatan</label>
                                   <select id="kecamatan" x-model="kecamatanId" @change="fetchKelurahans" class="form-input" :disabled="!!kompleksId">
-                                      <option value="">-Pilih Kecamatan-</option>
+                                      <option value="">Pilih Kecamatan</option>
                                       @foreach($kecamatans as $kecamatan)
                                         <option value="{{ $kecamatan->id }}">{{ $kecamatan->nama_kecamatan }}</option>
                                       @endforeach
@@ -113,7 +113,7 @@
                               <div>
                                   <label for="kelurahan" class="form-label">2. Pilih Kelurahan</label>
                                   <select id="kelurahan" x-model="kelurahanId" @change="fetchKompleks" class="form-input" :disabled="!kecamatanId || kelurahansLoading || !!kompleksId">
-                                      <option value="">-Pilih Kelurahan-</option>
+                                      <option value="">Pilih Kelurahan</option>
                                       <option x-show="kelurahansLoading" disabled>Memuat Kelurahan...</option>
                                       <template x-for="kelurahan in kelurahans" :key="kelurahan.id">
                                           <option :value="kelurahan.id" x-text="kelurahan.nama_kelurahan"></option>
@@ -125,9 +125,9 @@
                           <div x-show="kelurahanId" x-transition>
                               <label for="kompleks_select" class="form-label">3. Pilih Nama Perumahan</label>
                               <select id="kompleks_select" x-model="kompleksId" class="form-input" :disabled="!kelurahanId || kompleksLoading || !!kompleksId">
-                                  <option value="">-- Pilih Nama Komplek Perumahan --</option>
+                                  <option value="">Pilih Nama Komplek Perumahan</option>
                                   <option x-show="kompleksLoading" disabled>Memuat Komplek...</option>
-                                  <option x-show="isKompleksListEmpty" disabled value="">-Data Perumahan Tidak Ditemukan-</option>
+                                  <option x-show="isKompleksListEmpty" disabled value="">Pilih Nama Komplek Perumahan</option>
                                   <template x-for="komplek in kompleksList" :key="komplek.id">
                                       <option :value="komplek.id" x-text="komplek.nama_komplek"></option>
                                   </template>
