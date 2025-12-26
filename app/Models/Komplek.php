@@ -29,13 +29,16 @@ class Komplek extends Model
         'fasilitas_umum',
         'fasilitas_pendidikan',
         'fasilitas_kesehatan',
+        'latitude',
+        'longitude',
         // 'area', // Dinonaktifkan sementara
     ];
 
-    // Casts untuk 'area' dinonaktifkan sementara
-    // protected $casts = [
-    //     'area' => MultiPolygon::class,
-    // ];
+    protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
+        // 'area' => MultiPolygon::class,
+    ];
 
     public function kelurahan(): BelongsTo
     {

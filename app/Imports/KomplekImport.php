@@ -27,6 +27,8 @@ class KomplekImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
                 if (
                     !in_array('nama_komplek', $headings) ||
                     !in_array('nama_kelurahan', $headings) ||
+                    !in_array('latitude', $headings) ||
+                    !in_array('longitude', $headings) ||
                     in_array('nama_kecamatan', $headings)
                 ) {
                     throw ValidationException::withMessages([
@@ -42,6 +44,8 @@ class KomplekImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
         return [
             'nama_komplek'   => 'required|string',
             'nama_kelurahan' => 'required|string|exists:kelurahans,nama_kelurahan',
+            'latitude'       => 'required|numeric',
+            'longitude'      => 'required|numeric',
         ];
     }
 
@@ -51,6 +55,10 @@ class KomplekImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
             'nama_komplek.required'   => 'Kolom `nama_komplek` wajib diisi.',
             'nama_kelurahan.required' => 'Kolom `nama_kelurahan` wajib diisi.',
             'nama_kelurahan.exists'   => 'Kelurahan dengan nama `:input` tidak ditemukan di database.',
+            'latitude.required'       => 'Kolom `latitude` wajib diisi.',
+            'latitude.numeric'        => 'Kolom `latitude` harus berupa angka.',
+            'longitude.required'      => 'Kolom `longitude` wajib diisi.',
+            'longitude.numeric'       => 'Kolom `longitude` harus berupa angka.',
         ];
     }
 
@@ -82,6 +90,8 @@ class KomplekImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
                 'fasilitas_umum'      => $row['fasilitas_umum'] ?? null,
                 'fasilitas_pendidikan'=> $row['fasilitas_pendidikan'] ?? null,
                 'fasilitas_kesehatan' => $row['fasilitas_kesehatan'] ?? null,
+                'latitude'            => isset($row['latitude']) && is_numeric($row['latitude']) ? (string) ($row['latitude']) : null,
+                'longitude'           => isset($row['longitude']) && is_numeric($row['longitude']) ? (string) ($row['longitude']) : null,
             ]
         );
 

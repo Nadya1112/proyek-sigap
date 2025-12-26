@@ -780,7 +780,7 @@
         // --- FETCH DATA ---
         Promise.all([
             fetch('{{ url('/api/kompleks') }}').then(r => r.json()).then(d => {
-                if (d.features) {
+                if (d.features && d.features.length > 0) {
                     const geoJsonLayer = L.geoJSON(d, {
                         pane: 'paneKomplek',
                         pointToLayer: (f, latlng) => {
@@ -796,13 +796,14 @@
                             dataStore[p.id] = p;
                             searchableList.push({
                                 id: p.id,
-                                name: p.nama_perumahan,
+                                name: p.nama_komplek || p.nama_perumahan, // Support both field names
                                 lat: f.geometry.coordinates[1],
                                 lng: f.geometry.coordinates[0]
                             });
 
+                            const displayName = p.nama_komplek || p.nama_perumahan || '-';
                             const popupContent = `
-                                <div class="komplek-popup-title">${p.nama_perumahan}</div>
+                                <div class="komplek-popup-title">${displayName}</div>
                                 <div style="font-size:12px; color:#666;">
                                     <strong>Pengembang:</strong><br>
                                     ${(p.nama_pengembang || '-').replace(/;/g, '.')}
@@ -815,7 +816,10 @@
                         }
                     });
                     layers.komplek.addLayer(geoJsonLayer);
+                    console.log('Kompleks berhasil dimuat:', d.features.length, 'titik');
                 }
+            }).catch(err => {
+                console.error('Error loading kompleks:', err);
             }),
 
             fetch('{{ url('/api/kelurahan') }}').then(r => r.json()).then(d => {
@@ -858,64 +862,91 @@
                         }
                     }).addTo(layers.kelurahan);
                 }
+            }).catch(err => {
+                console.error('Error loading kelurahan:', err);
             }),
 
             fetch('{{ url('/api/kecamatan') }}').then(r => r.json()).then(d => {
                 const ul = document.getElementById('list-kecamatan');
                 if (d.features) d.features.forEach(f => {
-                    const nama = f.properties.nama_kecamatan; // Pastikan nama properti benar
-                    // Mengambil warna dari properti GeoJSON yang didapat dari API
-                    // Fallback ke oranye jika tidak ada warna di database
-                    const warna = f.properties.warna || '#F97316';
+                    try {
+                        const nama = f.properties.nama_kecamatan;
+                        const warna = f.properties.warna || '#F97316';
 
-                    layers.kecamatan[nama] = L.geoJSON(f, {
-                        pane: 'paneKecamatan',
-                        style: {
-                            color: warna,
-                            weight: 2,
-                            opacity: 1,
-                            fillColor: warna,
-                            fillOpacity: 0.75
-                        },
-                        onEachFeature: (feature, layer) => {
-                            layer.bindTooltip(nama, {
-                                permanent: true,
-                                direction: "center",
-                                className: "label-kecamatan"
-                            });
+                        // Skip jika geometry tidak valid
+                        if (!f.geometry || !f.geometry.type) {
+                            console.warn('Skipping kecamatan with invalid geometry:', nama);
+                            return;
                         }
-                    });
 
-                    const div = document.createElement('div');
-                    div.className = 'layer-item';
-                    div.innerHTML = `
-                        <input type="checkbox" value="${nama}" checked onchange="toggleKecamatan(this); checkMasterState();">
-                        <label>${nama}</label>
-                        <div class="legend-box" style="background:${warna}"></div>
-                    `;
-                    ul.appendChild(div);
-                    map.addLayer(layers.kecamatan[nama]);
+                        layers.kecamatan[nama] = L.geoJSON(f, {
+                            pane: 'paneKecamatan',
+                            style: {
+                                color: warna,
+                                weight: 2,
+                                opacity: 1,
+                                fillColor: warna,
+                                fillOpacity: 0.75
+                            },
+                            onEachFeature: (feature, layer) => {
+                                layer.bindTooltip(nama, {
+                                    permanent: true,
+                                    direction: "center",
+                                    className: "label-kecamatan"
+                                });
+                            }
+                        });
+
+                        const div = document.createElement('div');
+                        div.className = 'layer-item';
+                        div.innerHTML = `
+                            <input type="checkbox" value="${nama}" checked onchange="toggleKecamatan(this); checkMasterState();">
+                            <label>${nama}</label>
+                            <div class="legend-box" style="background:${warna}"></div>
+                        `;
+                        ul.appendChild(div);
+                        map.addLayer(layers.kecamatan[nama]);
+                    } catch (kecError) {
+                        console.error('Error processing kecamatan:', f.properties?.nama_kecamatan, kecError);
+                    }
                 });
+            }).catch(err => {
+                console.error('Error loading kecamatan:', err);
             })
-        ]).then(() => {
-            // Setelah semua data berhasil dimuat, cek parameter URL
+        ]).finally(() => {
+            // Selalu panggil checkUrlForDetail setelah semua fetch selesai (berhasil atau gagal)
             checkUrlForDetail();
-        }).catch(err => {
-            console.error("Gagal memuat data:", err);
         });
 
         function checkUrlForDetail() {
             const urlParams = new URLSearchParams(window.location.search);
-            const komplekId = urlParams.get('location');
+            const komplekIdStr = urlParams.get('location');
+
+            if (!komplekIdStr) return;
+
+            // Konversi ke integer karena ID dari database adalah integer
+            const komplekId = parseInt(komplekIdStr, 10);
+            
+            // Debug logging (bisa dihapus setelah fitur bekerja)
+            console.log('Mencari komplek ID:', komplekId);
+            console.log('Data tersedia:', Object.keys(dataStore).length, 'komplek');
+            console.log('Komplek ditemukan:', !!dataStore[komplekId]);
 
             if (komplekId && dataStore[komplekId]) {
                 const marker = markersById[komplekId];
                 if (marker) {
-                    map.flyTo(marker.getLatLng(), 18);
-                    layers.komplek.zoomToShowLayer(marker, function() {
-                        marker.openPopup();
-                    });
+                    // Gunakan setTimeout untuk memastikan peta sudah siap
+                    setTimeout(() => {
+                        map.flyTo(marker.getLatLng(), 18);
+                        layers.komplek.zoomToShowLayer(marker, function() {
+                            marker.openPopup();
+                        });
+                    }, 300);
+                } else {
+                    console.warn('Marker tidak ditemukan untuk ID:', komplekId);
                 }
+            } else {
+                console.warn('Komplek tidak ditemukan di dataStore untuk ID:', komplekId);
             }
         }
 
@@ -1023,8 +1054,12 @@
             }
 
             map.closePopup();
-            document.getElementById('m-title').innerText = d.nama_perumahan;
-            document.getElementById('m-alamat').innerText = (d.alamat || '-').replace(/;/g, '.');
+            // Support both field names
+            const namaKomplek = d.nama_komplek || d.nama_perumahan || '-';
+            const alamatKomplek = d.alamat_komplek || d.alamat || '-';
+            
+            document.getElementById('m-title').innerText = namaKomplek;
+            document.getElementById('m-alamat').innerText = alamatKomplek.replace(/;/g, '.');
             document.getElementById('m-kelurahan').innerText = (d.nama_kelurahan || '-').replace(/;/g, '.');
             document.getElementById('m-sertifikat').innerText = (d.jumlah_sertifikat != null ? d.jumlah_sertifikat :
                 '-');

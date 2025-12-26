@@ -21,7 +21,7 @@ class DokumenRegulasiResource extends Resource
     protected static ?string $model = Regulasi::class;
     protected static ?string $slug = 'dokumen-regulasi';
     protected static ?string $navigationIcon = 'heroicon-o-folder-open';
-    protected static ?string $navigationLabel = 'Dokumen Regulasi';
+    protected static ?string $navigationLabel = 'Regulasi';
     protected static ?string $navigationGroup = 'Manajemen Admin';
     protected static ?int $navigationSort = 3;
 
