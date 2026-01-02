@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('kelurahans', function (Blueprint $table) {
-            //
-        });
+        // Soft deletes sudah ditambahkan di migrasi create_kelurahans
     }
 
     /**
@@ -21,8 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('kelurahans', function (Blueprint $table) {
-            //
-        });
+        //
     }
 };

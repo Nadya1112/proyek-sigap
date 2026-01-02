@@ -35,6 +35,15 @@ class KomplekResource extends Resource
     protected static ?string $navigationGroup = 'Informasi FASUM';
     protected static ?string $title = 'Komplek';
     protected static ?string $navigationIcon = 'heroicon-o-home-modern';
+    
+    // Label untuk tombol create
+    protected static ?string $modelLabel = 'Komplek Perumahan';
+    protected static ?string $pluralModelLabel = 'Komplek Perumahan';
+    
+    public static function getCreateButtonLabel(): string
+    {
+        return 'Buat Komplek Perumahan';
+    }
 
     public static function form(Form $form): Form
     {
@@ -96,6 +105,7 @@ class KomplekResource extends Resource
                 Action::make('importExcel')
                 ->label('Impor')
                 ->icon('heroicon-o-arrow-down-tray')
+                ->color('success')
                 ->form([
                     FileUpload::make('file_excel')
                         ->label('File Excel (.xlsx)')

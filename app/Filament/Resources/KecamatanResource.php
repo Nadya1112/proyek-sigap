@@ -36,6 +36,15 @@ class KecamatanResource extends Resource
     protected static ?string $title = 'Kecamatan';
     protected static ?string $navigationLabel = 'Kecamatan';
     protected static ?string $navigationIcon = 'heroicon-o-map-pin';
+    
+    // Label untuk tombol create
+    protected static ?string $modelLabel = 'Kecamatan';
+    protected static ?string $pluralModelLabel = 'Kecamatan';
+    
+    public static function getCreateButtonLabel(): string
+    {
+        return 'Buat Kecamatan';
+    }
     public static function form(Form $form): Form
     {
         return $form

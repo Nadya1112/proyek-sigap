@@ -8,11 +8,13 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('kompleks_id')->constrained('kompleks')->cascadeOnDelete();
-            $table->string('nama_pengaju');
+            $table->string('nama_pengaju', 100);
             $table->string('kontak_pengaju', 20);
-            $table->string('dokumen_proposal');
+            $table->string('alamat', 255)->nullable();
+            $table->string('proposal', 255);
             $table->text('catatan')->nullable();
-            $table->enum('status', ['Diajukan', 'Diverifikasi', 'Disetujui', 'Ditolak'])->default('Diajukan');
+            $table->enum('status', ['Diajukan', 'Diverifikasi JF', 'Disetujui Kabid', 'Disetujui Kadis', 'Ditolak'])->default('Diajukan');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

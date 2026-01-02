@@ -54,7 +54,7 @@ class PengaduanObserver
         if ($pengaduan->user) {
             Notification::make()
                 ->title('Pengaduan Berhasil Diajukan')
-                ->body('Terima kasih, pengaduan Anda telah kami terima dan akan segera ditinjau.')
+                ->body('Terima kasih, pengaduan Anda telah anda diajukan dan akan segera ditinjau.')
                 ->icon('heroicon-o-chat-bubble-bottom-center-text')
                 ->iconColor('success')
                 ->sendToDatabase($pengaduan->user);

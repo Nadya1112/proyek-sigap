@@ -10,12 +10,13 @@ return new class extends Migration
     {
         Schema::create('regulasis', function (Blueprint $table) {
             $table->id();
-            $table->string('judul');
-            $table->integer('tahun')->nullable();
-            $table->string('path'); // Untuk menyimpan lokasi file di storage/app/public/regulasi
-            $table->string('nama_file_asli');
-            $table->string('tipe_file');
-            $table->unsignedInteger('ukuran_file'); // dalam kilobyte (KB)
+            $table->string('judul', 150);
+            $table->integer('tahun')->nullable(); // Menyimpan tahun (misal: 2025)
+            $table->string('path', 255); // Untuk menyimpan lokasi file di storage/app/public/regulasi
+            $table->string('nama_file_asli', 255);
+            $table->string('tipe_file', 50);
+            $table->integer('ukuran_file'); // dalam kilobyte (KB)
+            $table->softDeletes();
             $table->timestamps();
         });
     }

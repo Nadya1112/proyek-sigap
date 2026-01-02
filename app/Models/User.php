@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\ResetPasswordNotification;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -87,5 +88,17 @@ class User extends Authenticatable implements FilamentUser
     public function pengaduans(): HasMany
     {
         return $this->hasMany(Pengaduan::class, 'user_id');
+    }
+
+    /**
+     * Override method untuk mengirim notifikasi reset password.
+     * Menggunakan custom notification yang menghasilkan URL yang benar.
+     *
+     * @param string $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }

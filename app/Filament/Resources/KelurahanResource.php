@@ -35,6 +35,15 @@ class KelurahanResource extends Resource
     protected static ?string $navigationGroup = 'Informasi FASUM';
     protected static ?string $title = 'Kelurahan';
     protected static ?string $navigationIcon = 'heroicon-o-map';
+    
+    // Label untuk tombol create
+    protected static ?string $modelLabel = 'Kelurahan';
+    protected static ?string $pluralModelLabel = 'Kelurahan';
+    
+    public static function getCreateButtonLabel(): string
+    {
+        return 'Buat Kelurahan';
+    }
 
     public static function form(Form $form): Form
     {

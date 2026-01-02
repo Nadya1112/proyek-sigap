@@ -31,22 +31,24 @@ class PengaduanController extends Controller
         }
 
         $validated = $request->validate([
-            'nama_pelapor'   => 'required|string|max:255',
-            'kontak_pelapor' => 'required|string|max:20',
-            'isi_pengaduan'  => 'required|string',
-            'bukti_foto'     => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'nama_pelapor'     => 'required|string|max:255',
+            'kontak_pelapor'   => 'required|string|max:20',
+            'judul_pengaduan'  => 'required|string|max:255',
+            'isi_pengaduan'    => 'required|string',
+            'bukti_foto'       => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         // Ini akan menyimpan path sebagai pengaduan/foto.jpg
         $path = $request->file('bukti_foto')->store('pengaduan', 'public'); 
 
         Pengaduan::create([
-            'nama_pelapor'   => $validated['nama_pelapor'],
-            'kontak_pelapor' => $validated['kontak_pelapor'],
-            'isi_pengaduan'  => $validated['isi_pengaduan'],
-            'bukti_foto'     => $path,
-            'user_id'        => Auth::id(),
-            'status'         => Pengaduan::STATUS_DIAJUKAN,
+            'nama_pelapor'     => $validated['nama_pelapor'],
+            'kontak_pelapor'   => $validated['kontak_pelapor'],
+            'judul_pengaduan'  => $validated['judul_pengaduan'],
+            'isi_pengaduan'    => $validated['isi_pengaduan'],
+            'bukti_foto'       => $path,
+            'user_id'          => Auth::id(),
+            'status'           => Pengaduan::STATUS_DIAJUKAN,
         ]);
 
         return redirect()->back()->with('success', 'Pengaduan Anda berhasil diajukan! Terima kasih.');

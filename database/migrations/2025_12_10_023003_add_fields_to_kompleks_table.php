@@ -11,15 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('kompleks', function (Blueprint $table) {
-            $table->string('nama_pengembang')->nullable()->after('nama_komplek');
-            $table->text('alamat_komplek')->nullable()->after('nama_pengembang');
-            $table->integer('jumlah_unit')->nullable()->after('jumlah_sertifikat');
-            $table->string('fasilitas_ibadah')->nullable()->after('status_aset');
-            $table->string('fasilitas_umum')->nullable()->after('fasilitas_ibadah');
-            $table->string('fasilitas_pendidikan')->nullable()->after('fasilitas_umum');
-            $table->string('fasilitas_kesehatan')->nullable()->after('fasilitas_pendidikan');
-        });
+        // Kolom-kolom ini sudah digabungkan ke migrasi create_kompleks dengan tipe yang rasional
     }
 
     /**
@@ -27,16 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('kompleks', function (Blueprint $table) {
-            $table->dropColumn([
-                'nama_pengembang',
-                'alamat_komplek',
-                'jumlah_unit',
-                'fasilitas_ibadah',
-                'fasilitas_umum',
-                'fasilitas_pendidikan',
-                'fasilitas_kesehatan',
-            ]);
-        });
+        //
     }
 };

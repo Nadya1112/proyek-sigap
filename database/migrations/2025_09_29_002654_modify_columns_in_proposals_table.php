@@ -12,16 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('proposals', function (Blueprint $table) {
-            // 1. Tambahkan kolom 'nama_perumahan' setelah 'kontak_pengaju'
-            $table->string('nama_perumahan')->after('kontak_pengaju');
-
-            // 2. Tambahkan kolom 'alamat' setelah 'nama_perumahan'
-            $table->string('alamat')->after('nama_perumahan');
-            
-            // 3. Ubah nama kolom 'dokumen_proposal' menjadi 'proposal'
-            $table->renameColumn('dokumen_proposal', 'proposal');
-        });
+        // Kolom sudah disesuaikan di migrasi create_proposals
     }
 
     /**
@@ -30,12 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('proposals', function (Blueprint $table) {
-            // 1. Kembalikan nama kolom 'proposal' menjadi 'dokumen_proposal'
-            $table->renameColumn('proposal', 'dokumen_proposal');
-            
-            // 2. Hapus kedua kolom yang tadi ditambahkan
-            $table->dropColumn(['alamat', 'nama_perumahan']);
-        });
+        //
     }
 };

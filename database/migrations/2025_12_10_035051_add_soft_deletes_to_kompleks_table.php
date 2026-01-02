@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('kompleks', function (Blueprint $table) {
-            $table->softDeletes();
-        });
+        // Soft deletes sudah ditambahkan di migrasi create_kompleks
     }
 
     /**
@@ -21,8 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('kompleks', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        //
     }
 };

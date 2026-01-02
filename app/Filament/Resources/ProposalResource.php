@@ -179,17 +179,17 @@ class ProposalResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nama_pengaju')->searchable(),
+                Tables\Columns\TextColumn::make('nama_pengaju')->label('Nama Pengaju')->searchable(),
                 Tables\Columns\TextColumn::make('komplek.nama_komplek')->label('Nama Komplek')->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        Proposal::STATUS_DIAJUKAN => 'warning',
-                        Proposal::STATUS_DITERIMA => 'info',
-                        Proposal::STATUS_DIVERIFIKASI_JF => 'primary',
-                        Proposal::STATUS_DISETUJUI_KABID => 'success',
-                        Proposal::STATUS_DISETUJUI_KADIS => 'success',
-                        Proposal::STATUS_DITOLAK => 'danger',
+                        Proposal::STATUS_DIAJUKAN => 'gray',        
+                        Proposal::STATUS_DITERIMA => 'primary',           
+                        Proposal::STATUS_DIVERIFIKASI_JF => 'info', 
+                        Proposal::STATUS_DISETUJUI_KABID => 'success',    
+                        Proposal::STATUS_DISETUJUI_KADIS => 'success', 
+                        Proposal::STATUS_DITOLAK => 'danger',          
                         default => 'gray',
                     })
                     ->searchable(),
@@ -201,20 +201,21 @@ class ProposalResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
-                    ->visible(fn (User $user) => $user->isSuperAdmin()),
+                    ->visible(fn () => auth()->user()->isSuperAdmin()),
                 ForceDeleteAction::make()
-                    ->visible(fn (User $user) => $user->isSuperAdmin()),
-                RestoreAction::make()
-                    ->visible(fn (User $user) => $user->isSuperAdmin()),
+                    ->label('Hapus Permanen')
+                    ->visible(fn () => auth()->user()->isSuperAdmin()),
+                // RestoreAction::make()
+                //     ->visible(fn () => auth()->user()->isSuperAdmin()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->visible(fn (User $user) => $user->isSuperAdmin()),
+                        ->visible(fn () => auth()->user()->isSuperAdmin()),
                     ForceDeleteBulkAction::make()
-                        ->visible(fn (User $user) => $user->isSuperAdmin()),
+                        ->visible(fn () => auth()->user()->isSuperAdmin()),
                     RestoreBulkAction::make()
-                        ->visible(fn (User $user) => $user->isSuperAdmin()),
+                        ->visible(fn () => auth()->user()->isSuperAdmin()),
                 ]),
             ]);
     }

@@ -24,6 +24,15 @@ class DokumenRegulasiResource extends Resource
     protected static ?string $navigationLabel = 'Regulasi';
     protected static ?string $navigationGroup = 'Manajemen Admin';
     protected static ?int $navigationSort = 3;
+    
+    // Label untuk tombol create
+    protected static ?string $modelLabel = 'Regulasi';
+    protected static ?string $pluralModelLabel = 'Regulasi';
+    
+    public static function getCreateButtonLabel(): string
+    {
+        return 'Buat Regulasi';
+    }
 
     public static function form(Form $form): Form
     {
@@ -38,6 +47,8 @@ class DokumenRegulasiResource extends Resource
                 
                 Forms\Components\Select::make('jenis_dokumen')
                     ->options([
+                        'Undang-Undang' => 'Undang-Undang',
+                        'SK' => 'Surat Keputusan (SK)',
                         'Perda' => 'Perda (Peraturan Daerah)',
                         'Perkada' => 'Perkada (Peraturan Kepala Daerah)',
                         'SOP' => 'SOP (Standar Operasional Prosedur)',

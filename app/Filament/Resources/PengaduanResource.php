@@ -69,6 +69,7 @@ class PengaduanResource extends Resource
                 
                 Forms\Components\Section::make('Detail Pengaduan')
                     ->schema([
+                        Forms\Components\TextInput::make('judul_pengaduan')->disabled()->label('Judul Pengaduan')->columnSpanFull(),
                         Forms\Components\Textarea::make('isi_pengaduan')->disabled()->columnSpanFull(),
                         Forms\Components\FileUpload::make('bukti_foto')->image()->disabled()->label('Bukti Foto')->disk('public'),
                     ]),
@@ -136,17 +137,18 @@ class PengaduanResource extends Resource
             ->query(self::getEloquentQuery()) 
             ->columns([
                 Tables\Columns\TextColumn::make('nama_pelapor')->searchable(),
+                Tables\Columns\TextColumn::make('judul_pengaduan')->label('Judul Pengaduan')->searchable()->limit(40),
                 Tables\Columns\ImageColumn::make('bukti_foto')->label('Bukti')->disk('public'),
-                Tables\Columns\TextColumn::make('isi_pengaduan')->limit(50)->wrap(),
+                Tables\Columns\TextColumn::make('isi_pengaduan')->label('Isi')->limit(30)->wrap()->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        Pengaduan::STATUS_DIAJUKAN => 'warning',
-                        Pengaduan::STATUS_DITERIMA => 'info',
-                        Pengaduan::STATUS_DIVERIFIKASI_JF => 'primary',
-                        Pengaduan::STATUS_DISETUJUI_KABID => 'success',
-                        Pengaduan::STATUS_DISETUJUI_KADIS => 'success',
-                        Pengaduan::STATUS_DITOLAK => 'danger',
+                        Pengaduan::STATUS_DIAJUKAN => 'gray',        // Kuning/Orange - Menunggu
+                        Pengaduan::STATUS_DITERIMA => 'primary',           // Biru Muda - Diterima Staff
+                        Pengaduan::STATUS_DIVERIFIKASI_JF => 'info', // Biru - Diverifikasi JF
+                        Pengaduan::STATUS_DISETUJUI_KABID => 'success',    // Abu-abu/Slate - Disetujui Kabid
+                        Pengaduan::STATUS_DISETUJUI_KADIS => 'success', // Hijau - Final/Selesai
+                        Pengaduan::STATUS_DITOLAK => 'danger',          // Merah - Ditolak
                         default => 'gray',
                     })
                     ->searchable(),
@@ -157,21 +159,22 @@ class PengaduanResource extends Resource
             ])
            ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->visible(fn (User $user) => $user->isSuperAdmin()),
+                // Tables\Actions\DeleteAction::make()
+                //     ->visible(fn () => auth()->user()->isSuperAdmin()),
                 ForceDeleteAction::make()
-                    ->visible(fn (User $user) => $user->isSuperAdmin()),
-                RestoreAction::make()
-                    ->visible(fn (User $user) => $user->isSuperAdmin()),
+                    ->label('Hapus Permanen')
+                    ->visible(fn () => auth()->user()->isSuperAdmin()),
+                // RestoreAction::make()
+                //     ->visible(fn () => auth()->user()->isSuperAdmin()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn (User $user) => $user->isSuperAdmin()),
+                        ->visible(fn () => auth()->user()->isSuperAdmin()),
                     ForceDeleteBulkAction::make()
-                        ->visible(fn (User $user) => $user->isSuperAdmin()),
+                        ->visible(fn () => auth()->user()->isSuperAdmin()),
                     RestoreBulkAction::make()
-                        ->visible(fn (User $user) => $user->isSuperAdmin()),
+                        ->visible(fn () => auth()->user()->isSuperAdmin()),
                 ]),
             ]);
     }

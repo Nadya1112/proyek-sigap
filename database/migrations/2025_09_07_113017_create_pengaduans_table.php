@@ -7,11 +7,14 @@ return new class extends Migration {
         Schema::create('pengaduans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('nama_pelapor');
+            $table->string('nama_pelapor', 100);
             $table->string('kontak_pelapor', 20);
+            $table->string('judul_pengaduan', 150);
             $table->text('isi_pengaduan');
-            $table->string('bukti_foto');
-            $table->enum('status', ['Diterima', 'Diproses', 'Selesai'])->default('Diterima');
+            $table->string('bukti_foto', 255);
+            $table->enum('status', ['Diajukan', 'Diverifikasi JF', 'Disetujui Kabid', 'Disetujui Kadis', 'Ditolak'])->default('Diajukan');
+            $table->text('catatan_admin')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

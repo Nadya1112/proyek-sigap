@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('kecamatans', function (Blueprint $table) {
-            $table->softDeletes();
-        });
+        // Soft deletes sudah ditambahkan di migrasi create_kecamatans
     }
 
     /**
@@ -21,8 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('kecamatans', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        //
     }
 };

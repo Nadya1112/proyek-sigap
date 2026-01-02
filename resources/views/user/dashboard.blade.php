@@ -123,8 +123,8 @@
     @endphp
     <div class="py-4 border-b border-gray-100 flex items-center justify-between gap-4">
         <div class="min-w-0">
-             {{-- Asumsi $row->judul tidak ada, ganti dengan isi pengaduan --}}
-            <p class="text-sm font-semibold text-gray-800 truncate">{{ Str::limit($row->isi_pengaduan, 50) }}</p>
+             {{-- Tampilkan judul pengaduan, fallback ke isi pengaduan jika tidak ada --}}
+            <p class="text-sm font-semibold text-gray-800 truncate">{{ $row->judul_pengaduan ?? Str::limit($row->isi_pengaduan, 50) }}</p>
             <p class="text-xs text-gray-500 mt-1">Dibuat pada: {{ \Carbon\Carbon::parse($row->created_at)->format('d M Y, H:i') }}</p>
         </div>
         <span class="px-3 py-1 text-xs font-medium rounded-full flex-shrink-0 {{ $colorClass }}">

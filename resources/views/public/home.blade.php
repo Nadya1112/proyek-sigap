@@ -50,7 +50,7 @@
                         <div class="cta-primary-hover"></div>
                     </a>
 
-                    <a href="{{ route('kontak') }}" class="cta-secondary">
+                    <a href="#kontak" class="cta-secondary">
                         Pelajari Lebih Lanjut
                     </a>
                 </div>

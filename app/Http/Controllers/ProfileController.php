@@ -45,6 +45,7 @@ class ProfileController extends Controller
 
     /**
      * METHOD BARU: Mengirim link reset password ke email pengguna yang sedang login.
+     * Menggunakan notification khusus yang mengarah ke halaman profil.
      */
     public function sendResetLink(Request $request)
     {
@@ -56,14 +57,13 @@ class ProfileController extends Controller
             return back()->withErrors(['email' => 'Alamat email tidak cocok dengan akun Anda.']);
         }
 
-        // Kirim link reset menggunakan sistem bawaan Laravel
-        $status = Password::sendResetLink($request->only('email'));
+        // Buat token reset password
+        $token = Password::broker()->createToken($user);
 
-        if ($status == Password::RESET_LINK_SENT) {
-            return back()->with('status', 'password-link-sent');
-        }
+        // Kirim notification custom yang mengarah ke halaman profil
+        $user->notify(new \App\Notifications\ProfileResetPasswordNotification($token));
 
-        return back()->withErrors(['email' => __($status)]);
+        return back()->with('status', 'password-link-sent');
     }
 
     /**

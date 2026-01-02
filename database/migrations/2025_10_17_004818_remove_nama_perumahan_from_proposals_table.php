@@ -7,17 +7,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('proposals', function (Blueprint $table) {
-            // Hapus kolom 'nama_perumahan'
-            $table->dropColumn('nama_perumahan');
-        });
+        // Kolom nama_perumahan tidak lagi ditambahkan, jadi tidak perlu dihapus
     }
 
     public function down(): void
     {
-        Schema::table('proposals', function (Blueprint $table) {
-            // Sediakan cara untuk mengembalikannya jika migrasi di-rollback
-            $table->string('nama_perumahan')->after('kontak_pengaju');
-        });
+        //
     }
 };

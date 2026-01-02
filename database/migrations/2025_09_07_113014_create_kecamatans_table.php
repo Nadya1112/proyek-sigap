@@ -10,9 +10,10 @@ return new class extends Migration
     {
         Schema::create('kecamatans', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_kecamatan')->unique();
-            $table->string('warna')->nullable();
-            $table->json('geometri'); // Kolom untuk menyimpan data GeoJSON polygon
+            $table->string('nama_kecamatan', 100)->unique();
+            $table->string('warna', 10)->nullable();
+            $table->json('geometri')->nullable(); // Kolom untuk menyimpan data GeoJSON polygon
+            $table->softDeletes();
             $table->timestamps();
         });
     }

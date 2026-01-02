@@ -122,8 +122,17 @@
                         </div>
 
                         <div>
+                            <label for="judul_pengaduan" class="form-label">Judul Pengaduan</label>
+                            <input type="text" id="judul_pengaduan" name="judul_pengaduan" class="form-input"
+                                value="{{ old('judul_pengaduan') }}" placeholder="Contoh: Kerusakan Jalan di Komplek A" required>
+                            @error('judul_pengaduan')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
                             <label for="isi_pengaduan" class="form-label">Isi Pengaduan</label>
-                            <textarea id="isi_pengaduan" name="isi_pengaduan" rows="5" class="form-input" required>{{ old('isi_pengaduan') }}</textarea>
+                            <textarea id="isi_pengaduan" name="isi_pengaduan" rows="5" class="form-input" placeholder="Jelaskan detail pengaduan Anda..." required>{{ old('isi_pengaduan') }}</textarea>
                             @error('isi_pengaduan')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror

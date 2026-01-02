@@ -55,7 +55,7 @@
                     <a href="{{ route('regulasi') }}" class="nav-link {{ request()->routeIs('regulasi*') ? 'active' : '' }}">
                         Regulasi
                     </a>
-                    <a href="{{ route('home') }}#kontak" class="nav-link {{ request()->routeIs('kontak') ? 'active' : '' }}">
+                    <a href="#kontak" class="nav-link">
                         Kontak
                     </a>
                 </div>

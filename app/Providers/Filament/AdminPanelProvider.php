@@ -39,6 +39,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->authGuard('web')
             ->databaseNotifications()
             ->colors([
                 'primary' => Color::Amber,
